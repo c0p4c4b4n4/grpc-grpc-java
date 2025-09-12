@@ -1,3 +1,0 @@
-FROM openjdk:17-bullseye
-COPY target/grpc-sample-1.0-SNAPSHOT.jar .
-ENTRYPOINT ["java","-jar","grpc-sample-1.0-SNAPSHOT.jar"]

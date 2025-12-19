@@ -8,36 +8,27 @@ import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class Echo3Client {
 
     public static void main(String[] args) throws Exception {
-        String target = "localhost:50051";
-        ManagedChannel channel = Grpc.newChannelBuilder(target, InsecureChannelCredentials.create())
-            .build();
-
-        CountDownLatch finishLatch = new CountDownLatch(1);
+        ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
 
         EchoServiceGrpc.EchoServiceFutureStub futureStub = EchoServiceGrpc.newFutureStub(channel);
-        ListenableFuture<EchoResponse> responseFuture = futureStub.unaryEcho(EchoRequest.newBuilder().setMessage("world").build());
+        EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
+        ListenableFuture<EchoResponse> responseFuture = futureStub.unaryEcho(request);
         Futures.addCallback(responseFuture, new FutureCallback<EchoResponse>() {
             @Override
             public void onSuccess(EchoResponse result) {
                 System.out.println(result.getMessage());
-                finishLatch.countDown();
             }
 
             @Override
             public void onFailure(Throwable t) {
-                finishLatch.countDown();
+                System.out.println("error: " + t);
             }
         }, MoreExecutors.directExecutor());
-
-        if (!finishLatch.await(1, TimeUnit.MINUTES)) {
-            System.err.println("Calls did not finish within timeout.");
-        }
 
         channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
     }

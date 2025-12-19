@@ -25,19 +25,20 @@ public class Echo2Client {
 
                 @Override
                 public void onError(Throwable t) {
-                    finishLatch.countDown();
+//                    finishLatch.countDown();
                 }
 
                 @Override
                 public void onCompleted() {
-                    finishLatch.countDown();
+//                    finishLatch.countDown();
                 }
             });
 
-        if (!finishLatch.await(1, TimeUnit.MINUTES)) {
-            System.err.println("Calls did not finish within timeout.");
-        }
-
         channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+//        if (!finishLatch.await(1, TimeUnit.MINUTES)) {
+//            System.err.println("Calls did not finish within timeout.");
+//        }
+//
+//        channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
     }
 }

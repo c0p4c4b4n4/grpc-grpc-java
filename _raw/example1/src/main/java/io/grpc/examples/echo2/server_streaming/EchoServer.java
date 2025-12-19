@@ -21,7 +21,7 @@ public class EchoServer {
         @Override
         public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
             for (int i = 1; i <= 5; i++) {
-                String value = "Echo [" + i + "]: " + request.getMessage();
+                String value = "echo [" + i + "]: " + request.getMessage();
                 EchoResponse response = EchoResponse.newBuilder().setMessage(value).build();
                 responseObserver.onNext(response);
             }

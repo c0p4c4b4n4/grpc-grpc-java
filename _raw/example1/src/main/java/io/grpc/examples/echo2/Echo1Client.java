@@ -3,7 +3,6 @@ package io.grpc.examples.echo2;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusException;
 import io.grpc.StatusRuntimeException;
 
@@ -14,15 +13,10 @@ public class Echo1Client {
             .build();
 
         try {
-            EchoServiceGrpc.EchoServiceBlockingV2Stub blockingV2Stub =       EchoServiceGrpc.newBlockingV2Stub(channel);
-
-            EchoRequest request = EchoRequest.newBuilder()                .setMessage("wolld")                .build();
-
-            // Execute the unary call (this blocks until response is received)
-            System.out.println("Sending Unary request via V2 stub...");
+            EchoServiceGrpc.EchoServiceBlockingV2Stub blockingV2Stub = EchoServiceGrpc.newBlockingV2Stub(channel);
+            EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
             EchoResponse response = blockingV2Stub.unaryEcho(request);
-
-            System.out.println("Response received: " + response.getMessage());
+            System.out.println(response.getMessage());
 
         } catch (StatusRuntimeException e) {
             System.err.println("RPC failed: " + e.getStatus());

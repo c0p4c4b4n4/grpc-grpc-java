@@ -1,0 +1,30 @@
+In gRPC-Java, whether you catch StatusRuntimeException or StatusException depends strictly on which stub you are using. In most production scenarios, catching StatusRuntimeException is sufficient.
+1. When to catch StatusRuntimeException (Unchecked)
+This is the most common exception in gRPC-Java and is thrown by:
+Standard Blocking Stubs (V1): The traditional newBlockingStub only throws StatusRuntimeException.
+Unary Calls in V2 Blocking Stubs: For simple one-request/one-response calls, the V2 stub behaves like V1 and uses the unchecked runtime version.
+Async/Future Stubs: When these calls fail, the error delivered to onError(Throwable t) or the ExecutionException cause is typically a StatusRuntimeException.
+2. When to catch StatusException (Checked)
+You must handle StatusException specifically when using the Blocking V2 Stub for Streaming:
+Client & Bidirectional Streaming (V2): The modern V2 blocking API uses checked StatusException for streaming methods to force developers to handle potential network or stream failures explicitly.
+Manual Conversions: If you are using lower-level gRPC utilities that favor checked exceptions for safety, you will encounter this type.
+Summary Comparison Table
+Call Type	Stub Type	Primary Exception to Catch
+Unary	Blocking V1 or V2	StatusRuntimeException
+Server Streaming	Blocking V1	StatusRuntimeException
+Any Streaming	Blocking V2	StatusException (Checked)
+Async Callbacks	Async Stub	StatusRuntimeException (via onError)
+Best Practice: Catch Both or Use Status.fromThrowable()
+Since both exceptions contain the same underlying Status information (error code and description), the most robust way to handle errors without worrying about the specific exception type is to use the Status helper:
+java
+try {
+    // Your gRPC call here
+} catch (Exception e) {
+    // Automatically extracts Status from StatusException OR StatusRuntimeException
+    Status status = Status.fromThrowable(e);
+    System.out.println("Error Code: " + status.getCode());
+    System.out.println("Description: " + status.getDescription());
+}
+Use code with caution.
+
+This approach works across all stubs and avoids complex multi-catch blocks.

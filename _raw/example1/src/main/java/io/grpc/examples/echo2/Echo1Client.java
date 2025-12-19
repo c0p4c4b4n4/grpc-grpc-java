@@ -12,11 +12,7 @@ public class Echo1Client {
             .build();
 
         EchoServiceGrpc.EchoServiceBlockingStub blockingStub = EchoServiceGrpc.newBlockingStub(channel);
-        EchoRequest request = EchoRequest
-            .newBuilder()
-            .setMessage("world")
-            .build();
-        EchoResponse response = blockingStub.unaryEcho(request);
+        EchoResponse response = blockingStub.unaryEcho(EchoRequest.newBuilder().setMessage("world").build());
         System.out.println(response.getMessage());
     }
 }

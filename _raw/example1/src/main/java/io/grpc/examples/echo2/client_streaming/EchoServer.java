@@ -21,17 +21,24 @@ public class EchoServer {
         @Override
         public StreamObserver<EchoRequest> clientStreamingEcho(StreamObserver<EchoResponse> responseObserver) {
             return new StreamObserver<EchoRequest>() {
-                StringBuilder summary = new StringBuilder();
+                StringBuilder result = new StringBuilder();
 
-                @Override public void onNext(EchoRequest req) {
-                    summary.append(req.getMessage()).append(" ");
+                @Override
+                public void onNext(EchoRequest request) {
+                    String message = request.getMessage();
+                    System.out.println("server next: " + message);
+                    result.append(message).append(" ");
                 }
 
-                @Override public void onError(Throwable t) { t.printStackTrace(); }
+                @Override
+                public void onError(Throwable t) {
+                    System.out.println("server error: " + t);
+                }
 
-                @Override public void onCompleted() {
+                @Override
+                public void onCompleted() {
                     responseObserver.onNext(EchoResponse.newBuilder()
-                        .setMessage("received: " + summary.toString().trim())
+                        .setMessage("server completed: " + result.toString().trim())
                         .build());
                     responseObserver.onCompleted();
                 }

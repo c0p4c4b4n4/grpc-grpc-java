@@ -19,8 +19,8 @@ public class EchoServer {
 
     static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
         @Override
-        public void unaryEcho(EchoRequest req, StreamObserver<EchoResponse> responseObserver) {
-            EchoResponse reply = EchoResponse.newBuilder().setMessage("hello " + req.getMessage()).build();
+        public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
+            EchoResponse reply = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
             responseObserver.onNext(reply);
             responseObserver.onCompleted();
         }

@@ -1,4 +1,4 @@
-package io.grpc.examples.echo2.unary;
+package io.grpc.examples.echo2.client_streaming;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;

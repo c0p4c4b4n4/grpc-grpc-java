@@ -6,22 +6,36 @@ import io.grpc.ManagedChannel;
 import io.grpc.examples.echo2.EchoRequest;
 import io.grpc.examples.echo2.EchoResponse;
 import io.grpc.examples.echo2.EchoServiceGrpc;
+import io.grpc.stub.StreamObserver;
 
-import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 public class Echo2Client {
 
-    public static void main(String[] args) throws InterruptedException{
+    public static void main(String[] args) throws InterruptedException {
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
 
-        EchoServiceGrpc.EchoServiceBlockingStub blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+        EchoServiceGrpc.EchoServiceStub asyncStub = EchoServiceGrpc.newStub(channel);
         EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
-        Iterator<EchoResponse> responses = blockingStub.serverStreamingEcho(            request);
+        asyncStub.serverStreamingEcho(
+            request,
+            new StreamObserver<EchoResponse>() {
+                @Override
+                public void onNext(EchoResponse value) {
+                    System.out.println("async received: " + value.getMessage());
+                }
 
-        while (responses.hasNext()) {
-            System.out.println("received: " + responses.next().getMessage());
-        }
+                @Override
+                public void onError(Throwable t) {
+                    System.out.println("error: " + t);
+                }
+
+                @Override
+                public void onCompleted() {
+                    System.out.println("completed");
+                }
+            });
+
         channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
     }
 }

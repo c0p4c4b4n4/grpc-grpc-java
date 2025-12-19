@@ -8,7 +8,7 @@ import io.grpc.stub.StreamObserver;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class Echo2Client {
+public class Echo3Client {
 
     public static void main(String[] args) throws Exception {
         String target = "localhost:50051";

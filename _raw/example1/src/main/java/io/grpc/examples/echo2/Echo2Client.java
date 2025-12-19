@@ -21,10 +21,21 @@ public class Echo2Client {
         asyncStub.unaryEcho(
             EchoRequest.newBuilder().setMessage("world").build(),
             new StreamObserver<EchoResponse>() {
-            @Override public void onNext(EchoResponse value) { System.out.println(value.getMessage()); }
-            @Override public void onError(Throwable t) { finishLatch.countDown(); }
-            @Override public void onCompleted() {finishLatch.countDown();}
-        });
+                @Override
+                public void onNext(EchoResponse value) {
+                    System.out.println(value.getMessage());
+                }
+
+                @Override
+                public void onError(Throwable t) {
+                    finishLatch.countDown();
+                }
+
+                @Override
+                public void onCompleted() {
+                    finishLatch.countDown();
+                }
+            });
 
         if (!finishLatch.await(1, TimeUnit.MINUTES)) {
             System.err.println("Calls did not finish within timeout.");

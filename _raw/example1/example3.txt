@@ -1,3 +1,5 @@
+grpc blocking V2 stub
+
 1. Protobuf Definition
 Save as echo.proto.
 protobuf

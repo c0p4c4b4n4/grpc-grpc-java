@@ -1,3 +1,5 @@
+grpc blocking V2 stub
+
 In gRPC-Java, Bidirectional Streaming (where both sides stream independently) is only natively supported by the Asynchronous Stub (EchoServiceStub). The BlockingStub and FutureStub do not support bidirectional methods because they are architecturally designed for request-response patterns.
 To meet your requirements for three client variants, we use the async stub for the core logic and bridge it for sync and future-like behaviors.
 1. Protobuf Definition

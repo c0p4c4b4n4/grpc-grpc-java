@@ -1,0 +1,74 @@
+1. Protobuf Definition
+Save this as echo.proto.
+protobuf
+syntax = "proto3";
+option java_multiple_files = true;
+package com.example.grpc;
+
+service EchoService {
+  // Client sends one message, server returns a stream of messages
+  rpc ServerStreamingEcho(EchoRequest) returns (stream EchoResponse);
+}
+
+message EchoRequest { string message = 1; }
+message EchoResponse { string message = 1; }
+Use code with caution.
+
+2. gRPC Server Implementation
+The server iterates and sends multiple messages via the responseObserver.
+java
+public class EchoServer {
+    public static void main(String[] args) throws Exception {
+        Server server = ServerBuilder.forPort(50051)
+                .addService(new EchoServiceImpl())
+                .build().start();
+        server.awaitTermination();
+    }
+
+    static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+        @Override
+        public void serverStreamingEcho(EchoRequest req, StreamObserver<EchoResponse> responseObserver) {
+            for (int i = 1; i <= 5; i++) {
+                String replyMsg = "Echo [" + i + "]: " + req.getMessage();
+                EchoResponse response = EchoResponse.newBuilder().setMessage(replyMsg).build();
+                responseObserver.onNext(response); // Send a message in the stream
+            }
+            responseObserver.onCompleted(); // Signal end of stream
+        }
+    }
+}
+Use code with caution.
+
+3. Client Variants
+A. Synchronous (Blocking) Client
+Uses Iterator to process the stream. The thread blocks while waiting for each new message.
+java
+EchoServiceGrpc.EchoServiceBlockingStub blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+Iterator<EchoResponse> responses = blockingStub.serverStreamingEcho(
+    EchoRequest.newBuilder().setMessage("Hello Sync").build());
+
+while (responses.hasNext()) {
+    System.out.println("Received: " + responses.next().getMessage());
+}
+Use code with caution.
+
+B. Asynchronous (Callback) Client
+Uses StreamObserver to handle messages non-blockingly as they arrive.
+java
+EchoServiceGrpc.EchoServiceStub asyncStub = EchoServiceGrpc.newStub(channel);
+asyncStub.serverStreamingEcho(
+    EchoRequest.newBuilder().setMessage("Hello Async").build(),
+    new StreamObserver<EchoResponse>() {
+        @Override public void onNext(EchoResponse value) {
+            System.out.println("Async Received: " + value.getMessage());
+        }
+        @Override public void onError(Throwable t) { t.printStackTrace(); }
+        @Override public void onCompleted() { System.out.println("Stream finished."); }
+    });
+Use code with caution.
+
+C. ListenableFuture Variant (Limitation)
+Standard gRPC FutureStub does not support server streaming. To achieve a similar effect, you must use the Asynchronous Client (shown above) and manually wrap it in a custom logic if you need to bridge it to a ListenableFuture (e.g., resolving the future only once the stream completes).
+
+
+

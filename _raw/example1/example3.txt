@@ -1,0 +1,97 @@
+1. Protobuf Definition
+Save as echo.proto.
+protobuf
+syntax = "proto3";
+option java_multiple_files = true;
+package com.example.grpc;
+
+service EchoService {
+  // Client sends a stream of messages, server returns a single response
+  rpc ClientStreamingEcho(stream EchoRequest) returns (EchoResponse);
+}
+
+message EchoRequest { string message = 1; }
+message EchoResponse { string message = 1; }
+Use code with caution.
+
+2. gRPC Server Implementation
+The server returns a StreamObserver to handle incoming messages and sends the final response via the provided responseObserver.
+java
+public class EchoServer {
+    public static void main(String[] args) throws Exception {
+        Server server = ServerBuilder.forPort(50051)
+                .addService(new EchoServiceImpl())
+                .build().start();
+        server.awaitTermination();
+    }
+
+    static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+        @Override
+        public StreamObserver<EchoRequest> clientStreamingEcho(StreamObserver<EchoResponse> responseObserver) {
+            return new StreamObserver<EchoRequest>() {
+                StringBuilder summary = new StringBuilder();
+
+                @Override public void onNext(EchoRequest req) {
+                    summary.append(req.getMessage()).append(" ");
+                }
+
+                @Override public void onError(Throwable t) { t.printStackTrace(); }
+
+                @Override public void onCompleted() {
+                    responseObserver.onNext(EchoResponse.newBuilder()
+                            .setMessage("Received: " + summary.toString().trim())
+                            .build());
+                    responseObserver.onCompleted();
+                }
+            };
+        }
+    }
+}
+Use code with caution.
+
+3. Client Variants
+Client streaming must use the asynchronous stub (EchoServiceStub).
+A. Asynchronous (Callback) Client
+This is the standard way to handle client streaming. You send messages one by one and wait for the server's final acknowledgment.
+java
+EchoServiceGrpc.EchoServiceStub asyncStub = EchoServiceGrpc.newStub(channel);
+StreamObserver<EchoRequest> requestObserver = asyncStub.clientStreamingEcho(new StreamObserver<EchoResponse>() {
+    @Override public void onNext(EchoResponse value) { System.out.println("Final Result: " + value.getMessage()); }
+    @Override public void onError(Throwable t) { t.printStackTrace(); }
+    @Override public void onCompleted() { System.out.println("Server finished."); }
+});
+
+// Stream multiple messages
+requestObserver.onNext(EchoRequest.newBuilder().setMessage("Part 1").build());
+requestObserver.onNext(EchoRequest.newBuilder().setMessage("Part 2").build());
+requestObserver.onCompleted(); // Signal end of stream
+Use code with caution.
+
+B. Manual Synchronous (Simulated)
+Since a BlockingStub does not support this method, you can simulate a synchronous wait using a CountDownLatch with the async stub.
+java
+CountDownLatch latch = new CountDownLatch(1);
+StreamObserver<EchoRequest> requestObserver = asyncStub.clientStreamingEcho(new StreamObserver<EchoResponse>() {
+    @Override public void onNext(EchoResponse value) { System.out.println(value.getMessage()); }
+    @Override public void onError(Throwable t) { latch.countDown(); }
+    @Override public void onCompleted() { latch.countDown(); }
+});
+
+requestObserver.onNext(EchoRequest.newBuilder().setMessage("Wait for me").build());
+requestObserver.onCompleted();
+latch.await(); // Thread blocks here until stream is finished
+Use code with caution.
+
+C. Manual ListenableFuture (Simulated)
+The FutureStub is incompatible with client streaming. To get a ListenableFuture, you can wrap the async stub with a SettableFuture.
+java
+SettableFuture<EchoResponse> settableFuture = SettableFuture.create();
+StreamObserver<EchoRequest> requestObserver = asyncStub.clientStreamingEcho(new StreamObserver<EchoResponse>() {
+    @Override public void onNext(EchoResponse value) { settableFuture.set(value); }
+    @Override public void onError(Throwable t) { settableFuture.setException(t); }
+    @Override public void onCompleted() {}
+});
+
+requestObserver.onNext(EchoRequest.newBuilder().setMessage("Future flow").build());
+requestObserver.onCompleted();
+// Use settableFuture as a standard ListenableFuture

@@ -1,7 +1,10 @@
-package io.grpc.examples.echo2;
+package io.grpc.examples.echo2.unary;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.examples.echo2.EchoRequest;
+import io.grpc.examples.echo2.EchoResponse;
+import io.grpc.examples.echo2.EchoServiceGrpc;
 import io.grpc.stub.StreamObserver;
 
 public class EchoServer {

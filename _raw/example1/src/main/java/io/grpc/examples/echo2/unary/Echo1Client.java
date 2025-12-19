@@ -1,9 +1,12 @@
-package io.grpc.examples.echo2;
+package io.grpc.examples.echo2.unary;
 
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
 import io.grpc.StatusException;
+import io.grpc.examples.echo2.EchoRequest;
+import io.grpc.examples.echo2.EchoResponse;
+import io.grpc.examples.echo2.EchoServiceGrpc;
 
 public class Echo1Client {
 

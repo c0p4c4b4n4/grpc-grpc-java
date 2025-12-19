@@ -1,8 +1,11 @@
-package io.grpc.examples.echo2;
+package io.grpc.examples.echo2.unary;
 
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
+import io.grpc.examples.echo2.EchoRequest;
+import io.grpc.examples.echo2.EchoResponse;
+import io.grpc.examples.echo2.EchoServiceGrpc;
 import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.TimeUnit;

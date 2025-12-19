@@ -1,4 +1,4 @@
-package io.grpc.examples.echo2;
+package io.grpc.examples.echo2.unary;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -7,6 +7,9 @@ import com.google.common.util.concurrent.MoreExecutors;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
+import io.grpc.examples.echo2.EchoRequest;
+import io.grpc.examples.echo2.EchoResponse;
+import io.grpc.examples.echo2.EchoServiceGrpc;
 
 import java.util.concurrent.TimeUnit;
 

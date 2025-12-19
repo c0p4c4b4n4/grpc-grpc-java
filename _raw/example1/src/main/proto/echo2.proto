@@ -25,12 +25,17 @@ option java_outer_classname = "Echo2Proto";
 
 package grpc.examples.echo2;
 
+message EchoRequest {
+  string message = 1;
+}
+
+message EchoResponse {
+  string message = 1;
+}
+
 service EchoService {
-  rpc UnaryEcho(string) returns (string);
-  
-  rpc ServerStreamingEcho(string) returns (stream string);
-  
-  rpc ClientStreamingEcho(stream string) returns (string);
-  
-  rpc BidirectionalStreamingEcho(stream string) returns (stream string);
+  rpc UnaryEcho(EchoRequest) returns (EchoResponse);
+  rpc ServerStreamingEcho(EchoRequest) returns (stream EchoResponse);
+  rpc ClientStreamingEcho(stream EchoRequest) returns (EchoResponse);
+  rpc BidirectionalStreamingEcho(stream EchoRequest) returns (stream EchoResponse);
 }

@@ -19,15 +19,13 @@ public class EchoServer {
 
     static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
         @Override
-        public StreamObserver<EchoRequest> clientStreamingEcho(StreamObserver<EchoResponse> responseObserver) {
+        public StreamObserver<EchoRequest> bidirectionalStreamingEcho(StreamObserver<EchoResponse> responseObserver) {
             return new StreamObserver<EchoRequest>() {
-                StringBuilder result = new StringBuilder();
-
                 @Override
                 public void onNext(EchoRequest request) {
-                    String message = request.getMessage();
-                    System.out.println("server next: " + message);
-                    result.append(message).append(" ");
+                    // Business logic: Echo back immediately or process
+                    EchoResponse response = EchoResponse.newBuilder().setMessage("server next: " + request.getMessage()).build();
+                    responseObserver.onNext(response);
                 }
 
                 @Override
@@ -37,9 +35,7 @@ public class EchoServer {
 
                 @Override
                 public void onCompleted() {
-                    responseObserver.onNext(EchoResponse.newBuilder()
-                        .setMessage("server completed: " + result.toString().trim())
-                        .build());
+                    System.out.println("server completed");
                     responseObserver.onCompleted();
                 }
             };

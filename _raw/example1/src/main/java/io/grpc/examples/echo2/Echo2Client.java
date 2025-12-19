@@ -11,10 +11,7 @@ import java.util.concurrent.TimeUnit;
 public class Echo2Client {
 
     public static void main(String[] args) throws Exception {
-        String target = "localhost:50051";
-        ManagedChannel channel = Grpc.newChannelBuilder(target, InsecureChannelCredentials.create())
-            .build();
-
+        ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
         CountDownLatch finishLatch = new CountDownLatch(1);
 
         EchoServiceGrpc.EchoServiceStub asyncStub = EchoServiceGrpc.newStub(channel);

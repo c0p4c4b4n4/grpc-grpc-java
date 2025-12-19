@@ -27,10 +27,10 @@ package grpc.examples.echo2;
 
 service EchoService {
   rpc UnaryEcho(string) returns (string);
-
+  
   rpc ServerStreamingEcho(string) returns (stream string);
-
+  
   rpc ClientStreamingEcho(stream string) returns (string);
-
+  
   rpc BidirectionalStreamingEcho(stream string) returns (stream string);
 }

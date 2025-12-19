@@ -19,10 +19,23 @@ public class EchoServer {
 
     static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
         @Override
-        public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-            EchoResponse reply = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
-            responseObserver.onNext(reply);
-            responseObserver.onCompleted();
+        public StreamObserver<EchoRequest> clientStreamingEcho(StreamObserver<EchoResponse> responseObserver) {
+            return new StreamObserver<EchoRequest>() {
+                StringBuilder summary = new StringBuilder();
+
+                @Override public void onNext(EchoRequest req) {
+                    summary.append(req.getMessage()).append(" ");
+                }
+
+                @Override public void onError(Throwable t) { t.printStackTrace(); }
+
+                @Override public void onCompleted() {
+                    responseObserver.onNext(EchoResponse.newBuilder()
+                        .setMessage("received: " + summary.toString().trim())
+                        .build());
+                    responseObserver.onCompleted();
+                }
+            };
         }
     }
 }

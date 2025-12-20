@@ -1,22 +1,18 @@
 @startuml
-title ClientStreamingEcho (Client Streaming RPC)
+title client streaming RPC
 
-participant Client
+participant "gRPC Client" as Client
 participant "gRPC Server" as Server
-participant "StreamObserver<EchoRequest>" as ReqObs
-participant "StreamObserver<EchoResponse>" as RespObs
 
-Client -> Server: clientStreamingEcho(RespObs)
-Server --> Client: ReqObs
+Client -> Server: requestObserver.onNext("one")
 activate Server
 
-loop for each request
-  Client -> ReqObs: onNext(EchoRequest)
-end
+Client -> Server: requestObserver.onNext("two")
+Client -> Server: requestObserver.onNext("three")
+Client -> Server: requestObserver.onComplete()
 
-Client -> ReqObs: onCompleted()
-
-Server -> RespObs: onNext(EchoResponse)
-Server -> RespObs: onCompleted()
+Server -> Client: response.onNext(EchoResponse)
+Server -> Client: response.onCompleted()
 deactivate Server
+
 @enduml

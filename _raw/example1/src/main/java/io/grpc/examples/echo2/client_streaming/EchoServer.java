@@ -37,6 +37,7 @@ public class EchoServer {
 
                 @Override
                 public void onCompleted() {
+                    System.out.println("server completed: " + result.toString().trim());
                     responseObserver.onNext(EchoResponse.newBuilder()
                         .setMessage("server completed: " + result.toString().trim())
                         .build());

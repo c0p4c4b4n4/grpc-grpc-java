@@ -23,6 +23,7 @@ public class EchoServer {
             return new StreamObserver<EchoRequest>() {
                 @Override
                 public void onNext(EchoRequest request) {
+                    System.out.println("server next: " + "server next: " + request.getMessage());
                     // Business logic: Echo back immediately or process
                     EchoResponse response = EchoResponse.newBuilder().setMessage("server next: " + request.getMessage()).build();
                     responseObserver.onNext(response);

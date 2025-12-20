@@ -1,0 +1,15 @@
+@startuml
+title UnaryEcho (Unary RPC)
+
+participant Client
+participant "gRPC Server" as Server
+participant "StreamObserver<EchoResponse>" as RespObs
+
+Client -> Server: unaryEcho(EchoRequest)
+activate Server
+
+Server -> RespObs: onNext(EchoResponse)
+Server -> RespObs: onCompleted()
+
+deactivate Server
+@enduml

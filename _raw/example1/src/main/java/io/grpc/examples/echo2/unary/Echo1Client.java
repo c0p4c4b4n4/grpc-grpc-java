@@ -10,7 +10,7 @@ import io.grpc.examples.echo2.EchoServiceGrpc;
 
 public class Echo1Client {
 
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
         try {
             EchoServiceGrpc.EchoServiceBlockingV2Stub blockingStub = EchoServiceGrpc.newBlockingV2Stub(channel);
@@ -24,7 +24,7 @@ public class Echo1Client {
         }
     }
 
-    public static void main2(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
         try {
             EchoServiceGrpc.EchoServiceBlockingStub blockingStub = EchoServiceGrpc.newBlockingStub(channel);

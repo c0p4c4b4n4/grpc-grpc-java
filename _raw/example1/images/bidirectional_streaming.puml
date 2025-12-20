@@ -1,0 +1,26 @@
+@startuml
+title BidirectionalStreamingEcho (Bidirectional Streaming RPC)
+
+participant Client
+participant "gRPC Server" as Server
+participant "StreamObserver<EchoRequest>" as ReqObs
+participant "StreamObserver<EchoResponse>" as RespObs
+
+Client -> Server: bidirectionalStreamingEcho(RespObs)
+Server --> Client: ReqObs
+activate Server
+
+par Client sends requests
+  loop
+    Client -> ReqObs: onNext(EchoRequest)
+  end
+  Client -> ReqObs: onCompleted()
+and Server sends responses
+  loop
+    Server -> RespObs: onNext(EchoResponse)
+  end
+  Server -> RespObs: onCompleted()
+end
+
+deactivate Server
+@enduml

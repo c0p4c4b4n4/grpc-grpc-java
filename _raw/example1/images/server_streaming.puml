@@ -1,0 +1,17 @@
+@startuml
+title ServerStreamingEcho (Server Streaming RPC)
+
+participant Client
+participant "gRPC Server" as Server
+participant "StreamObserver<EchoResponse>" as RespObs
+
+Client -> Server: serverStreamingEcho(EchoRequest)
+activate Server
+
+loop for each response
+  Server -> RespObs: onNext(EchoResponse)
+end
+
+Server -> RespObs: onCompleted()
+deactivate Server
+@enduml

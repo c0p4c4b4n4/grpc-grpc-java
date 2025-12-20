@@ -1,4 +1,4 @@
-package io.grpc.examples.echo2.bidirectional_streaming.client_streaming;
+package io.grpc.examples.echo2.bidirectional_streaming;
 
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;

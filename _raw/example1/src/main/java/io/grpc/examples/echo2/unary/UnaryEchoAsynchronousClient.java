@@ -10,31 +10,29 @@ import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.TimeUnit;
 
-public class Echo2Client {
+public class UnaryEchoAsynchronousClient {
 
     public static void main(String[] args) throws Exception {
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
 
         EchoServiceGrpc.EchoServiceStub asyncStub = EchoServiceGrpc.newStub(channel);
         EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
-        asyncStub.unaryEcho(
-            request,
-            new StreamObserver<EchoResponse>() {
-                @Override
-                public void onNext(EchoResponse value) {
-                    System.out.println(value.getMessage());
-                }
+        asyncStub.unaryEcho(request, new StreamObserver<EchoResponse>() {
+            @Override
+            public void onNext(EchoResponse response) {
+                System.out.println("next: " + response.getMessage());
+            }
 
-                @Override
-                public void onError(Throwable t) {
-                    System.out.println("error: " + t);
-                }
+            @Override
+            public void onError(Throwable t) {
+                System.out.println("error: " + t);
+            }
 
-                @Override
-                public void onCompleted() {
-                    System.out.println("completed");
-                }
-            });
+            @Override
+            public void onCompleted() {
+                System.out.println("completed");
+            }
+        });
 
         channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
     }

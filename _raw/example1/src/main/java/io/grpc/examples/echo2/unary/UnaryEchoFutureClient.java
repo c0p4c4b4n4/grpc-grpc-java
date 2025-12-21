@@ -11,30 +11,24 @@ import io.grpc.examples.echo2.EchoRequest;
 import io.grpc.examples.echo2.EchoResponse;
 import io.grpc.examples.echo2.EchoServiceGrpc;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class Echo3Client {
+public class UnaryEchoFutureClient {
 
     public static void main(String[] args) throws Exception {
-        String target = "localhost:50051";
-        ManagedChannel channel = Grpc.newChannelBuilder(target, InsecureChannelCredentials.create())
-            .build();
-
-//        CountDownLatch finishLatch = new CountDownLatch(1);
+        ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create())            .build();
 
         EchoServiceGrpc.EchoServiceFutureStub futureStub = EchoServiceGrpc.newFutureStub(channel);
         ListenableFuture<EchoResponse> responseFuture = futureStub.unaryEcho(EchoRequest.newBuilder().setMessage("world").build());
         Futures.addCallback(responseFuture, new FutureCallback<EchoResponse>() {
             @Override
-            public void onSuccess(EchoResponse result) {
-                System.out.println(result.getMessage());
-//                finishLatch.countDown();
+            public void onSuccess(EchoResponse response) {
+                System.out.println("success: " + response.getMessage());
             }
 
             @Override
             public void onFailure(Throwable t) {
-//                finishLatch.countDown();
+                System.out.println("error: " + t);
             }
         }, MoreExecutors.directExecutor());
 

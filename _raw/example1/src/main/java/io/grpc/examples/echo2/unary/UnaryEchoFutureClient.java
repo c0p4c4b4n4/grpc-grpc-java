@@ -12,8 +12,11 @@ import io.grpc.examples.echo2.EchoResponse;
 import io.grpc.examples.echo2.EchoServiceGrpc;
 
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 public class UnaryEchoFutureClient {
+
+    private static final Logger logger = Logger.getLogger(UnaryEchoFutureClient.class.getName());
 
     public static void main(String[] args) throws Exception {
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
@@ -23,12 +26,12 @@ public class UnaryEchoFutureClient {
         Futures.addCallback(responseFuture, new FutureCallback<EchoResponse>() {
             @Override
             public void onSuccess(EchoResponse response) {
-                System.out.println("success: " + response.getMessage());
+                logger.info("success: " + response.getMessage());
             }
 
             @Override
             public void onFailure(Throwable t) {
-                System.out.println("error: " + t);
+                logger.info("error: " + t);
             }
         }, MoreExecutors.directExecutor());
 

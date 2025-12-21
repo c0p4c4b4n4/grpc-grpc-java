@@ -9,8 +9,11 @@ import io.grpc.examples.echo2.EchoServiceGrpc;
 import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 public class UnaryEchoAsynchronousClient {
+
+    private static final Logger logger = Logger.getLogger(UnaryEchoAsynchronousClient.class.getName());
 
     public static void main(String[] args) throws Exception {
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
@@ -20,17 +23,17 @@ public class UnaryEchoAsynchronousClient {
         asyncStub.unaryEcho(request, new StreamObserver<EchoResponse>() {
             @Override
             public void onNext(EchoResponse response) {
-                System.out.println("next: " + response.getMessage());
+                logger.info("next: " + response.getMessage());
             }
 
             @Override
             public void onError(Throwable t) {
-                System.out.println("error: " + t);
+                logger.info("error: " + t);
             }
 
             @Override
             public void onCompleted() {
-                System.out.println("completed");
+                logger.info("completed");
             }
         });
 

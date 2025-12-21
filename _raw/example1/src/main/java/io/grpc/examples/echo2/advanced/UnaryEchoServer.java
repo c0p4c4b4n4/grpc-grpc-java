@@ -25,6 +25,7 @@ public class UnaryEchoServer {
                     }
                 }
             )
+            .intercept(new LoggingInterceptor())
             .build()
             .start();
 

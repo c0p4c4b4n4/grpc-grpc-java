@@ -21,7 +21,7 @@ public class Echo3Client {
         ManagedChannel channel = Grpc.newChannelBuilder(target, InsecureChannelCredentials.create())
             .build();
 
-        CountDownLatch finishLatch = new CountDownLatch(1);
+//        CountDownLatch finishLatch = new CountDownLatch(1);
 
         EchoServiceGrpc.EchoServiceFutureStub futureStub = EchoServiceGrpc.newFutureStub(channel);
         ListenableFuture<EchoResponse> responseFuture = futureStub.unaryEcho(EchoRequest.newBuilder().setMessage("world").build());
@@ -29,18 +29,14 @@ public class Echo3Client {
             @Override
             public void onSuccess(EchoResponse result) {
                 System.out.println(result.getMessage());
-                finishLatch.countDown();
+//                finishLatch.countDown();
             }
 
             @Override
             public void onFailure(Throwable t) {
-                finishLatch.countDown();
+//                finishLatch.countDown();
             }
         }, MoreExecutors.directExecutor());
-
-        if (!finishLatch.await(1, TimeUnit.MINUTES)) {
-            System.err.println("Calls did not finish within timeout.");
-        }
 
         channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
     }

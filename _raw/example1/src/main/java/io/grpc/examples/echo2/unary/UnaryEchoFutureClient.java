@@ -26,12 +26,12 @@ public class UnaryEchoFutureClient {
         Futures.addCallback(responseFuture, new FutureCallback<EchoResponse>() {
             @Override
             public void onSuccess(EchoResponse response) {
-                logger.info("success: " + response.getMessage());
+                System.out.println("success: " + response.getMessage());
             }
 
             @Override
             public void onFailure(Throwable t) {
-                logger.info("error: " + t);
+                System.out.println("error: " + t);
             }
         }, MoreExecutors.directExecutor());
 

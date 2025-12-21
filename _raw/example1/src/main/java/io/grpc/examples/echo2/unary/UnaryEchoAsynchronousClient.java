@@ -23,17 +23,17 @@ public class UnaryEchoAsynchronousClient {
         asyncStub.unaryEcho(request, new StreamObserver<EchoResponse>() {
             @Override
             public void onNext(EchoResponse response) {
-                logger.info("next: " + response.getMessage());
+                System.out.println("next: " + response.getMessage());
             }
 
             @Override
             public void onError(Throwable t) {
-                logger.info("error: " + t);
+                System.out.println("error: " + t);
             }
 
             @Override
             public void onCompleted() {
-                logger.info("completed");
+                System.out.println("completed");
             }
         });
 

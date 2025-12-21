@@ -1,14 +1,14 @@
-#### gRPC Remote Procedure Calls
+### gRPC Remote Procedure Calls
 
 
-##### What is gRPC
+#### What is gRPC
 
 gRPC is a multi-lingual and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed to provide high-performance inter-service interaction within and between data centers, as well as for resource-constrained mobile and IoT applications.
 
 gRPC uses Protocol Buffers as a binary serialization format and RPC interface description language, *and* HTTP/2 as a transport layer protocol. Due to these features, gRPC can provide qualitative and quantitative characteristics of inter-service communication that are not available to REST (that most often means transferring textual JSONs over the HTTP/1.1 protocol).
 
 
-##### RPC vs REST
+#### Why not REST ?
 
 RPC (Remote Procedure Call) is a different architectural style for building interservice interactions than REST (Representational State Transfer). REST is an architectural style that is based on the concept of *resources*. A resource is identified by an URI and clients read or modify the *state* of the resource by *transferring* its *representation*.
 
@@ -32,14 +32,14 @@ However, in RPC it is impossible to fully avert the intermediate network communi
 * network can partially fail, so client have to use retries and servers should be idempotent
 
 
-##### The problem
+#### The problem
 
 When developing an effective RPC framework, developers had to address two primary challenges. First, developers needed to ensure efficient cross-platform serialization. Solutions, based on textual formats (such as XML, JSON, or YAML), are typically an order of magnitude less efficient than binary formats. They require additional computational resources for serialization/deserialization and additional network resources for transmitting larger messages. Solutions based on binary formats, often face significant challenges in ensuring portability across different languages ​​and platforms.
 
 Second, there was an absence of an efficient application-layer network protocol specifically designed for modern inter-service communication. The HTTP/1.1 protocol was originally designed to enable browsers to retrieve resources within the hypermedia networks. It was not designed to support high-speed, bidirectional, full-duplex communication. Various workarounds based on this protocol (short and long polling, streaming, webhooks) were inherently inefficient in their utilization of computational and network resources. Solutions built on the TCP *transport layer* protocol were overly complex due to the low-level nature of the protocol and the lack of portability across different languages ​​and platforms.
 
 
-##### The solution
+#### The solution
 
 Since 2001, Google had been developing an internal RPC framework called Stubby. It was designed to connect almost all of the internal services both within and across Google data centers. Stubby was a high-performance, cross-platform framework built on Protocol Buffers for serialization.
 
@@ -48,7 +48,7 @@ But only in 2015, with the appearance of the breakthrough HTTP/2 protocol, Googl
 Today, gRPC remains the primary mechanism for inter-service communication at Google. Also, Google offers gRPC interfaces alongside REST interfaces for many of its public services. This is because gRPC provides notable performance benefits and supports bidirectional streaming - a feature that is not achievable with traditional REST services.
 
 
-##### gRPC foundations
+#### gRPC foundations
 
 The gRPC framework includes three main components:
 
@@ -59,7 +59,7 @@ The gRPC framework includes three main components:
 * HTTP/2 - an application-level protocol
 
 
-###### Protocol Buffers
+##### Protocol Buffers
 
 Protocol Buffers (Protobuf) is a serialization framework. It includes a compact binary serialization format *and* multi-language runtime libraries. This framework is optimized for exchanging short messages that fit entirely within device memory (usually less than a few megabytes).
 
@@ -109,7 +109,7 @@ message Person {
 *Attributes* are additional metadata that can be added to messages. Previous versions of Protobuf had various attributes, but in version 3, only two remain: *optional* and *repeated*. The *optional* attribute is used to determine whether it was explicitly set or not, even if it's set to its default value. The *repeated* attribute is used to describe arrays.
 
 
-###### Interface Definition Language
+##### Interface Definition Language
 
 The interface description language is designed to describe the interface of RPC methods. Like message descriptions, interface descriptions are stored in a file with the *.proto* extension. This file, using the Protobuf compiler, converts pseudocode into client-server stubs in the selected programming language.
 
@@ -144,7 +144,7 @@ service EchoService {
 For backend developers who have long and unsuccessfully tried to implement simultaneous bidirectional inter-service communication with HTTP/1.1, it will be important to note that gRPC allows streaming from server to client, from client to server, and bidirectional simultaneous streaming.
 
 
-###### HTTP/2
+##### HTTP/2
 
 HTTP/2 is the next version of the HTTP transport protocol. Initially this protocol was developed to allow a client (usually a browser) to request resources (HTML documents, images, scripts) from a server in a hypermedia network. However, using this protocol to implement modern client-server systems (simultaneous bi-directional streaming) leads to complex and inefficient solutions. Even developing new features in HTTP/1.1 (persistent connections, pipelining, chunked transfer encoding) was not adequate.
 
@@ -159,7 +159,7 @@ The second important change is the transition from a text-based format of header
 >HTTP/2 allows services to efficiently exchange information both in various simplex (unidirectional) modes and using a full-duplex (bidirectional) connection with simultaneous transmission of messages.
 
 
-##### gRPC in practice
+#### gRPC in practice
 
 The following simplified example shows how to use all four types of gRPC methods in Java applications. The example includes an echo of the client sending a string to the server, and an echo of the server responding to that string.
 
@@ -188,4 +188,75 @@ service EchoService {
 ```
 
 
-If you run Gradle task *mvn protobuf:compile* (or just *mvn clean install*), the generated stubs for the client and server will be created in directory in the */target/generated-sources/protobuf* directory.
+If you run the Gradle task *mvn protobuf:compile* (or just *mvn clean install*), the generated stubs for the client and server will be created in directory in the */target/generated-sources/protobuf* directory.
+
+The API that the client and server use to manage gRPC flows is the *StreamObserver* interface. This interface represents the gRPC stream of messages. It is used by both the client and server implementations for sending or receiving messages. For outgoing messages, an observer is provided by the gRPC library to the application. For incoming messages, the application implements the observer and passes it to the gRPC library for receiving.
+
+
+```
+public interface StreamObserver<V> {
+  void onNext(V value);
+  void onError(Throwable t);
+  void onCompleted();
+}
+```
+
+
+
+##### Service stub
+
+The generated server stub provides the following API.
+
+
+```
+public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver)
+public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver)
+public StreamObserver<EchoRequest> clientStreamingEcho(StreamObserver<EchoResponse> responseObserver)
+public StreamObserver<EchoRequest> bidirectionalStreamingEcho(StreamObserver<EchoResponse> responseObserver)
+```
+
+
+Notice that the signatures for unary and server-streaming methods are the same. A single requestis received from the client, and the server sends its one or many responses by calling the *onNext* method on the *response observer*. The difference is that for the unary method, the server calls the *onNext* method exactly once, followed by the call of the *onCompleted* method. In the server-streaming method, the *onNext* method can be called multiple times before streaming ends by the server with a call to the *onCompleted* method. (Using runtime behavior-based differences over compile-time method overloading keeps the API simple and uniform.)
+
+Similarly, the signatures for client-streaming and bidirectional-streaming methods are the same either. Since the client can always send multiple messages to a service, the service provides it with a *request observer*. In both cases, the client can send one or many requests by calling the *onNext* method on the *request observer*, followed by the call of the *onCompleted* method. The difference is, that for the client-streaming method, the server calls the *onNext* method on the *response observer* exactly once, immediately followed by the call of the *onCompleted* method. In the bidirectional-streaming method, the server calls the *onNext* method the *response observer* multiple times before the call of the *onCompleted* method. (Since this is an echo example, the server's response always follows the client's request. In real bidirectional-streaming applications, client and server requests and responses can be in any order and can be interrupted by both the client and the server.)
+
+
+##### Client stubs
+
+Three types of client stubs are generated: asynchronous, blocking, and future.
+
+
+###### Asynchronous stub
+
+The asynchronous stub is the primary stub type for working with the gRPC via the Java API. This stub implements all service definition methods, and its interface is completely identical to that of the service stub. The asynchronous stub operates entirely through callbacks outgoing and incoming stream observers.
+
+
+```
+public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver)
+public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver)
+public StreamObserver<EchoRequest> clientStreamingEcho(StreamObserver<EchoResponse> responseObserver)
+public StreamObserver<EchoRequest> bidirectionalStreamingEcho(StreamObserver<EchoResponse> responseObserver)
+```
+
+
+
+###### Blocking stub
+
+The blocking stub uses synchronous calls that block until the response from the service is available. Blocking stubs implement only unary and server-streaming methods in the service definition. Blocking stubs do not support client-streaming or bidirectional-streaming methods.
+
+
+```
+public EchoResponse unaryEcho(EchoRequest request)
+public Iterator<EchoResponse> serverStreamingEcho(EchoRequest request)
+```
+
+
+
+###### Future stub
+
+The asynchronous stub uses asynchronous calls that wrap the result into the *com.google.common.util.concurrent.ListenableFuture* interface.Future stubs implement only unary methods in the service definition. Future stubs do not support any streaming calls.
+
+
+```
+public ListenableFuture<EchoResponse> unaryExample(EchoRequest request)
+```

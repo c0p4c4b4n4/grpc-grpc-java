@@ -14,6 +14,7 @@ public class UnaryEchoServer {
             .addService(new EchoServiceImpl())
             .build()
             .start();
+
         server.awaitTermination();
     }
 

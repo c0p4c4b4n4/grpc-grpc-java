@@ -3,7 +3,7 @@
 
 #### What is gRPC
 
-gRPC is a multi-lingual and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed to provide high-performance inter-service interaction within and between data centers, as well as for resource-constrained mobile and IoT applications.
+gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed to provide high-performance inter-service interaction within and between data centers, as well as for resource-constrained mobile and IoT applications.
 
 gRPC uses Protocol Buffers as a binary serialization format and RPC interface description language, *and* HTTP/2 as a transport layer protocol. Due to these features, gRPC can provide qualitative and quantitative characteristics of inter-service communication that are not available to REST (that most often means transferring textual JSONs over the HTTP/1.1 protocol).
 
@@ -124,14 +124,6 @@ Depending on whether the method sends a single value or a stream and whether it 
 
 
 ```
-message EchoRequest {
-    string message = 1;
-}
-
-message EchoResponse {
-    string message = 1;
-}
-
 service EchoService {
     rpc UnaryEcho(EchoRequest) returns (EchoResponse);
     rpc ServerStreamingEcho(EchoRequest) returns (stream EchoResponse);
@@ -216,9 +208,33 @@ public StreamObserver<EchoRequest> bidirectionalStreamingEcho(StreamObserver<Ech
 ```
 
 
-Notice that the signatures for unary and server-streaming methods are the same. A single requestis received from the client, and the server sends its one or many responses by calling the *onNext* method on the *response observer*. The difference is that for the unary method, the server calls the *onNext* method exactly once, followed by the call of the *onCompleted* method. In the server-streaming method, the *onNext* method can be called multiple times before streaming ends by the server with a call to the *onCompleted* method. (Using runtime behavior-based differences over compile-time method overloading keeps the API simple and uniform.)
+Notice that the signatures for unary and server-streaming methods are the same. A single requestis received from the client, and the server sends its one or many responses by calling the *onNext* method on the *response observer*. The difference is that for the unary method, the server calls the *onNext* method exactly once, followed by the call of the *onCompleted* method. In the server-streaming method, the *onNext* method can be called multiple times before streaming ends by the server with a call to the *onCompleted* method.
 
-Similarly, the signatures for client-streaming and bidirectional-streaming methods are the same either. Since the client can always send multiple messages to a service, the service provides it with a *request observer*. In both cases, the client can send one or many requests by calling the *onNext* method on the *request observer*, followed by the call of the *onCompleted* method. The difference is, that for the client-streaming method, the server calls the *onNext* method on the *response observer* exactly once, immediately followed by the call of the *onCompleted* method. In the bidirectional-streaming method, the server calls the *onNext* method the *response observer* multiple times before the call of the *onCompleted* method. (Since this is an echo example, the server's response always follows the client's request. In real bidirectional-streaming applications, client and server requests and responses can be in any order and can be interrupted by both the client and the server.)
+>>Using runtime behavior-based differences over compile-time method overloading keeps the API simple and uniform
+
+Similarly, the signatures for client-streaming and bidirectional-streaming methods are the same either. Since the client can always send multiple messages to a service, the service provides it with a *request observer*. In both cases, the client can send one or many requests by calling the *onNext* method on the *request observer*, followed by the call of the *onCompleted* method. The difference is, that for the client-streaming method, the server calls the *onNext* method on the *response observer* exactly once, immediately followed by the call of the *onCompleted* method. In the bidirectional-streaming method, the server calls the *onNext* method the *response observer* multiple times before the call of the *onCompleted* method.
+
+>>Since this is an echo example, the server's response always follows the client's request. In real bidirectional-streaming applications, client and server requests and responses can be in any order and can be finished by both the client and the server.
+
+A *simplified* version of the server that provides the unari echo method looks something like this:
+
+
+```
+Server server = ServerBuilder.forPort(50051)
+   .addService(new EchoServiceGrpc.EchoServiceImplBase() {
+       @Override
+       public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
+           EchoResponse response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
+           responseObserver.onNext(response);
+           responseObserver.onCompleted();
+       }
+   })
+   .build()
+   .start();
+
+server.awaitTermination();
+```
+
 
 
 ##### Client stubs
@@ -239,6 +255,37 @@ public StreamObserver<EchoRequest> bidirectionalStreamingEcho(StreamObserver<Ech
 ```
 
 
+>>Use asynchronous stub for high-performance applications that stream from server to client, from client to server, or full-duplex.
+
+A *simplified* version of the asynchronous client that consumes the unari echo method looks something like this:
+
+
+```
+ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
+
+EchoServiceGrpc.EchoServiceStub asyncStub = EchoServiceGrpc.newStub(channel);
+EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
+asyncStub.unaryEcho(request, new StreamObserver<EchoResponse>() {
+   @Override
+   public void onNext(EchoResponse response) {
+       System.out.println("next: " + response.getMessage());
+   }
+
+   @Override
+   public void onError(Throwable t) {
+       System.out.println("error: " + t);
+   }
+
+   @Override
+   public void onCompleted() {
+       System.out.println("completed");
+   }
+});
+
+channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+```
+
+
 
 ###### Blocking stub
 
@@ -251,12 +298,55 @@ public Iterator<EchoResponse> serverStreamingEcho(EchoRequest request)
 ```
 
 
+>>Use blocking stubs for simple applications where blocking calls are justified by simplicity and thread inefficiency is not a concern.
+
+A *simplified* version of the blocking client that consumes the unari echo method looks something like this:
+
+
+```
+ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
+
+EchoServiceGrpc.EchoServiceBlockingStub blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
+EchoResponse response = blockingStub.unaryEcho(request);
+System.out.println("result: " + response.getMessage());
+
+channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+```
+
+
 
 ###### Future stub
 
-The asynchronous stub uses asynchronous calls that wrap the result into the *com.google.common.util.concurrent.ListenableFuture* interface.Future stubs implement only unary methods in the service definition. Future stubs do not support any streaming calls.
+The asynchronous stub uses asynchronous calls that wrap the result into the *com.google.common.util.concurrent.ListenableFuture* interface. Future stubs implement only unary methods in the service definition. Future stubs do not support any streaming calls.
 
 
 ```
 public ListenableFuture<EchoResponse> unaryExample(EchoRequest request)
+```
+
+
+>>Use asynchronous stubs for high-performance applications that use only unary request/response calls.
+
+A *simplified* version of the future client that consumes the unari echo method looks something like this:
+
+
+```
+ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
+
+EchoServiceGrpc.EchoServiceFutureStub futureStub = EchoServiceGrpc.newFutureStub(channel);
+ListenableFuture<EchoResponse> responseFuture = futureStub.unaryEcho(EchoRequest.newBuilder().setMessage("world").build());
+Futures.addCallback(responseFuture, new FutureCallback<EchoResponse>() {
+   @Override
+   public void onSuccess(EchoResponse response) {
+       System.out.println("success: " + response.getMessage());
+   }
+
+   @Override
+   public void onFailure(Throwable t) {
+       System.out.println("error: " + t);
+   }
+}, MoreExecutors.directExecutor());
+
+channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
 ```

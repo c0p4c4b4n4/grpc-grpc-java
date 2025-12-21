@@ -1,4 +1,4 @@
-package io.grpc.examples.echo2.unary;
+package io.grpc.examples.echo2.advanced;
 
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;

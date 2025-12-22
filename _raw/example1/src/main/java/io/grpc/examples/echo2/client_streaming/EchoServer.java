@@ -2,14 +2,19 @@ package io.grpc.examples.echo2.client_streaming;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.Status;
 import io.grpc.examples.echo2.EchoRequest;
 import io.grpc.examples.echo2.EchoResponse;
 import io.grpc.examples.echo2.EchoServiceGrpc;
+import io.grpc.examples.echo2.unary.UnaryEchoFutureClient;
 import io.grpc.stub.StreamObserver;
 
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class EchoServer {
+
+    private static final Logger logger = Logger.getLogger(UnaryEchoFutureClient.class.getName());
 
     public static void main(String[] args) throws Exception {
         Server server = ServerBuilder.forPort(50051)
@@ -35,8 +40,7 @@ public class EchoServer {
 
                 @Override
                 public void onError(Throwable t) {
-//                    logger.log(Level.WARNING, "echo stream cancelled or had a problem and is no longer usable " + t.getMessage());
-                    System.out.println("server error: " + t);
+                    logger.log(Level.WARNING, "error: {0}", Status.fromThrowable(t));
                 }
 
                 @Override

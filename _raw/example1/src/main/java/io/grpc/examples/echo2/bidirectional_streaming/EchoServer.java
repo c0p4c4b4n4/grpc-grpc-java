@@ -2,6 +2,7 @@ package io.grpc.examples.echo2.bidirectional_streaming;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.Status;
 import io.grpc.examples.echo2.EchoRequest;
 import io.grpc.examples.echo2.EchoResponse;
 import io.grpc.examples.echo2.EchoServiceGrpc;
@@ -34,9 +35,7 @@ public class EchoServer {
 
                 @Override
                 public void onError(Throwable t) {
-//                    logger.log(Level.WARNING,
-//                        "echo stream cancelled or had a problem and is no longer usable " + t.getMessage());
-                    System.out.println("server error: " + t);
+                    logger.log(Level.WARNING, "error: {0}", Status.fromThrowable(t));
                 }
 
                 @Override

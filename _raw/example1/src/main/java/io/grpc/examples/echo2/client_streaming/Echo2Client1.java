@@ -3,14 +3,20 @@ package io.grpc.examples.echo2.client_streaming;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
+import io.grpc.Status;
 import io.grpc.examples.echo2.EchoRequest;
 import io.grpc.examples.echo2.EchoResponse;
 import io.grpc.examples.echo2.EchoServiceGrpc;
+import io.grpc.examples.echo2.unary.UnaryEchoFutureClient;
 import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Echo2Client1 {
+
+    private static final Logger logger = Logger.getLogger(UnaryEchoFutureClient.class.getName());
 
     public static void main(String[] args) throws InterruptedException {
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
@@ -25,7 +31,7 @@ public class Echo2Client1 {
 
             @Override
             public void onError(Throwable t) {
-                System.out.println("client error: " + t);
+                logger.log(Level.WARNING, "error: {0}", Status.fromThrowable(t));
             }
 
             @Override

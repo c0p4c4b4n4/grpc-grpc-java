@@ -3,6 +3,7 @@ package io.grpc.examples.echo2.unary;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
+import io.grpc.Status;
 import io.grpc.examples.echo2.EchoRequest;
 import io.grpc.examples.echo2.EchoResponse;
 import io.grpc.examples.echo2.EchoServiceGrpc;
@@ -31,6 +32,8 @@ public class UnaryEchoAsynchronousClient {
 
             @Override
             public void onError(Throwable t) {
+                logger.warning("client error: {0}" + Status.fromThrowable(t));
+
                 logger.info("error: " + t);
             }
 

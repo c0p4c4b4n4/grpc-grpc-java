@@ -32,9 +32,7 @@ public class UnaryEchoAsynchronousClient {
 
             @Override
             public void onError(Throwable t) {
-                logger.warning("client error: {0}" + Status.fromThrowable(t));
-
-                logger.info("error: " + t);
+                logger.warning("error: " + Status.fromThrowable(t));
             }
 
             @Override
@@ -43,6 +41,11 @@ public class UnaryEchoAsynchronousClient {
             }
         });
 
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
         channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
     }
 }

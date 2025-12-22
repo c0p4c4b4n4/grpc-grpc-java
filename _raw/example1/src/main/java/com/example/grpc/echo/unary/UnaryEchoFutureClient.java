@@ -23,7 +23,6 @@ public class UnaryEchoFutureClient {
     public static void main(String[] args) throws Exception {
         Logging.init();
 
-
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
 
         EchoServiceGrpc.EchoServiceFutureStub futureStub = EchoServiceGrpc.newFutureStub(channel);
@@ -31,7 +30,7 @@ public class UnaryEchoFutureClient {
         Futures.addCallback(responseFuture, new FutureCallback<EchoResponse>() {
             @Override
             public void onSuccess(EchoResponse response) {
-                System.out.println("success: " + response.getMessage());
+                logger.info("response received: " + response.getMessage());
             }
 
             @Override

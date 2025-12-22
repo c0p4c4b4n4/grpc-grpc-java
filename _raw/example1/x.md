@@ -1,3 +1,27 @@
+<!-----
+
+
+
+Conversion time: 1.316 seconds.
+
+
+Using this Markdown file:
+
+1. Paste this output into your source file.
+2. See the notes and action items below regarding this conversion run.
+3. Check the rendered output (headings, lists, code blocks, tables) for proper
+   formatting and use a linkchecker before you publish this page.
+
+Conversion notes:
+
+* Docs™ to Markdown version 2.0β1
+* Mon Dec 22 2025 01:13:13 GMT-0800 (PST)
+* Source doc: g 1
+* This is a partial selection. Check to make sure intra-doc links work.
+----->
+
+
+
 ### gRPC Remote Procedure Calls
 
 
@@ -20,7 +44,7 @@ However, challenges with REST architecture arise when implementing client-server
 * low-latency and high-throughput communication
 * client streaming or bidirectional streaming
 
-The foundation of RPC is based on the idea of invoking methods on another process as if they were local methods. RPC frameworks provide code generation tools that, based on the provided interfaces, create stub implementations for the client and server that handle binary serialization and network transmission. So, when a cliend calls a remote method with parameters and receives a return value, it *looks* like a local call. The RPC framework hides away all the complexity of serializing and network communication.
+The foundation of RPC is based on the idea of invoking methods on another process as if they were local methods. RPC frameworks provide code generation tools that, based on the provided interfaces, create stub implementations for the client and server that handle binary serialization and network transmission. So, when a client calls a remote method with parameters and receives a return value, it *looks* like a local call. The RPC framework hides away all the complexity of serializing and network communication.
 
 However, in RPC it is impossible to fully avert the intermediate network communication (because *network is unreliable by its nature*) such as:
 
@@ -70,32 +94,9 @@ Each message consists of fields with a *type*, *name*, and *identifier* (fields 
 
 ```
 message Person {
-  // scalar types
-  double height = 1;
-  float weight = 2;
-  int32 social_credit = 3;
-  bool is_сitizen = 4;
-  string full_name = 5;
-  bytes photo = 6; 
-
-  // composite types
-  enum Status { // enumeration
-    UNKNOWN = 0;
-    ON = 1;
-    OFF = 3;
-  }
-  Status status = 7;
-
-  message Address { // structure
-    string country = 1;
-    string city = 2;
-    string street = 3;
-  }
-  Address primary_address = 8;
-
-  map<string, string> attributes = 9; // map
-
-  repeated string phone_numbers = 10; // array
+    int32 id = 1;
+    string name = 2;
+    bool has_photo = 3;
 }
 ```
 
@@ -208,15 +209,15 @@ public StreamObserver<EchoRequest> bidirectionalStreamingEcho(StreamObserver<Ech
 ```
 
 
-Notice that the signatures for unary and server-streaming methods are the same. A single requestis received from the client, and the server sends its one or many responses by calling the *onNext* method on the *response observer*. The difference is that for the unary method, the server calls the *onNext* method exactly once, followed by the call of the *onCompleted* method. In the server-streaming method, the *onNext* method can be called multiple times before streaming ends by the server with a call to the *onCompleted* method.
+Notice that the signatures for unary and server-streaming methods are the same. A single request is received from the client, and the server sends its one or many responses by calling the *onNext* method on the *response observer*. The difference is that for the unary method, the server calls the *onNext* method exactly once, followed by the call of the *onCompleted* method. In the server-streaming method, the *onNext* method can be called multiple times before streaming ends by the server with a call to the *onCompleted* method.
 
->>Using runtime behavior-based differences over compile-time method overloading keeps the API simple and uniform
+>Using runtime behavior-based differences over compile-time method overloading keeps the API simple and uniform
 
 Similarly, the signatures for client-streaming and bidirectional-streaming methods are the same either. Since the client can always send multiple messages to a service, the service provides it with a *request observer*. In both cases, the client can send one or many requests by calling the *onNext* method on the *request observer*, followed by the call of the *onCompleted* method. The difference is, that for the client-streaming method, the server calls the *onNext* method on the *response observer* exactly once, immediately followed by the call of the *onCompleted* method. In the bidirectional-streaming method, the server calls the *onNext* method the *response observer* multiple times before the call of the *onCompleted* method.
 
->>Since this is an echo example, the server's response always follows the client's request. In real bidirectional-streaming applications, client and server requests and responses can be in any order and can be finished by both the client and the server.
+>Since this is an echo example, the server's response always follows the client's request. In real bidirectional-streaming applications, client and server requests and responses can be in any order and can be finished by both the client and the server.
 
-A *simplified* version of the server that provides the unari echo method looks something like this:
+A *simplified* version of the server that provides the unary echo method looks something like this:
 
 
 ```
@@ -255,9 +256,9 @@ public StreamObserver<EchoRequest> bidirectionalStreamingEcho(StreamObserver<Ech
 ```
 
 
->>Use asynchronous stub for high-performance applications that stream from server to client, from client to server, or full-duplex.
+>Use asynchronous stub for high-performance applications that stream from server to client, from client to server, or full-duplex.
 
-A *simplified* version of the asynchronous client that consumes the unari echo method looks something like this:
+A *simplified* version of the asynchronous client that consumes the unary echo method looks something like this:
 
 
 ```
@@ -298,9 +299,9 @@ public Iterator<EchoResponse> serverStreamingEcho(EchoRequest request)
 ```
 
 
->>Use blocking stubs for simple applications where blocking calls are justified by simplicity and thread inefficiency is not a concern.
+>Use blocking stubs for simple applications where blocking calls are justified by simplicity and thread inefficiency is not a concern.
 
-A *simplified* version of the blocking client that consumes the unari echo method looks something like this:
+A *simplified* version of the blocking client that consumes the unary echo method looks something like this:
 
 
 ```
@@ -326,9 +327,9 @@ public ListenableFuture<EchoResponse> unaryExample(EchoRequest request)
 ```
 
 
->>Use asynchronous stubs for high-performance applications that use only unary request/response calls.
+>Use asynchronous stubs for high-performance applications that use only unary request/response calls.
 
-A *simplified* version of the future client that consumes the unari echo method looks something like this:
+A *simplified* version of the future client that consumes the unary echo method looks something like this:
 
 
 ```
@@ -350,3 +351,27 @@ Futures.addCallback(responseFuture, new FutureCallback<EchoResponse>() {
 
 channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
 ```
+
+
+
+#### Conclusion
+
+gRPC is an effective framework for developing inter-service communication. However, like any technology, it is not universal, but designed to solve a specific problem area.You should misgrate your application from REST to gRPC if it meets most of the following conditions:
+
+
+
+* The application is high-performance and requires high throughput and low latency.
+* The application needs client-streaming or bidirectional-streaming, which is impossible to achieve using HTTP/1.1.
+* For all required languages and platforms there is automatic generation of gRPC client and server stubs.
+* The application server and client are developed within your organization, and the application will run in a controlled environment.
+* Your organisation has strong engineering requirements that benefit from contracts between the client and server in *.proto* files
+
+However, using REST is a more appropriate solution for the application if it meets most of the following conditions:
+
+
+
+* The application is simple and has low loads, and increasing performance is not economically justified.
+* The application has unary requests/responses and does not use streaming. (Or the application *does* use streaming, but you consider that using WebSockets and an application protocol on top of it does not violate the REST architecture.)
+* Requests to the server are made directly from a browser, but using the gRPC-Web proxy is not technically justified.
+* The application has an public API intended for use by a large number of consumers outside your organization. (The technical level of these developers may vary, and some of them may have difficulty adopting HTTP/2 or debugging binary messages)
+* Your organization has proven engineering processes that guarantee successful backward and forward compatibility and versioning during the evolution of the application.

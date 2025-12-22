@@ -7,7 +7,7 @@ import io.grpc.examples.echo2.EchoResponse;
 import io.grpc.examples.echo2.EchoServiceGrpc;
 import io.grpc.stub.StreamObserver;
 
-public class EchoServer {
+public class ServerStreamingEchoServer {
 
     public static void main(String[] args) throws Exception {
         Server server = ServerBuilder.forPort(50051)

@@ -6,15 +6,14 @@ import io.grpc.Status;
 import io.grpc.examples.echo2.EchoRequest;
 import io.grpc.examples.echo2.EchoResponse;
 import io.grpc.examples.echo2.EchoServiceGrpc;
-import io.grpc.examples.echo2.unary.UnaryEchoFutureClient;
 import io.grpc.stub.StreamObserver;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class EchoServer {
+public class ClientStreamingEchoServer {
 
-    private static final Logger logger = Logger.getLogger(UnaryEchoFutureClient.class.getName());
+    private static final Logger logger = Logger.getLogger(ClientStreamingEchoServer.class.getName());
 
     public static void main(String[] args) throws Exception {
         Server server = ServerBuilder.forPort(50051)

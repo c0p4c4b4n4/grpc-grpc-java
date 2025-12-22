@@ -9,8 +9,11 @@ import io.grpc.examples.echo2.EchoServiceGrpc;
 import io.grpc.stub.StreamObserver;
 
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class EchoServer {
+public class BidirectionalStreamingEchoServer {
+
+    private static final Logger logger = Logger.getLogger(BidirectionalStreamingEchoServer.class.getName());
 
     public static void main(String[] args) throws Exception {
         Server server = ServerBuilder.forPort(50051)

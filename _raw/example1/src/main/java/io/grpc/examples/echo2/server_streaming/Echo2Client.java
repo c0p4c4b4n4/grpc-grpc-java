@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 public class Echo2Client {
 
-    private static final Logger logger = Logger.getLogger(UnaryEchoFutureClient.class.getName());
+    private static final Logger logger = Logger.getLogger(Echo2Client.class.getName());
 
     public static void main(String[] args) throws InterruptedException {
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();

@@ -32,8 +32,8 @@ public class ServerStreamingEchoServer {
     static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
         @Override
         public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-            logger.info("request received: " + request.getMessage());
-            for (int i = 1; i <= 5; i++) {
+            logger.info("request: " + request.getMessage());
+            for (int i = 1; i <= 3; i++) {
                 String value = "hello " + request.getMessage() + " " + i;
                 EchoResponse response = EchoResponse.newBuilder().setMessage(value).build();
                 responseObserver.onNext(response);

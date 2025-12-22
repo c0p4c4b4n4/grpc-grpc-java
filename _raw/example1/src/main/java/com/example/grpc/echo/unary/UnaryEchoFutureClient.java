@@ -34,7 +34,7 @@ public class UnaryEchoFutureClient {
         Futures.addCallback(responseFuture, new FutureCallback<EchoResponse>() {
             @Override
             public void onSuccess(EchoResponse response) {
-                logger.info("success: " + response.getMessage());
+                logger.info("result: " + response.getMessage());
                 latch.countDown();
             }
 

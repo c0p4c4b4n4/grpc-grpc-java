@@ -23,7 +23,7 @@ public class ServerStreamingEchoBlockingClient {
             Iterator<EchoResponse> responses = blockingStub.serverStreamingEcho(request);
 
             while (responses.hasNext()) {
-                System.out.println("success: " + responses.next().getMessage());
+                System.out.println("response: " + responses.next().getMessage());
             }
         } finally {
             channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);

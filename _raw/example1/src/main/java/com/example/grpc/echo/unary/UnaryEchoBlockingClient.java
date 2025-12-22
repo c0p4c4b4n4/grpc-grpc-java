@@ -23,7 +23,7 @@ public class UnaryEchoBlockingClient {
             EchoServiceGrpc.EchoServiceBlockingStub blockingStub = EchoServiceGrpc.newBlockingStub(channel);
             EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
             EchoResponse response = blockingStub.unaryEcho(request);
-            logger.info("success: " + response.getMessage());
+            logger.info("response: " + response.getMessage());
         } finally {
             channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
         }

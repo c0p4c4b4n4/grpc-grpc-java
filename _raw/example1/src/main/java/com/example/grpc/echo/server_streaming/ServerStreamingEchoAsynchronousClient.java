@@ -30,8 +30,7 @@ public class ServerStreamingEchoAsynchronousClient {
         asyncStub.serverStreamingEcho(request, new StreamObserver<EchoResponse>() {
             @Override
             public void onNext(EchoResponse value) {
-//                    System.out.println("Received an echo: " + response.getMessage());
-                System.out.println("next: " + value.getMessage());
+                logger.info("next: " + value.getMessage());
             }
 
             @Override
@@ -42,8 +41,7 @@ public class ServerStreamingEchoAsynchronousClient {
 
             @Override
             public void onCompleted() {
-//                    System.out.println("Server acknowledged end of echo stream.");
-                System.out.println("completed");
+                logger.info("completed");
                 latch.countDown();
             }
         });

@@ -37,7 +37,7 @@ public class UnaryEchoFutureClient {
 
             @Override
             public void onFailure(Throwable t) {
-                logger.log(Level.WARNING, "error: {0}", Status.fromThrowable(t));
+                logger.warning("error: " + Status.fromThrowable(t));
             }
         }, MoreExecutors.directExecutor());
 

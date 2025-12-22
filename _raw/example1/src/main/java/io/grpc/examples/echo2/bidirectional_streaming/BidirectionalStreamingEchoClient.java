@@ -32,7 +32,7 @@ public class BidirectionalStreamingEchoClient {
 
             @Override
             public void onError(Throwable t) {
-                logger.log(Level.WARNING, "error: {0}", Status.fromThrowable(t));
+                logger.warning("error: " + Status.fromThrowable(t));
             }
 
             @Override

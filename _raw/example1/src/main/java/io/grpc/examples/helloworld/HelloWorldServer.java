@@ -34,13 +34,13 @@ public class HelloWorldServer {
 
     private static final Logger logger = Logger.getLogger(HelloWorldServer.class.getName());
 
-    private Server server;
+//    private Server server;
 
 
     public static void main(String[] args) throws IOException, InterruptedException {
         final HelloWorldServer helloWorldServer = new HelloWorldServer();
-        helloWorldServer.start();
-        helloWorldServer.blockUntilShutdown();
+        Server server = helloWorldServer.start();
+        helloWorldServer.blockUntilShutdown(server);
     }
 
     static class GreeterImpl extends GreeterGrpc.GreeterImplBase {
@@ -53,7 +53,7 @@ public class HelloWorldServer {
         }
     }
 
-    private void start() throws IOException {
+    private Server start() throws IOException {
         int port = 50051;
         /*
          * By default gRPC uses a global, shared Executor.newCachedThreadPool() for gRPC callbacks into
@@ -64,7 +64,7 @@ public class HelloWorldServer {
          * Async application code generally does not need more threads than CPU cores.
          */
         ExecutorService executor = Executors.newFixedThreadPool(2);
-        server = Grpc.newServerBuilderForPort(port, InsecureServerCredentials.create())
+        Server server = Grpc.newServerBuilderForPort(port, InsecureServerCredentials.create())
             .executor(executor)
             .addService(new GreeterImpl())
             .build()
@@ -78,7 +78,7 @@ public class HelloWorldServer {
                 // Use stderr here since the logger may have been reset by its JVM shutdown hook.
                 System.err.println("*** shutting down gRPC server since JVM is shutting down");
                 try {
-                    HelloWorldServer.this.stop();
+                    HelloWorldServer.this.stop(server);
                 } catch (InterruptedException e) {
                     if (server != null) {
                         server.shutdownNow();
@@ -90,9 +90,11 @@ public class HelloWorldServer {
                 System.err.println("*** server shut down");
             }
         });
+
+        return server;
     }
 
-    private void stop() throws InterruptedException {
+    private void stop(Server server) throws InterruptedException {
         if (server != null) {
             server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
         }
@@ -101,7 +103,7 @@ public class HelloWorldServer {
     /**
      * Await termination on the main thread since the grpc library uses daemon threads.
      */
-    private void blockUntilShutdown() throws InterruptedException {
+    private void blockUntilShutdown(Server server) throws InterruptedException {
         if (server != null) {
             server.awaitTermination();
         }

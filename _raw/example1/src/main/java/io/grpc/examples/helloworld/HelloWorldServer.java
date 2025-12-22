@@ -38,9 +38,9 @@ public class HelloWorldServer {
 
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        final HelloWorldServer server = new HelloWorldServer();
-        server.start();
-        server.blockUntilShutdown();
+        final HelloWorldServer helloWorldServer = new HelloWorldServer();
+        helloWorldServer.start();
+        helloWorldServer.blockUntilShutdown();
     }
 
     static class GreeterImpl extends GreeterGrpc.GreeterImplBase {

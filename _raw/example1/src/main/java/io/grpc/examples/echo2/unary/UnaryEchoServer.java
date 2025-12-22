@@ -7,6 +7,7 @@ import io.grpc.examples.echo2.EchoResponse;
 import io.grpc.examples.echo2.EchoServiceGrpc;
 import io.grpc.stub.StreamObserver;
 
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class UnaryEchoServer {
@@ -32,6 +33,30 @@ public class UnaryEchoServer {
             .build()
             .start();
 
-        server.awaitTermination();
+        logger.info("server started");
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                System.err.println("server is stopping");
+                try {
+                    if (server != null) {
+                        server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+                    }
+                } catch (InterruptedException e) {
+                    if (server != null) {
+                        server.shutdownNow();
+                    }
+                    e.printStackTrace(System.err);
+//                } finally {
+//                    executor.shutdown();
+                }
+                System.err.println("server has been stopped");
+            }
+        });
+//        server.awaitTermination();
+        if (server != null) {
+            server.awaitTermination();
+        }
     }
 }

@@ -25,8 +25,6 @@ import io.grpc.examples.helloworld.HelloRequest;
 import io.grpc.stub.StreamObserver;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -43,7 +41,9 @@ public class HelloWorldServer {
     public static void main(String[] args) throws IOException, InterruptedException {
         final HelloWorldServer helloWorldServer = new HelloWorldServer();
         Server server = helloWorldServer.start();
-        helloWorldServer.blockUntilShutdown(server);
+        if (server != null) {
+            server.awaitTermination();
+        }
     }
 
     static class GreeterImpl extends GreeterGrpc.GreeterImplBase {
@@ -81,7 +81,9 @@ public class HelloWorldServer {
                 // Use stderr here since the logger may have been reset by its JVM shutdown hook.
                 System.err.println("*** shutting down gRPC server since JVM is shutting down");
                 try {
-                    HelloWorldServer.this.stop(server);
+                    if (server != null) {
+                        server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+                    }
                 } catch (InterruptedException e) {
                     if (server != null) {
                         server.shutdownNow();
@@ -103,12 +105,4 @@ public class HelloWorldServer {
         }
     }
 
-    /**
-     * Await termination on the main thread since the grpc library uses daemon threads.
-     */
-    private void blockUntilShutdown(Server server) throws InterruptedException {
-        if (server != null) {
-            server.awaitTermination();
-        }
-    }
 }

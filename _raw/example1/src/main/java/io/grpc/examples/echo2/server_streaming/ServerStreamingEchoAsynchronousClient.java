@@ -8,16 +8,15 @@ import io.grpc.examples.echo2.EchoRequest;
 import io.grpc.examples.echo2.EchoResponse;
 import io.grpc.examples.echo2.EchoServiceGrpc;
 import io.grpc.examples.echo2.Logging;
-import io.grpc.examples.echo2.unary.UnaryEchoFutureClient;
 import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Echo2Client {
+public class ServerStreamingEchoAsynchronousClient {
 
-    private static final Logger logger = Logger.getLogger(Echo2Client.class.getName());
+    private static final Logger logger = Logger.getLogger(ServerStreamingEchoAsynchronousClient.class.getName());
 
     public static void main(String[] args) throws InterruptedException {
         Logging.init();

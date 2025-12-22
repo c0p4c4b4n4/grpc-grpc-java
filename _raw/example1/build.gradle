@@ -14,12 +14,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
-// IMPORTANT: You probably want the non-SNAPSHOT version of gRPC. Make sure you
-// are looking at a tagged version of the example and not "master"!
-
-// Feel free to delete the comment at the next line. It is just for safely
-// updating the version in our release process.
-def grpcVersion = '1.76.0-SNAPSHOT' // CURRENT_GRPC_VERSION
+def grpcVersion = '1.76.2'
 def protobufVersion = '3.25.8'
 def protocVersion = protobufVersion
 
@@ -27,9 +22,6 @@ dependencies {
     implementation "io.grpc:grpc-protobuf:${grpcVersion}"
     implementation "io.grpc:grpc-services:${grpcVersion}"
     implementation "io.grpc:grpc-stub:${grpcVersion}"
-
-    // examples/advanced need this for JsonFormat
-//    implementation "com.google.protobuf:protobuf-java-util:${protobufVersion}"
 
     runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
 }

@@ -6,6 +6,7 @@ import io.grpc.examples.echo2.EchoRequest;
 import io.grpc.examples.echo2.EchoResponse;
 import io.grpc.examples.echo2.EchoServiceGrpc;
 import io.grpc.examples.echo2.Logging;
+import io.grpc.examples.echo2.Shutdown;
 import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.TimeUnit;
@@ -35,17 +36,7 @@ public class UnaryEchoServer {
 
         logger.info("server started");
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.err.println("server is shutting down");
-            try {
-                server.shutdown().awaitTermination(10, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                System.err.println("server shutdown was interrupted");
-                server.shutdownNow();
-            }
-            System.err.println("server has been shut down");
-        }));
-
+        Shutdown.init(server);
         server.awaitTermination();
     }
 }

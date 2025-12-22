@@ -7,6 +7,7 @@ import io.grpc.examples.echo2.EchoRequest;
 import io.grpc.examples.echo2.EchoResponse;
 import io.grpc.examples.echo2.EchoServiceGrpc;
 import io.grpc.examples.echo2.Logging;
+import io.grpc.examples.echo2.Shutdown;
 import io.grpc.stub.StreamObserver;
 
 import java.util.logging.Level;
@@ -25,6 +26,8 @@ public class BidirectionalStreamingEchoServer {
             )
             .build()
             .start();
+
+        Shutdown.init(server);
         server.awaitTermination();
     }
 

@@ -6,7 +6,6 @@ import io.grpc.ManagedChannel;
 import io.grpc.examples.echo2.EchoRequest;
 import io.grpc.examples.echo2.EchoResponse;
 import io.grpc.examples.echo2.EchoServiceGrpc;
-import io.grpc.examples.echo2.Init;
 import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.TimeUnit;
@@ -17,8 +16,9 @@ public class UnaryEchoAsynchronousClient {
     private static final Logger logger = Logger.getLogger(UnaryEchoAsynchronousClient.class.getName());
 
     public static void main(String[] args) throws Exception {
-        Init.loggingFormat();
-        
+        System.setProperty("java.util.logging.SimpleFormatter.format",
+            "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$s %2$s %5$s%6$s%n");
+
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
 
         EchoServiceGrpc.EchoServiceStub asyncStub = EchoServiceGrpc.newStub(channel);

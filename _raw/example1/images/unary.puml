@@ -1,5 +1,14 @@
 @startuml
+
+scale 1.1
 title Unary gRPC
+hide footbox
+skinparam monochrome true
+skinparam defaultFontName Source Sans Pro
+'skinparam titleFontSize 15
+'skinparam sequenceMessageAlign center
+
+'title Unary gRPC
 
 participant "gRPC Client" as Client
 participant "gRPC Server" as Server

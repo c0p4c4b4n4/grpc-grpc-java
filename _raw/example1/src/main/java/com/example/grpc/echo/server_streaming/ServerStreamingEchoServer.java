@@ -1,12 +1,12 @@
-package io.grpc.examples.echo2.server_streaming;
+package com.example.grpc.echo.server_streaming;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
-import io.grpc.examples.echo2.EchoRequest;
-import io.grpc.examples.echo2.EchoResponse;
-import io.grpc.examples.echo2.EchoServiceGrpc;
-import io.grpc.examples.echo2.Logging;
-import io.grpc.examples.echo2.Shutdown;
+import com.example.grpc.echo.EchoRequest;
+import com.example.grpc.echo.EchoResponse;
+import com.example.grpc.echo.EchoServiceGrpc;
+import com.example.grpc.echo.Logging;
+import com.example.grpc.echo.Shutdown;
 import io.grpc.stub.StreamObserver;
 
 public class ServerStreamingEchoServer {

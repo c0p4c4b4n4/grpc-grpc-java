@@ -1,17 +1,16 @@
-package io.grpc.examples.echo2.bidirectional_streaming;
+package com.example.grpc.echo.bidirectional_streaming;
 
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
 import io.grpc.Status;
-import io.grpc.examples.echo2.EchoRequest;
-import io.grpc.examples.echo2.EchoResponse;
-import io.grpc.examples.echo2.EchoServiceGrpc;
-import io.grpc.examples.echo2.Logging;
+import com.example.grpc.echo.EchoRequest;
+import com.example.grpc.echo.EchoResponse;
+import com.example.grpc.echo.EchoServiceGrpc;
+import com.example.grpc.echo.Logging;
 import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class BidirectionalStreamingEchoClient {

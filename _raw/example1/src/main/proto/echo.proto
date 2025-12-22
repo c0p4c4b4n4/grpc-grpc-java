@@ -1,6 +1,6 @@
 syntax = "proto3";
 option java_multiple_files = true;
-package io.grpc.examples.echo2;
+package com.example.grpc.echo;
 
 message EchoRequest {
   string message = 1;

@@ -1,14 +1,8 @@
-package io.grpc.examples.echo2;
+package com.example.grpc.echo;
 
 import io.grpc.Server;
-import io.grpc.ServerBuilder;
-import io.grpc.examples.echo2.EchoRequest;
-import io.grpc.examples.echo2.EchoResponse;
-import io.grpc.examples.echo2.EchoServiceGrpc;
-import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 
 public class Shutdown {

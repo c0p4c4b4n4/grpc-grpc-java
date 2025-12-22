@@ -7,6 +7,8 @@ import io.grpc.examples.echo2.EchoResponse;
 import io.grpc.examples.echo2.EchoServiceGrpc;
 import io.grpc.stub.StreamObserver;
 
+import java.util.logging.Level;
+
 public class EchoServer {
 
     public static void main(String[] args) throws Exception {
@@ -23,6 +25,7 @@ public class EchoServer {
             return new StreamObserver<EchoRequest>() {
                 @Override
                 public void onNext(EchoRequest request) {
+//                    logger.info("Received bidirection streaming echo request: " + request.getMessage());
                     System.out.println("server next: " + "server next: " + request.getMessage());
                     // Business logic: Echo back immediately or process
                     EchoResponse response = EchoResponse.newBuilder().setMessage("server next: " + request.getMessage()).build();
@@ -31,11 +34,14 @@ public class EchoServer {
 
                 @Override
                 public void onError(Throwable t) {
+//                    logger.log(Level.WARNING,
+//                        "echo stream cancelled or had a problem and is no longer usable " + t.getMessage());
                     System.out.println("server error: " + t);
                 }
 
                 @Override
                 public void onCompleted() {
+//                    logger.info("Bidirectional stream completed from client side");
                     System.out.println("server completed");
                     responseObserver.onCompleted();
                 }

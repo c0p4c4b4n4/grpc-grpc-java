@@ -3,6 +3,7 @@ package io.grpc.examples.echo2.server_streaming;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
+import io.grpc.Status;
 import io.grpc.examples.echo2.EchoRequest;
 import io.grpc.examples.echo2.EchoResponse;
 import io.grpc.examples.echo2.EchoServiceGrpc;
@@ -22,16 +23,19 @@ public class Echo2Client {
             new StreamObserver<EchoResponse>() {
                 @Override
                 public void onNext(EchoResponse value) {
+//                    System.out.println("Received an echo: " + response.getMessage());
                     System.out.println("async received: " + value.getMessage());
                 }
 
                 @Override
                 public void onError(Throwable t) {
+//                    logger.warning("Echo Failed: {0}" + Status.fromThrowable(t));
                     System.out.println("error: " + t);
                 }
 
                 @Override
                 public void onCompleted() {
+//                    System.out.println("Server acknowledged end of echo stream.");
                     System.out.println("completed");
                 }
             });

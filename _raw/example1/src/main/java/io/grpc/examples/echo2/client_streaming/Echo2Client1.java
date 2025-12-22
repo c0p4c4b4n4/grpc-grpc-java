@@ -39,6 +39,6 @@ public class Echo2Client1 {
         requestObserver.onNext(EchoRequest.newBuilder().setMessage("three").build());
         requestObserver.onCompleted();
 
-        channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+        channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
     }
 }

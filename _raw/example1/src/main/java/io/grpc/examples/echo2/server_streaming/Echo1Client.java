@@ -22,6 +22,6 @@ public class Echo1Client {
         while (responses.hasNext()) {
             System.out.println("received: " + responses.next().getMessage());
         }
-        channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+        channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
     }
 }

@@ -40,6 +40,6 @@ public class Echo2Client {
                 }
             });
 
-        channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+        channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
     }
 }

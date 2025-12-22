@@ -35,28 +35,18 @@ public class UnaryEchoServer {
 
         logger.info("server started");
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                System.err.println("server is stopping");
-                try {
-                    if (server != null) {
-                        server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
-                    }
-                } catch (InterruptedException e) {
-                    if (server != null) {
-                        server.shutdownNow();
-                    }
-                    e.printStackTrace(System.err);
-//                } finally {
-//                    executor.shutdown();
-                }
-                System.err.println("server has been stopped");
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.err.println("server is shutting down");
+            try {
+                server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                System.err.println("server shutdown was interrupted");
+                server.shutdownNow();
+                e.printStackTrace(System.err);
             }
-        });
-//        server.awaitTermination();
-        if (server != null) {
-            server.awaitTermination();
-        }
+            System.err.println("server has been shut down");
+        }));
+
+        server.awaitTermination();
     }
 }

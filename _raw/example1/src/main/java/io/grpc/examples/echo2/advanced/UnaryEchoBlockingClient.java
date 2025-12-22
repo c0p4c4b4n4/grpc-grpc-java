@@ -17,7 +17,9 @@ public class UnaryEchoBlockingClient {
     public static void main(String[] args) throws Exception {
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
 
-        EchoServiceGrpc.EchoServiceBlockingStub blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+        EchoServiceGrpc.EchoServiceBlockingStub blockingStub = EchoServiceGrpc
+            .newBlockingStub(channel)
+            .withInterceptors(new LoggingClientInterceptor());
         EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
         EchoResponse response = blockingStub.unaryEcho(request);
         System.out.println("result: " + response.getMessage());

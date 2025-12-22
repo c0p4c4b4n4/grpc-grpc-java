@@ -5,13 +5,18 @@ import io.grpc.ServerBuilder;
 import io.grpc.examples.echo2.EchoRequest;
 import io.grpc.examples.echo2.EchoResponse;
 import io.grpc.examples.echo2.EchoServiceGrpc;
+import io.grpc.examples.echo2.Logging;
 import io.grpc.stub.StreamObserver;
 
 public class ServerStreamingEchoServer {
 
     public static void main(String[] args) throws Exception {
+        Logging.init();
+
         Server server = ServerBuilder.forPort(50051)
-            .addService(new EchoServiceImpl())
+            .addService(
+                new EchoServiceImpl()
+            )
             .build()
             .start();
         server.awaitTermination();

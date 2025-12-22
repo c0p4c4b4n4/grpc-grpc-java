@@ -7,6 +7,7 @@ import io.grpc.Status;
 import io.grpc.examples.echo2.EchoRequest;
 import io.grpc.examples.echo2.EchoResponse;
 import io.grpc.examples.echo2.EchoServiceGrpc;
+import io.grpc.examples.echo2.Logging;
 import io.grpc.examples.echo2.unary.UnaryEchoFutureClient;
 import io.grpc.stub.StreamObserver;
 
@@ -19,6 +20,8 @@ public class Echo2Client1 {
     private static final Logger logger = Logger.getLogger(Echo2Client1.class.getName());
 
     public static void main(String[] args) throws InterruptedException {
+        Logging.init();
+
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
 
         EchoServiceGrpc.EchoServiceStub asyncStub = EchoServiceGrpc.newStub(channel);

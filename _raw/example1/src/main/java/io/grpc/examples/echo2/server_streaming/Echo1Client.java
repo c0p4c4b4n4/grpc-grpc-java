@@ -6,6 +6,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.examples.echo2.EchoRequest;
 import io.grpc.examples.echo2.EchoResponse;
 import io.grpc.examples.echo2.EchoServiceGrpc;
+import io.grpc.examples.echo2.Logging;
 
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
@@ -13,6 +14,8 @@ import java.util.concurrent.TimeUnit;
 public class Echo1Client {
 
     public static void main(String[] args) throws InterruptedException {
+        Logging.init();
+
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
 
         EchoServiceGrpc.EchoServiceBlockingStub blockingStub = EchoServiceGrpc.newBlockingStub(channel);

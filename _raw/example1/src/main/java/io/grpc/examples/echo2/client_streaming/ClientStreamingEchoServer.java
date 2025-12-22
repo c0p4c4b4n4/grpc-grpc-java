@@ -6,6 +6,7 @@ import io.grpc.Status;
 import io.grpc.examples.echo2.EchoRequest;
 import io.grpc.examples.echo2.EchoResponse;
 import io.grpc.examples.echo2.EchoServiceGrpc;
+import io.grpc.examples.echo2.Logging;
 import io.grpc.stub.StreamObserver;
 
 import java.util.logging.Level;
@@ -16,8 +17,12 @@ public class ClientStreamingEchoServer {
     private static final Logger logger = Logger.getLogger(ClientStreamingEchoServer.class.getName());
 
     public static void main(String[] args) throws Exception {
+        Logging.init();
+
         Server server = ServerBuilder.forPort(50051)
-            .addService(new EchoServiceImpl())
+            .addService(
+                new EchoServiceImpl()
+            )
             .build()
             .start();
         server.awaitTermination();

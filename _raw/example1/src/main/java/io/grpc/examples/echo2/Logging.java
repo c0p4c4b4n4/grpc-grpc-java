@@ -1,8 +1,6 @@
 package io.grpc.examples.echo2;
 
-import io.grpc.Server;
-
-public class Logger {
+public class Logging {
 
     public static void init() {
         System.setProperty("java.util.logging.SimpleFormatter.format",

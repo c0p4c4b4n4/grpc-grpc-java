@@ -1,12 +1,12 @@
 package com.example.grpc.echo.unary;
 
-import io.grpc.Grpc;
-import io.grpc.InsecureChannelCredentials;
-import io.grpc.ManagedChannel;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
 import com.example.grpc.echo.Logging;
+import io.grpc.Grpc;
+import io.grpc.InsecureChannelCredentials;
+import io.grpc.ManagedChannel;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -19,12 +19,13 @@ public class UnaryEchoBlockingClient {
         Logging.init();
 
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
-
-        EchoServiceGrpc.EchoServiceBlockingStub blockingStub = EchoServiceGrpc.newBlockingStub(channel);
-        EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
-        EchoResponse response = blockingStub.unaryEcho(request);
-        logger.info("response received: " + response.getMessage());
-
-        channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
+        try {
+            EchoServiceGrpc.EchoServiceBlockingStub blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+            EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
+            EchoResponse response = blockingStub.unaryEcho(request);
+            logger.info("success: " + response.getMessage());
+        } finally {
+            channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
+        }
     }
 }

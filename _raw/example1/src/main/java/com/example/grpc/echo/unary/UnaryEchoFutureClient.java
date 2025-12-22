@@ -1,5 +1,9 @@
 package com.example.grpc.echo.unary;
 
+import com.example.grpc.echo.EchoRequest;
+import com.example.grpc.echo.EchoResponse;
+import com.example.grpc.echo.EchoServiceGrpc;
+import com.example.grpc.echo.Logging;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -8,11 +12,8 @@ import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
 import io.grpc.Status;
-import com.example.grpc.echo.EchoRequest;
-import com.example.grpc.echo.EchoResponse;
-import com.example.grpc.echo.EchoServiceGrpc;
-import com.example.grpc.echo.Logging;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -26,19 +27,25 @@ public class UnaryEchoFutureClient {
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
 
         EchoServiceGrpc.EchoServiceFutureStub futureStub = EchoServiceGrpc.newFutureStub(channel);
-        ListenableFuture<EchoResponse> responseFuture = futureStub.unaryEcho(EchoRequest.newBuilder().setMessage("world").build());
+        EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
+        ListenableFuture<EchoResponse> responseFuture = futureStub.unaryEcho(request);
+
+        CountDownLatch latch = new CountDownLatch(1);
         Futures.addCallback(responseFuture, new FutureCallback<EchoResponse>() {
             @Override
             public void onSuccess(EchoResponse response) {
-                logger.info("response received: " + response.getMessage());
+                logger.info("success: " + response.getMessage());
+                latch.countDown();
             }
 
             @Override
             public void onFailure(Throwable t) {
                 logger.warning("error: " + Status.fromThrowable(t));
+                latch.countDown();
             }
         }, MoreExecutors.directExecutor());
 
+        latch.await();
         channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
     }
 }

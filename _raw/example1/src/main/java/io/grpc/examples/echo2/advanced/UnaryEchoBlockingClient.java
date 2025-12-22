@@ -33,6 +33,9 @@ public class UnaryEchoBlockingClient {
     }
 
     public static void main(String[] args) throws Exception {
+        System.setProperty("java.util.logging.SimpleFormatter.format",
+            "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$s %2$s %5$s%6$s%n");
+
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
 
         try {
@@ -42,7 +45,7 @@ public class UnaryEchoBlockingClient {
                 .withWaitForReady().withDeadline(Deadline.after(20, TimeUnit.SECONDS));
             EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
             EchoResponse response = blockingStub.unaryEcho(request);
-            System.out.println("result: " + response.getMessage());
+            logger.info("result: " + response.getMessage());
         } finally {
 //            channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
             channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);

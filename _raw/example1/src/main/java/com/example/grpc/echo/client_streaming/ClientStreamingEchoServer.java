@@ -1,13 +1,13 @@
 package com.example.grpc.echo.client_streaming;
 
-import io.grpc.Server;
-import io.grpc.ServerBuilder;
-import io.grpc.Status;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
 import com.example.grpc.echo.Logging;
 import com.example.grpc.echo.Shutdown;
+import io.grpc.Server;
+import io.grpc.ServerBuilder;
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
 import java.util.logging.Logger;

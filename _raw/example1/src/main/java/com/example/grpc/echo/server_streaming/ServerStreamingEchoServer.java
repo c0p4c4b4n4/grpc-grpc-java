@@ -1,15 +1,19 @@
 package com.example.grpc.echo.server_streaming;
 
-import io.grpc.Server;
-import io.grpc.ServerBuilder;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
 import com.example.grpc.echo.Logging;
 import com.example.grpc.echo.Shutdown;
+import io.grpc.Server;
+import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 
+import java.util.logging.Logger;
+
 public class ServerStreamingEchoServer {
+
+    private static final Logger logger = Logger.getLogger(ServerStreamingEchoServer.class.getName());
 
     public static void main(String[] args) throws Exception {
         Logging.init();
@@ -28,9 +32,9 @@ public class ServerStreamingEchoServer {
     static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
         @Override
         public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-//            logger.info("Received server streaming echo request: " + request.getMessage());
+            logger.info("request received: " + request.getMessage());
             for (int i = 1; i <= 5; i++) {
-                String value = "echo [" + i + "]: " + request.getMessage();
+                String value = "hello " + request.getMessage() + " " + i;
                 EchoResponse response = EchoResponse.newBuilder().setMessage(value).build();
                 responseObserver.onNext(response);
             }

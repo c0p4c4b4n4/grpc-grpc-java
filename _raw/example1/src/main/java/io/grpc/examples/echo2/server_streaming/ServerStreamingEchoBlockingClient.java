@@ -11,7 +11,7 @@ import io.grpc.examples.echo2.Logging;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
-public class Echo1Client {
+public class ServerStreamingEchoBlockingClient {
 
     public static void main(String[] args) throws InterruptedException {
         Logging.init();

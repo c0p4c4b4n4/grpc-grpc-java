@@ -2,6 +2,7 @@ plugins {
     id 'application'
     id 'com.google.protobuf' version '0.9.5'
     id 'idea'
+    id 'org.jetbrains.kotlin.jvm'
 }
 
 repositories {
@@ -9,9 +10,8 @@ repositories {
     mavenLocal()
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+kotlin {
+    jvmToolchain(17)
 }
 
 def grpcVersion = '1.76.2'
@@ -24,6 +24,7 @@ dependencies {
     implementation "io.grpc:grpc-stub:${grpcVersion}"
 
     runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
 protobuf {

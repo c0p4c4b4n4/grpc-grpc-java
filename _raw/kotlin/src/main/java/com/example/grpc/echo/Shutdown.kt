@@ -1,22 +1,19 @@
-package com.example.grpc.echo;
+package com.example.grpc.echo
 
-import io.grpc.Server;
+import io.grpc.Server
+import java.util.concurrent.TimeUnit
 
-import java.util.concurrent.TimeUnit;
-
-
-public class Shutdown {
-
-    public static void init(Server server) {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.err.println("server is shutting down");
+object Shutdown {
+    fun init(server: Server) {
+        Runtime.getRuntime().addShutdownHook(Thread(Runnable {
+            System.err.println("server is shutting down")
             try {
-                server.shutdown().awaitTermination(10, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                System.err.println("server shutdown was interrupted");
-                server.shutdownNow();
+                server.shutdown().awaitTermination(10, TimeUnit.SECONDS)
+            } catch (e: InterruptedException) {
+                System.err.println("server shutdown was interrupted")
+                server.shutdownNow()
             }
-            System.err.println("server has been shut down");
-        }));
+            System.err.println("server has been shut down")
+        }))
     }
 }

@@ -1,52 +1,48 @@
-package com.example.grpc.echo.unary;
+package com.example.grpc.echo.unary
 
-import com.example.grpc.echo.EchoRequest;
-import com.example.grpc.echo.EchoResponse;
-import com.example.grpc.echo.EchoServiceGrpc;
-import com.example.grpc.echo.Logging;
-import io.grpc.Grpc;
-import io.grpc.InsecureChannelCredentials;
-import io.grpc.ManagedChannel;
-import io.grpc.Status;
-import io.grpc.stub.StreamObserver;
+import com.example.grpc.echo.EchoRequest
+import com.example.grpc.echo.EchoResponse
+import com.example.grpc.echo.EchoServiceGrpc
+import com.example.grpc.echo.Logging
+import io.grpc.Grpc
+import io.grpc.InsecureChannelCredentials
+import io.grpc.Status
+import io.grpc.stub.StreamObserver
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.logging.Logger
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
+object UnaryEchoAsynchronousClient {
+    private val logger: Logger = Logger.getLogger(UnaryEchoAsynchronousClient::class.java.getName())
 
-public class UnaryEchoAsynchronousClient {
+    @kotlin.Throws(Exception::class)
+    @kotlin.jvm.JvmStatic
+    fun main(args: Array<String>) {
+        Logging.init()
 
-    private static final Logger logger = Logger.getLogger(UnaryEchoAsynchronousClient.class.getName());
+        val channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build()
 
-    public static void main(String[] args) throws Exception {
-        Logging.init();
+        val asyncStub = EchoServiceGrpc.newStub(channel)
+        val request = EchoRequest.newBuilder().setMessage("world").build()
 
-        ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
-
-        EchoServiceGrpc.EchoServiceStub asyncStub = EchoServiceGrpc.newStub(channel);
-        EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
-
-        CountDownLatch latch = new CountDownLatch(1);
-        asyncStub.unaryEcho(request, new StreamObserver<EchoResponse>() {
-            @Override
-            public void onNext(EchoResponse response) {
-                logger.info("next: " + response.getMessage());
+        val latch = CountDownLatch(1)
+        asyncStub.unaryEcho(request, object : StreamObserver<EchoResponse?> {
+            override fun onNext(response: EchoResponse) {
+                logger.info("next: " + response.getMessage())
             }
 
-            @Override
-            public void onError(Throwable t) {
-                logger.warning("error: " + Status.fromThrowable(t));
-                latch.countDown();
+            override fun onError(t: Throwable) {
+                logger.warning("error: " + Status.fromThrowable(t))
+                latch.countDown()
             }
 
-            @Override
-            public void onCompleted() {
-                logger.info("completed");
-                latch.countDown();
+            override fun onCompleted() {
+                logger.info("completed")
+                latch.countDown()
             }
-        });
+        })
 
-        latch.await();
-        channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
+        latch.await()
+        channel.shutdown().awaitTermination(10, TimeUnit.SECONDS)
     }
 }

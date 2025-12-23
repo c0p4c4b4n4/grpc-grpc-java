@@ -1,4 +1,4 @@
-package com.example.grpc.echo
+package echo
 
 import io.grpc.Server
 import java.util.concurrent.TimeUnit

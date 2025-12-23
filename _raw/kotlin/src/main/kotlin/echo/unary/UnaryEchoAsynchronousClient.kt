@@ -1,9 +1,9 @@
-package com.example.grpc.echo.unary
+package echo.unary
 
 import com.example.grpc.echo.EchoRequest
 import com.example.grpc.echo.EchoResponse
 import com.example.grpc.echo.EchoServiceGrpc
-import com.example.grpc.echo.Logging
+import echo.Logging
 import io.grpc.Grpc
 import io.grpc.InsecureChannelCredentials
 import io.grpc.Status
@@ -15,8 +15,8 @@ import java.util.logging.Logger
 object UnaryEchoAsynchronousClient {
     private val logger: Logger = Logger.getLogger(UnaryEchoAsynchronousClient::class.java.getName())
 
-    @kotlin.Throws(Exception::class)
-    @kotlin.jvm.JvmStatic
+    @Throws(Exception::class)
+    @JvmStatic
     fun main(args: Array<String>) {
         Logging.init()
 

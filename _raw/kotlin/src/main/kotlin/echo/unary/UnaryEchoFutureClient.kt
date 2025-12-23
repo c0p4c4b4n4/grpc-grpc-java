@@ -1,9 +1,9 @@
-package com.example.grpc.echo.unary
+package echo.unary
 
 import com.example.grpc.echo.EchoRequest
 import com.example.grpc.echo.EchoResponse
 import com.example.grpc.echo.EchoServiceGrpc
-import com.example.grpc.echo.Logging
+import echo.Logging
 import com.google.common.util.concurrent.FutureCallback
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.MoreExecutors
@@ -17,8 +17,8 @@ import java.util.logging.Logger
 object UnaryEchoFutureClient {
     private val logger: Logger = Logger.getLogger(UnaryEchoFutureClient::class.java.getName())
 
-    @kotlin.Throws(Exception::class)
-    @kotlin.jvm.JvmStatic
+    @Throws(Exception::class)
+    @JvmStatic
     fun main(args: Array<String>) {
         Logging.init()
 

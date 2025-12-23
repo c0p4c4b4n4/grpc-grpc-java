@@ -1,10 +1,10 @@
-package com.example.grpc.echo.unary
+package echo.unary
 
 import com.example.grpc.echo.EchoRequest
 import com.example.grpc.echo.EchoResponse
 import com.example.grpc.echo.EchoServiceGrpc.EchoServiceImplBase
-import com.example.grpc.echo.Logging
-import com.example.grpc.echo.Shutdown
+import echo.Logging
+import echo.Shutdown
 import io.grpc.ServerBuilder
 import io.grpc.stub.StreamObserver
 import java.util.logging.Logger
@@ -12,8 +12,8 @@ import java.util.logging.Logger
 object UnaryEchoServer {
     private val logger: Logger = Logger.getLogger(UnaryEchoServer::class.java.getName())
 
-    @kotlin.Throws(Exception::class)
-    @kotlin.jvm.JvmStatic
+    @Throws(Exception::class)
+    @JvmStatic
     fun main(args: Array<String>) {
         Logging.init()
 

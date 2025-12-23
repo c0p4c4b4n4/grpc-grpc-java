@@ -1,4 +1,4 @@
-package com.example.grpc.echo
+package echo
 
 object Logging {
     fun init() {

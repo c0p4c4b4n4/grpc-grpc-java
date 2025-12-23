@@ -1,8 +1,8 @@
-package com.example.grpc.echo.unary
+package echo.unary
 
 import com.example.grpc.echo.EchoRequest
 import com.example.grpc.echo.EchoServiceGrpc
-import com.example.grpc.echo.Logging
+import echo.Logging
 import io.grpc.Grpc
 import io.grpc.InsecureChannelCredentials
 import java.util.concurrent.TimeUnit
@@ -11,8 +11,8 @@ import java.util.logging.Logger
 object UnaryEchoBlockingClient {
     private val logger: Logger = Logger.getLogger(UnaryEchoBlockingClient::class.java.getName())
 
-    @kotlin.Throws(Exception::class)
-    @kotlin.jvm.JvmStatic
+    @Throws(Exception::class)
+    @JvmStatic
     fun main(args: Array<String>) {
         Logging.init()
 

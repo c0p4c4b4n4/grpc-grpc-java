@@ -1,16 +1,25 @@
-### gRPC Remote Procedure Calls
+### Introduction to gRPC Remote Procedure Calls
+
+
+#### Introduction
+
+
+When a seasoned software developer decides which technology to use for a new project, they will most likely choose the one they know best. This is the right decision in most cases, except when a new technology offers capabilities that were previously unavailable. In such situations, the time and effort spent learning something new will be justified and paid off.
+
+
+This article provides developers with an introduction to the gRPC framework. In the first part, we explain what it is, how it originated, and which problems and how  it solves. The second part presents the main code patterns for using the gRPC framework in Java clients and servers.
 
 
 #### What is gRPC
 
 gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed to provide high-performance inter-service interaction within and between data centers, as well as for resource-constrained mobile and IoT applications.
 
-gRPC uses Protocol Buffers as a binary serialization format and RPC interface description language, *and* HTTP/2 as a transport layer protocol. Due to these features, gRPC can provide qualitative and quantitative characteristics of inter-service communication that are not available to REST (that most often means transferring textual JSONs over the HTTP/1.1 protocol).
+gRPC uses Protocol Buffers as a binary serialization format and RPC interface description language, and HTTP/2 as the transport layer protocol. Due to these features, gRPC can provide qualitative and quantitative characteristics of inter-service communication that are not available to REST (that most often means transferring textual JSONs over the HTTP/1.1 protocol).
 
 
 #### Why not REST ?
 
-RPC (Remote Procedure Call) is a different architectural style for building interservice interactions than REST (Representational State Transfer). REST is an architectural style that is based on the concept of *resources*. A resource is identified by an URI and clients read or modify the *state* of the resource by *transferring* its *representation*.
+RPC (Remote Procedure Call) is a different architectural style for building interservice interactions than REST (Representational State Transfer). REST is an architectural style that is based on the concept of *resources*. A resource is identified by an URI and clients read or write the *state* of the resource by *transferring* its *representation*.
 
 However, challenges with REST architecture arise when implementing client-server interactions that go beyond the scope of a client initiating a read or write of the state of a single resource, such as:
 
@@ -20,30 +29,30 @@ However, challenges with REST architecture arise when implementing client-server
 * low-latency and high-throughput communication
 * client streaming or bidirectional streaming
 
-The foundation of RPC is based on the idea of invoking methods on another process as if they were local methods. RPC frameworks provide code generation tools that, based on the provided interfaces, create stub implementations for the client and server that handle binary serialization and network transmission. So, when a client calls a remote method with parameters and receives a return value, it *looks* like a local call. The RPC framework hides away all the complexity of serializing and network communication.
+The foundation of RPC is based on the idea of invoking methods on another process as if they were local methods. RPC frameworks provide code generation tools that, based on the provided interfaces, create stub implementations for the client and server that handle binary serialization and network transmission. So, when a client calls a remote method with parameters and receives a return value, it *looks* like a local call. RPC frameworks try to hide away all the complexity of serializing and network communication.
 
-However, in RPC it is impossible to fully avert the intermediate network communication (because *network is unreliable by its nature*) such as:
+However, in RPC it is impossible to fully avert the intermediate network communication (because *network is unreliable by its nature*) because of:
 
 
 
 * network bandwidth is limited so client have to minimize size of parameters and return values
 * network latency exists so client have to use maximum timeouts on method calls
 * network can fail, so client stub can throw an exception
-* network can partially fail, so client have to use retries and servers should be idempotent
+* network can partially fail, so client have to use retries and server should be idempotent
 
 
 #### The problem
 
-When developing an effective RPC framework, developers had to address two primary challenges. First, developers needed to ensure efficient cross-platform serialization. Solutions, based on textual formats (such as XML, JSON, or YAML), are typically an order of magnitude less efficient than binary formats. They require additional computational resources for serialization/deserialization and additional network resources for transmitting larger messages. Solutions based on binary formats, often face significant challenges in ensuring portability across different languages ​​and platforms.
+When developing an effective RPC framework, developers had to address two primary challenges. First, developers needed to ensure efficient cross-platform serialization. Solutions, based on textual formats (such as XML, JSON, or YAML), are typically an order of magnitude less efficient than binary formats. They require additional computational resources for serialization and additional network resources for transmitting larger messages. Solutions based on binary formats, often face significant challenges in ensuring portability across different languages ​​and platforms.
 
-Second, there was an absence of an efficient application-layer network protocol specifically designed for modern inter-service communication. The HTTP/1.1 protocol was originally designed to enable browsers to retrieve resources within the hypermedia networks. It was not designed to support high-speed, bidirectional, full-duplex communication. Various workarounds based on this protocol (short and long polling, streaming, webhooks) were inherently inefficient in their utilization of computational and network resources. Solutions built on the TCP *transport layer* protocol were overly complex due to the low-level nature of the protocol and the lack of portability across different languages ​​and platforms.
+Second, there was an absence of an efficient application-layer network protocol specifically designed for modern inter-service communication. The HTTP/1.1 protocol was originally designed for browsers to retrieve resources within the hypermedia networks. It was not designed to support high-speed, bidirectional, full-duplex communication. Various workarounds based on this protocol (short and long polling, streaming, webhooks) were inherently inefficient in their utilization of computational and network resources. Solutions built on the TCP transport layer protocol were overly complex due to the low-level nature of the protocol and the lack of portability across different languages ​​and platforms.
 
 
 #### The solution
 
 Since 2001, Google had been developing an internal RPC framework called Stubby. It was designed to connect almost all of the internal services both within and across Google data centers. Stubby was a high-performance, cross-platform framework built on Protocol Buffers for serialization.
 
-But only in 2015, with the appearance of the breakthrough HTTP/2 protocol, Google decided to leverage its features in a redesigned version of Stubby. References to Google's internal infrastructure were removed from the framework, and the project was redesigned to comply with public open source standards. The framework has also been adapted for use in mobile, IoT, and cloud-native applications. This revamped version was released as gRPC (which is recursively deciphered as *gRPC Remote Procedure Calls*).
+But only in 2015, with the appearance of the breakthrough HTTP/2 protocol, Google decided to leverage its features in a redesigned version of Stubby. References to Google's internal infrastructure were removed from the framework, and the project was redesigned to comply with public open source standards. The framework has also been adapted for use in mobile, IoT, and cloud-native applications. This revamped version was released as gRPC (which recursively stands for *gRPC Remote Procedure Calls*).
 
 Today, gRPC remains the primary mechanism for inter-service communication at Google. Also, Google offers gRPC interfaces alongside REST interfaces for many of its public services. This is because gRPC provides notable performance benefits and supports bidirectional streaming - a feature that is not achievable with traditional REST services.
 
@@ -61,9 +70,9 @@ The gRPC framework includes three main components:
 
 ##### Protocol Buffers
 
-Protocol Buffers (Protobuf) is a serialization framework. It includes a compact binary serialization format *and* multi-language runtime libraries. This framework is optimized for exchanging short messages that fit entirely within device memory (usually less than a few megabytes).
+Protocol Buffers (Protobuf) is a serialization framework. It includes a compact binary serialization format *and* multi-language libraries. This framework is optimized for exchanging short messages that fit entirely within device memory (usually less than a few megabytes).
 
-Messages are described in a file with the *.proto* extension. This file, using the Protobuf compiler, generates domain objects in the selected programming language. Also, Protobuf includes runtime libraries for the conversion of these objects to and from the binary format.
+Messages are described in a file with the *.proto* extension. This file, using the Protobuf compiler, generates domain objects in the selected programming language. Also, Protobuf includes libraries for the conversion of these objects to and from the binary format.
 
 Each message consists of fields with a *type*, *name*, and *identifier* (fields can also have optional *attributes*):
 
@@ -77,7 +86,7 @@ message Person {
 ```
 
 
-*Types* contain *scalar* types - 32/64 bits integers, 32/64 bits floating-point numbers, boolean, strings (UTF-8 encoded or 7-bit ASCII text, and bytes - and *composite* types - enumerations, structures, maps, and arrays. Interestingly, the type system contains a few types for describing integer data. They allow developers to choose a more compact type depending on whether the number is signed or unsigned and whether these values ​​are mostly small or uniformly distributed across the entire range.
+*Types* contain *scalar* types - 32/64 bits integers, 32/64 bits floating-point numbers, boolean, strings (UTF-8 encoded or 7-bit ASCII text), and bytes - and *composite* types - enumerations, structures, maps, and arrays. Interestingly, the type system contains a few types for describing integer data. They allow developers to choose a more compact type depending on whether the number is signed or unsigned and whether these values ​​are mostly small or uniformly distributed across the entire range.
 
 *Names* are intended for developer understanding and are not included in the binary message.
 
@@ -88,7 +97,7 @@ message Person {
 
 ##### Interface Definition Language
 
-The interface description language is designed to describe the interface of RPC methods. Like message descriptions, interface descriptions are stored in a file with the *.proto* extension. This file, using the Protobuf compiler, converts pseudocode into client-server stubs in the selected programming language.
+The interface description language is designed to describe the interface of RPC methods. Like message descriptions, interface descriptions are stored in a file with the *.proto* extension. This file, using the Protobuf compiler, converts pseudocode into client and server stubs in the selected programming language.
 
 Depending on whether the method sends a single value or a stream and whether it returns a single value or a stream, there are 4 possible method types:
 
@@ -110,20 +119,20 @@ service EchoService {
 ```
 
 
-For backend developers who have long and unsuccessfully tried to implement simultaneous bidirectional inter-service communication with HTTP/1.1, it will be important to note that gRPC allows streaming from server to client, from client to server, and bidirectional simultaneous streaming.
+>For backend developers who have long and unsuccessfully tried to implement simultaneous bidirectional inter-service communication with HTTP/1.1, it will be important to note that gRPC allows streaming from server to client, from client to server, and bidirectional simultaneous streaming.
 
 
 ##### HTTP/2
 
 HTTP/2 is the next version of the HTTP transport protocol. Initially this protocol was developed to allow a client (usually a browser) to request resources (HTML documents, images, scripts) from a server in a hypermedia network. However, using this protocol to implement modern client-server systems (simultaneous bi-directional streaming) leads to complex and inefficient solutions. Even developing new features in HTTP/1.1 (persistent connections, pipelining, chunked transfer encoding) was not adequate.
 
-HTTP/2 retains the semantics of the previous version of the protocol (methods, response codes, headers), but has significant implementation changes. HTTP/2 introduces several changes important for different environments (browsers, mobile, IoT), but only a few are important for gRPC.
+HTTP/2 retains the semantics of the previous version of the protocol (methods, response codes, headers), but has significant implementation changes. HTTP/2 introduces several changes important for different environments (browsers, mobile, IoT), but only a few of them are important for gRPC.
 
-The first important change is *multiplexing*, or the ability to send multiple concurrent requests/responses over a single TCP connection. This solves the problem of the HTTP *head-of-line blocking*, where a slow response to a previous request slows down subsequent requests transmitted over the same TCP connection. This reduced latency and allowed the use of fewer TCP connections. Requests and responses are broken into frames (small data fragments), which are transmitted interleaved in the stream independently of each other. Multiplexing enables bidirectional, simultaneous data streaming between client and server.
+The first important change is *multiplexing*, or the ability to send multiple concurrent requests/responses over a single TCP connection. This solves the problem of the HTTP *head-of-line blocking*, where a slow response to a previous request slows down subsequent requests transmitted over the same TCP connection. This reduced latency and allowed the use of fewer TCP connections. Requests and responses are broken into frames (small data fragments), which are transmitted interleaved in a HTTP/2 stream independently of each other. Multiplexing enables bidirectional, simultaneous data streaming between client and server.
 
 >Multiplexing is the ability to send multiple concurrent streams on a single connection. gRPC uses channels to enable multiple streams over those multiple connections. Messages are sent as HTTP/2 data frames, each of which might contain multiple gRPC messages.
 
-The second important change is the transition from a text-based format of headers and bodies of requests/responses to an encoded one. It involves using a binary format for recalculating request and response bodies and header compression (HPACK). If multiple requests and responses in a row share the same headers (which is common in inter-service interactions), the amount of bytes transferred for headers and their values ​​can be reduced by using dictionaries and Huffman encoding.
+The second important change is the transition from a text-based format of headers and bodies of requests/responses to encoded ones. It involves using a binary format for request and response bodies and header compression (HPACK). If multiple requests and responses in a row share the same headers (which is common in inter-service interactions), the amount of bytes transferred for headers and their values ​​can be reduced by using dictionaries and Huffman encoding.
 
 >HTTP/2 allows services to efficiently exchange information both in various simplex (unidirectional) modes and using a full-duplex (bidirectional) connection with simultaneous transmission of messages.
 
@@ -172,7 +181,7 @@ public interface StreamObserver<V> {
 
 
 
-##### Service stub
+##### Service
 
 The generated server stub provides the following API.
 
@@ -187,7 +196,7 @@ public StreamObserver<EchoRequest> bidirectionalStreamingEcho(StreamObserver<Ech
 
 Notice that the signatures for unary and server-streaming methods are the same. A single request is received from the client, and the server sends its one or many responses by calling the *onNext* method on the *response observer*. The difference is that for the unary method, the server calls the *onNext* method exactly once, followed by the call of the *onCompleted* method. In the server-streaming method, the *onNext* method can be called multiple times before streaming ends by the server with a call to the *onCompleted* method.
 
->Using runtime behavior-based differences over compile-time method overloading keeps the API simple and uniform
+>Using runtime behavior-based differences over compile-time method overloading keeps the API simple and uniform.
 
 Similarly, the signatures for client-streaming and bidirectional-streaming methods are the same either. Since the client can always send multiple messages to a service, the service provides it with a *request observer*. In both cases, the client can send one or many requests by calling the *onNext* method on the *request observer*, followed by the call of the *onCompleted* method. The difference is, that for the client-streaming method, the server calls the *onNext* method on the *response observer* exactly once, immediately followed by the call of the *onCompleted* method. In the bidirectional-streaming method, the server calls the *onNext* method the *response observer* multiple times before the call of the *onCompleted* method.
 
@@ -214,12 +223,12 @@ server.awaitTermination();
 
 
 
-##### Client stubs
+##### Clients
 
 Three types of client stubs are generated: asynchronous, blocking, and future.
 
 
-###### Asynchronous stub
+###### Asynchronous client
 
 The asynchronous stub is the primary stub type for working with the gRPC via the Java API. This stub implements all service definition methods, and its interface is completely identical to that of the service stub. The asynchronous stub operates entirely through callbacks outgoing and incoming stream observers.
 
@@ -264,7 +273,7 @@ channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
 
 
 
-###### Blocking stub
+###### Blocking client
 
 The blocking stub uses synchronous calls that block until the response from the service is available. Blocking stubs implement only unary and server-streaming methods in the service definition. Blocking stubs do not support client-streaming or bidirectional-streaming methods.
 
@@ -293,7 +302,7 @@ channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
 
 
 
-###### Future stub
+###### Future client
 
 The asynchronous stub uses asynchronous calls that wrap the result into the *com.google.common.util.concurrent.ListenableFuture* interface. Future stubs implement only unary methods in the service definition. Future stubs do not support any streaming calls.
 
@@ -332,7 +341,7 @@ channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
 
 #### Conclusion
 
-gRPC is an effective framework for developing inter-service communication. However, like any technology, it is not universal, but designed to solve a specific problem area.You should misgrate your application from REST to gRPC if it meets most of the following conditions:
+gRPC is an effective framework for developing inter-service communication. However, like any technology, it is not universal, but designed to solve a specific problem area.You should migrate your application from REST to gRPC if it meets most of the following conditions:
 
 
 
@@ -347,7 +356,9 @@ However, using REST is a more appropriate solution for the application if it mee
 
 
 * The application is simple and has low loads, and increasing performance is not economically justified.
-* The application has unary requests/responses and does not use streaming. (Or the application *does* use streaming, but you consider that using WebSockets and an application protocol on top of it does not violate the REST architecture.)
+* The application has unary requests/responses and does not use streaming. (Or the application *does* use streaming, but you consider that using the WebSockets protocol and an application protocol on top of it does not violate the REST architecture.)
 * Requests to the server are made directly from a browser, but using the gRPC-Web proxy is not technically justified.
-* The application has an public API intended for use by a large number of consumers outside your organization. (The technical level of these developers may vary, and some of them may have difficulty adopting HTTP/2 or debugging binary messages)
+* The application has an public API intended for use by a large number of consumers outside your organization. (The technical level of these developers may vary, and some of them may have difficulty adopting HTTP/2 or debugging binary messages.)
 * Your organization has proven engineering processes that guarantee successful backward and forward compatibility and versioning during the evolution of the application.
+
+Regardless of whether or not you use gRPC, remember that you should make decisions based on technical requirements, not preconceptions. It may turn out that the best solution to your problem is neither option gRPC nor option REST, but something else entirely — such as GraphQL, a WebSocket-based framework (Socket.IO, RSocket, Spring WebFlux), or even a message-oriented solution.

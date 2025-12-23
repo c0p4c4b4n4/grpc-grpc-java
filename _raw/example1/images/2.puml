@@ -1,0 +1,31 @@
+@startuml
+title Multiplexed Streams over a Single TCP Connection
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+package "Client" {
+  [Stream 1\nRequest / Response]
+  [Stream 2\nRequest / Response]
+}
+
+component "TCP Connection" as TCP
+
+package "Server" {
+  [Stream 1\nRequest / Response]
+  [Stream 2\nRequest / Response]
+}
+
+[Stream 1\nRequest / Response] --> TCP : Frames (S1)
+[Stream 2\nRequest / Response] --> TCP : Frames (S2)
+
+TCP --> [Stream 1\nRequest / Response] : Frames (S1)
+TCP --> [Stream 2\nRequest / Response] : Frames (S2)
+
+note right of TCP
+  Single TCP connection
+  carries frames from
+  multiple independent streams
+end note
+
+@enduml

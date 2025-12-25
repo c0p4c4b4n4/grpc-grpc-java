@@ -7,23 +7,29 @@ import com.example.grpc.echo.Logging;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ServerStreamingEchoBlockingClient {
+
+    private static final Logger logger = Logger.getLogger(ServerStreamingEchoBlockingClient.class.getName());
 
     public static void main(String[] args) throws InterruptedException {
         Logging.init();
 
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
+        ManagedChannel channel2 = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         try {
             EchoServiceGrpc.EchoServiceBlockingStub blockingStub = EchoServiceGrpc.newBlockingStub(channel);
             EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
             Iterator<EchoResponse> responses = blockingStub.serverStreamingEcho(request);
 
             while (responses.hasNext()) {
-                System.out.println("response: " + responses.next().getMessage());
+                logger.log(Level.INFO, "response: {0}", responses.next().getMessage());
             }
         } finally {
             channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);

@@ -7,11 +7,13 @@ import com.example.grpc.echo.Logging;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ServerStreamingEchoAsynchronousClient {
@@ -22,6 +24,7 @@ public class ServerStreamingEchoAsynchronousClient {
         Logging.init();
 
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
+        ManagedChannel channel2 = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
 
         EchoServiceGrpc.EchoServiceStub asyncStub = EchoServiceGrpc.newStub(channel);
         EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
@@ -29,13 +32,13 @@ public class ServerStreamingEchoAsynchronousClient {
         CountDownLatch latch = new CountDownLatch(1);
         asyncStub.serverStreamingEcho(request, new StreamObserver<EchoResponse>() {
             @Override
-            public void onNext(EchoResponse value) {
-                logger.info("next: " + value.getMessage());
+            public void onNext(EchoResponse response) {
+                logger.log(Level.INFO, "next: {0}", response.getMessage());
             }
 
             @Override
             public void onError(Throwable t) {
-                logger.warning("error: " + Status.fromThrowable(t));
+                logger.log(Level.WARNING, "error: {0}", Status.fromThrowable(t));
                 latch.countDown();
             }
 

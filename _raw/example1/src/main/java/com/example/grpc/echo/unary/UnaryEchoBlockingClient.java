@@ -20,7 +20,7 @@ public class UnaryEchoBlockingClient {
 
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
         try {
-            EchoServiceGrpc.EchoServiceBlockingStub blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+            EchoServiceGrpc.EchoServiceBlockingV2Stub blockingStub = EchoServiceGrpc.newBlockingV2Stub(channel);
             EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
             EchoResponse response = blockingStub.unaryEcho(request);
             logger.info("response: " + response.getMessage());

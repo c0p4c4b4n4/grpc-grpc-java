@@ -1,0 +1,30 @@
+1. Mastering Go, 4th Edition (2024/2025)
+Author: Mihalis Tsoukalos
+This is the most up-to-date comprehensive guide for advanced Go.
+Key Topics Covered: Detailed coverage of Generics, modern Garbage Collection (GC), and the Go Scheduler.
+Relevance to your list: It provides the deep dive needed for "Runtime" topics like memory allocation (stack vs. heap), pprof profiling, and building production-grade microservices with gRPC.
+2. 100 Go Mistakes and How to Avoid Them (2022/2023)
+Author: Teiva Harsanyi
+While published slightly earlier, it remains the "gold standard" for senior developers to understand idiomatic Go and internal pitfalls.
+Key Topics Covered: Focuses heavily on your "Slice" and "Map" sections, explaining memory leaks in slices, map evacuation, and concurrency hazards.
+Relevance to your list: Essential for mastering the "Referece types" and "Pointers" section, as it explains exactly how Go handles memory under the hood to avoid common production bugs.
+3. Concurrency in Go (2017/Ongoing Updates)
+Author: Katherine Cox-Buday
+This is the definitive text for the MGP Model and advanced Channels.
+Key Topics Covered: Deep technical exploration of the G, M, and P structures, work-stealing algorithms, and the sync package (Mutex, WaitGroups, Cond).
+Relevance to your list: It covers almost every point in your "MGP model" and "Patterns" (Done-channel, Pipeline, TEE-channel) sections.
+4. Efficient Go (2022/2023)
+Author: Bartlomiej Plotka
+Focuses specifically on performance optimization and runtime internals.
+Key Topics Covered: Advanced memory management, the TCMalloc-based allocator, and how to use GODEBUG for profiling.
+Relevance to your list: Perfectly aligns with your "Runtime" and "Allocation" sections, including mcache, mcentral, and mheap.
+5. Know Go: Generics / The Power of Go: Tools (2024/2025)
+Author: John Arundel
+These modular books focus on modern language evolution.
+Key Topics Covered: The most thorough explanation of Generics and Iterators (introduced in Go 1.23).
+Relevance to your list: Essential for the "Generics" and "Interface" sections, as it covers the latest type parameter syntax used in 2025.
+Critical Updates for 2025-2026 (Online Resources)
+Because Go 1.24 (released Feb 2025) introduced the Swiss Table map implementation, most physical books will not have this yet.
+For "Map" internals (Swiss Tables): Refer to the Official Go Blog on Swiss Tables and recent Go 1.24 Release Notes.
+For "Project Layout": The Golang Standards Project Layout remains the community-accepted skeleton for 2026.
+For "Runtime" debugging: The Official Go GC Guide is the best source for GOMEMLIMIT and GOGC tuning.

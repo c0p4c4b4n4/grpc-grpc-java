@@ -152,4 +152,44 @@ Golang 2026
   * Скелеты
     * https://github.com/golang-standards/project-layout
   * Обработка ошибок
+    * Паники
+      * перехват (recover)
+      * вызвать панику
+    * значения, не исключения
+    * сравнение ошибок
+    * wrapping
+    * пользовательские ошибки
+    * сентинел ошибки
   * Инструменты
+    * Фрейтворки
+    * Тулкит
+      * Gorilla
+    * Роутеры
+      * Gorilla/mux
+      * chi
+    * ORM
+      * BUN
+      * GORM
+    * Драйверы
+      * pgx
+        * null mapping
+        * RowToStructByName
+    * Логирование
+      * logrus
+    * Линты
+      * golanci-lint
+        * staticcheck
+        * errcheck
+        * gosimple
+        * govet
+        * gosec
+    * Профилирование
+      * pprof
+      * goleak
+    * Тестирование
+      * ginkgo
+      * mockery
+      * testify
+      * cupolay
+    * Хранение статики
+      * hugo

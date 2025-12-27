@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package com.sample.grpc;
+package com.sample.grpc.echo;
 
-option java_package = "com.example.grpc";
+option java_package = "com.example.grpc.echo";
 option java_multiple_files = true;
 
 

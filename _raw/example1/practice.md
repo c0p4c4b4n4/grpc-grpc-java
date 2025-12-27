@@ -49,7 +49,6 @@ option java_multiple_files = true;
 message EchoRequest {
  string message = 1;
 }
-
 message EchoResponse {
  string message = 1;
 }

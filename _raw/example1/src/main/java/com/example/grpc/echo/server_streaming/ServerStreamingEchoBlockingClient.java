@@ -8,6 +8,8 @@ import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
@@ -21,8 +23,7 @@ public class ServerStreamingEchoBlockingClient {
     public static void main(String[] args) throws InterruptedException {
         Logging.init();
 
-        ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
-        ManagedChannel channel2 = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         try {
             EchoServiceGrpc.EchoServiceBlockingStub blockingStub = EchoServiceGrpc.newBlockingStub(channel);
             EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
@@ -31,6 +32,8 @@ public class ServerStreamingEchoBlockingClient {
             while (responses.hasNext()) {
                 logger.log(Level.INFO, "response: {0}", responses.next().getMessage());
             }
+        } catch (StatusRuntimeException e) {
+            logger.log(Level.WARNING, "error: {0}", e.getStatus());
         } finally {
             channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
         }

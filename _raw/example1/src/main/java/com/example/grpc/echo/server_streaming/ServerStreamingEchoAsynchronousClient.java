@@ -23,8 +23,7 @@ public class ServerStreamingEchoAsynchronousClient {
     public static void main(String[] args) throws InterruptedException {
         Logging.init();
 
-        ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
-        ManagedChannel channel2 = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
 
         EchoServiceGrpc.EchoServiceStub asyncStub = EchoServiceGrpc.newStub(channel);
         EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();

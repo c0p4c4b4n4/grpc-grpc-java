@@ -3,11 +3,9 @@
 
 #### Introduction
 
+When seasoned software developers decide which technology to use for a new project, they will most likely choose the one they know the best. This is the right decision in most cases, except when a new technology offers capabilities that were previously unavailable. In such situations, the time and effort spent learning something new will be justified and paid off.
 
-When a seasoned software developer decides which technology to use for a new project, they will most likely choose the one they know best. This is the right decision in most cases, except when a new technology offers capabilities that were previously unavailable. In such situations, the time and effort spent learning something new will be justified and paid off.
-
-
-This article provides developers with an introduction to the gRPC framework. In the first part, we explain what it is, how it originated, and which problems and how  it solves. The second part presents the main code patterns for using the gRPC framework in Java clients and servers.
+This article provides developers with an introduction to the gRPC framework. In the first part, we explain what it is, how it originated, and which problems and how  it solves. The second part presents the code fragments for using the gRPC framework in Java clients and servers.
 
 
 #### What is gRPC
@@ -17,7 +15,7 @@ gRPC is a multi-language and cross-platform remote procedure call (RPC) framewor
 gRPC uses Protocol Buffers as a binary serialization format and RPC interface description language, and HTTP/2 as the transport layer protocol. Due to these features, gRPC can provide qualitative and quantitative characteristics of inter-service communication that are not available to REST (that most often means transferring textual JSONs over the HTTP/1.1 protocol).
 
 
-#### Why not REST ?
+#### Why not REST?
 
 RPC (Remote Procedure Call) is a different architectural style for building interservice interactions than REST (Representational State Transfer). REST is an architectural style that is based on the concept of *resources*. A resource is identified by an URI and clients read or write the *state* of the resource by *transferring* its *representation*.
 
@@ -63,9 +61,9 @@ The gRPC framework includes three main components:
 
 
 
-* Protocol Buffers - a multi-language, cross-platform serialization framework
-* IDL (Interface Definition Language) - an extension of Protocol Buffers for defining RPC interfaces
-* HTTP/2 - an application-level protocol
+* Protocol Buffers — a multi-language, cross-platform serialization framework
+* IDL (Interface Definition Language) — an extension of Protocol Buffers for defining RPC interfaces
+* HTTP/2 — an application-level protocol
 
 
 ##### Protocol Buffers
@@ -86,7 +84,7 @@ message Person {
 ```
 
 
-*Types* contain *scalar* types - 32/64 bits integers, 32/64 bits floating-point numbers, boolean, strings (UTF-8 encoded or 7-bit ASCII text), and bytes - and *composite* types - enumerations, structures, maps, and arrays. Interestingly, the type system contains a few types for describing integer data. They allow developers to choose a more compact type depending on whether the number is signed or unsigned and whether these values ​​are mostly small or uniformly distributed across the entire range.
+*Types* contain *scalar* types — 32/64 bits integers, 32/64 bits floating-point numbers, boolean, strings (UTF-8 encoded or 7-bit ASCII text), and bytes — and *composite* types — enumerations, structures, maps, and arrays. Interestingly, the type system contains a few types for describing integer data. They allow developers to choose a more compact type depending on whether the number is signed or unsigned and whether these values ​​are mostly small or uniformly distributed across the entire range.
 
 *Names* are intended for developer understanding and are not included in the binary message.
 
@@ -99,14 +97,14 @@ message Person {
 
 The interface description language is designed to describe the interface of RPC methods. Like message descriptions, interface descriptions are stored in a file with the *.proto* extension. This file, using the Protobuf compiler, converts pseudocode into client and server stubs in the selected programming language.
 
-Depending on whether the method sends a single value or a stream and whether it returns a single value or a stream, there are 4 possible method types:
+Depending on whether the method sends a single value or a stream and whether it returns a single value or a stream, there are 4 possible *communication patterns*:
 
 
 
-* *unary*: a simple call in which a client sends a single request and a server replies with a single response
-* *server-side streaming*: a call in which a client sends a single request, but the server replies with multiple responses
-* *client-side streaming*: a call in which a client sends multiple requests and a server replies with a single response. The server can opt to wait for the entire stream of client requests to cease before processing and responding
-* *bidirectional streaming*: the client and server both send multiple calls back and forth concurrently, enabling real-time communication (full-duplex)
+* *unary*: a call in which a client sends a single request and a server replies with a single response
+* *server-side streaming*: a call in which a client sends a single request, and the server replies with multiple responses
+* *client-side streaming*: a call in which a client sends multiple requests and a server replies with a single response.
+* *bidirectional streaming*: the client and server both send multiple calls back and forth concurrently, enabling full-duplex communication.
 
 
 ```
@@ -139,202 +137,272 @@ The second important change is the transition from a text-based format of header
 
 #### gRPC in practice
 
-The following simplified example shows how to use all four types of gRPC methods in Java applications. The example includes an echo of the client sending a string to the server, and an echo of the server responding to that string.
+The following example shows how to implement a simple gRPC application in the Java programming language. The application consists of an echo client that sends one or many requests, and an echo server that receives those requests, modifies them, and sends them back. The client receives these responses and displays them.
 
-The project is a Gradle project that includes a minimal set of gRPC dependencies and plugins. The required *contract* between the client and the server is specified in the *.proto* file, which is located in the */src/main/proto* directory.
+To implement this, you need to do the following:
 
 
-```
+
+1. define a remote service in a .proto file
+2. generate server and client stubs using the Protobuf compiler
+3. implement a server that provides this service
+4. implement a client that consumes this service
+
+
+##### The contract
+
+A *.proto* file is a *contract* between a service and a client, consisting of the following distinct sections:
+
+*Syntax definition* to specify the version of the *proto* language being used.
+
+*Package* to declare the namespace for the definitions to prevent naming conflicts.
+
+*Imports* to allow the inclusion of definitions from other proto files, which is useful for their reusing.
+
+*Options* to provide instructions to the protoc compiler on how to generate the code for various programming languages. <sup>Options can be applied at different scopes: file, message, field, enum, enum value, and service.</sup>
+
+*Messages* to define data structures.
+
+*Services* to define RPC services and the methods the service provides.
+
+Here is the *.proto* file used in this example:
+
+
+```protobuf
+// syntax definition
 syntax = "proto3";
-option java_multiple_files = true;
-package example.grpc.echo;
 
+// package
+package com.sample.grpc.echo;
+
+// imports
+import "another.proto";
+
+// options
+option java_package = "com.example.grpc.echo";
+option java_multiple_files = true;
+
+// messages
 message EchoRequest {
-    string message = 1;
+  string message = 1;
 }
 
 message EchoResponse {
-    string message = 1;
+  string message = 1;
 }
 
+// services
 service EchoService {
-    rpc UnaryEcho(EchoRequest) returns (EchoResponse);
-    rpc ServerStreamingEcho(EchoRequest) returns (stream EchoResponse);
-    rpc ClientStreamingEcho(stream EchoRequest) returns (EchoResponse);
-    rpc BidirectionalStreamingEcho(stream EchoRequest) returns (stream EchoResponse);
+  rpc UnaryEcho(EchoRequest) returns (EchoResponse) ;
+  rpc ServerStreamingEcho(EchoRequest) returns (stream EchoResponse) ;
+  rpc ClientStreamingEcho(stream EchoRequest) returns (EchoResponse) ;
+  rpc BidirectionalStreamingEcho(stream EchoRequest) returns (stream EchoResponse) ;
 }
 ```
 
 
-If you run the Gradle task *mvn protobuf:compile* (or just *mvn clean install*), the generated stubs for the client and server will be created in directory in the */target/generated-sources/protobuf* directory.
+>You specify a server-side streaming method by placing the *stream* keyword before the response type and a client-side streaming method by placing the *stream* keyword before the request type.
 
-The API that the client and server use to manage gRPC flows is the *StreamObserver* interface. This interface represents the gRPC stream of messages. It is used by both the client and server implementations for sending or receiving messages. For outgoing messages, an observer is provided by the gRPC library to the application. For incoming messages, the application implements the observer and passes it to the gRPC library for receiving.
+>The *java_package* option overrides the package for the generated Java classes over the *package* keyword. If code is generated in another language, the *java_package* parameter will have no effect.
+
+
+##### Generating server and client stubs
+
+To use the gRPC in your Gradle project, put your *.proto* files in the *src/main/proto* directory, add the necessary Gradle dependencies, and configure the Protobuf Gradle plugin:
+
+// use properties
 
 
 ```
-public interface StreamObserver<V> {
-  void onNext(V value);
-  void onError(Throwable t);
-  void onCompleted();
+plugins {
+  id 'application'
+  id 'com.google.protobuf' version '0.9.5'
+}
+
+def grpcVersion = '1.76.2'
+def protobufVersion = '3.25.8'
+def protocVersion = protobufVersion
+
+dependencies {
+  implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+  implementation "io.grpc:grpc-services:${grpcVersion}"
+  implementation "io.grpc:grpc-stub:${grpcVersion}"
+
+  runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
+}
+
+protobuf {
+  protoc { 
+    artifact = "com.google.protobuf:protoc:${protocVersion}" 
+  }
+  plugins {
+    grpc { 
+      artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}" 
+    }
+  }
+  generateProtoTasks {
+    all()*.plugins { 
+      grpc {} 
+    }
+  }
 }
 ```
 
 
+Then, run a Gradle task (*./gradlew generateProto* or *./gradlew compileJava* or *./gradlew build*) and the generated Java classes will be placed under a determined folder (in our example *build/generated/source/proto/main/java*). The generated classes fall into two main categories: those for the message definitions and those specific to the service definition.
 
-##### Service
+For the EchoRequest message defined in the *.proto* file will be generated the immutable EchoRequest class for storing and serializing/deserializing these messages, and its inner EchoRequest.Builder class to create the messages using the Builder pattern. Similar classes will also be created for the EchoResponse message.
 
-The generated server stub provides the following API.
+For the EchoService service defined in the *.proto* file, an EchoServiceGrpc class file will be generated, containing classes for providing and consuming this remote service. For *providing* this service, a server stub will be generated – an abstract inner class EcoServiceImplBase, which you must implement on the server to provide the remote service. For *consuming* this service, three different client stubs will be generated. The inner EcoServiceStub class you should use to make asynchronous remote calls using the StreamObserver interface (it supports all four communication patterns). The inner EcoServiceBlockingStub class you should use to make synchronous remote calls (it supports only unary and server-streaming calls). The inner EcoServiceFutureStub you should use to make asynchronous remote calls using the ListenableFuture interface (it supports only unary calls). And, the EchoServiceGrpc class contains static methods newStub, newBlockingStub, and newFutureStub for creating instances of the various client stubs.
 
-
-```
-public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver)
-public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver)
-public StreamObserver<EchoRequest> clientStreamingEcho(StreamObserver<EchoResponse> responseObserver)
-public StreamObserver<EchoRequest> bidirectionalStreamingEcho(StreamObserver<EchoResponse> responseObserver)
-```
+Also, the EchoServiceGrpc class contains another blocking stub – the inner EcoServiceBlockingV2Stub class and the newBlockingV2Stub static method – if you want to use the checked StatusException exception instead of the non-checked StatusRuntimeException exception. Use this blocking stub if you want to ensure that potential gRPC errors will not be ignored, which may happen when using runtime exceptions.
 
 
-Notice that the signatures for unary and server-streaming methods are the same. A single request is received from the client, and the server sends its one or many responses by calling the *onNext* method on the *response observer*. The difference is that for the unary method, the server calls the *onNext* method exactly once, followed by the call of the *onCompleted* method. In the server-streaming method, the *onNext* method can be called multiple times before streaming ends by the server with a call to the *onCompleted* method.
+##### Creating the server
 
->Using runtime behavior-based differences over compile-time method overloading keeps the API simple and uniform.
+The next step in implementing the application is creating an echo server. To implement a server that provides this service, you need to complete the following steps:
 
-Similarly, the signatures for client-streaming and bidirectional-streaming methods are the same either. Since the client can always send multiple messages to a service, the service provides it with a *request observer*. In both cases, the client can send one or many requests by calling the *onNext* method on the *request observer*, followed by the call of the *onCompleted* method. The difference is, that for the client-streaming method, the server calls the *onNext* method on the *response observer* exactly once, immediately followed by the call of the *onCompleted* method. In the bidirectional-streaming method, the server calls the *onNext* method the *response observer* multiple times before the call of the *onCompleted* method.
 
->Since this is an echo example, the server's response always follows the client's request. In real bidirectional-streaming applications, client and server requests and responses can be in any order and can be finished by both the client and the server.
 
-A *simplified* version of the server that provides the unary echo method looks something like this:
+1. Override the service methods in the generated service stub.
+2. Run a server to listen for the client requests and return the service responses.
+
+This server has a EchoServiceImpl class that extends the generated EchoServiceGrpc.EchoServiceImplBase abstract class.This class overrides the serverStreamingEcho method that gets request as an EchoRequest instance when it should read from, and response as an *provided* instance of EchoResponse stream observer it should write to. In order to fulfill a client's request, we perform the following steps.For each message sent, we construct an EchoResponse using the builder. Then we use the response observer’s onNext() method to return this EchoResponse to the client. When all messages are sent, We use the response observer’s onCompleted() method to specify that we’ve finished the server-side streaming.
 
 
 ```
-Server server = ServerBuilder.forPort(50051)
-   .addService(new EchoServiceGrpc.EchoServiceImplBase() {
-       @Override
-       public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-           EchoResponse response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
+class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+   @Override
+   public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
+       logger.log(Level.INFO, "request: {0}", request.getMessage());
+       for (int i = 1; i <= 7; i++) {
+           String value = "hello " + request.getMessage() + " " + i;
+           EchoResponse response = EchoResponse.newBuilder().setMessage(value).build();
            responseObserver.onNext(response);
-           responseObserver.onCompleted();
        }
-   })
+       responseObserver.onCompleted();
+   }
+}
+```
+
+
+
+To implement a gRPC server that provides this service, you need to use the ServerBuilder class. First, we specify the port we want to use to listen for client requests using the forPort() method of the builder. Then, we then create an EchoServiceImpl instance and add it to the of provided services using the addService() method of the builder. Finally, we build the server and start it using a modified version of the Netty server.
+
+
+```
+int port = 50051;
+Server server = ServerBuilder.forPort(port)
+   .addService(new EchoServiceImpl())
    .build()
    .start();
+
+logger.log(Level.INFO, "server started, listening on {0}", port);
+
+Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+   System.err.println("server is shutting down");
+   try {
+       server.shutdown().awaitTermination(10, TimeUnit.SECONDS);
+   } catch (InterruptedException e) {
+       server.shutdownNow();
+   }
+   System.err.println("server has been shut down");
+}));
 
 server.awaitTermination();
 ```
 
 
 
-##### Clients
+##### Creating the client
 
-Three types of client stubs are generated: asynchronous, blocking, and future.
-
-
-###### Asynchronous client
-
-The asynchronous stub is the primary stub type for working with the gRPC via the Java API. This stub implements all service definition methods, and its interface is completely identical to that of the service stub. The asynchronous stub operates entirely through callbacks outgoing and incoming stream observers.
+The next step in implementing the application is creating an echo client. To implement a client that consumes this service, you need to complete the following steps:
 
 
-```
-public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver)
-public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver)
-public StreamObserver<EchoRequest> clientStreamingEcho(StreamObserver<EchoResponse> responseObserver)
-public StreamObserver<EchoRequest> bidirectionalStreamingEcho(StreamObserver<EchoResponse> responseObserver)
-```
 
+1. Create a channel to the service
+2. Get a client stub for the required communication pattern
+3. Call the service method on the obtained client stub
 
->Use asynchronous stub for high-performance applications that stream from server to client, from client to server, or full-duplex.
+We create a channel using the ManagedChannelBuilder specifying the server host and port we want to connect (a gRPC channel is an abstraction on top of one or more HTTP/2 connections). In the first client example, we use a blocking stub, obtaining it from the auto-generated EchoServiceGrpc class using the newBlockingStub factory method and the channel as the parameter. In this case, the client will be blocked on the serverStreamingEcho method and wait for the server to respond, and will either return a response or raise an StatusRuntimeException (where a gRPC error will be encoded as a Status).
 
-A *simplified* version of the asynchronous client that consumes the unary echo method looks something like this:
+Since this is an example of using server-streaming via blocking stub, the request is passed as a method parameter, and the response is as an iterator returned from the method. Once the call over the channel is completed, we shut it down to prevent loss of the underlying network resources.
 
 
 ```
-ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
+ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
+try {
+   EchoServiceGrpc.EchoServiceBlockingStub blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+   EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
+   Iterator<EchoResponse> responses = blockingStub.serverStreamingEcho(request);
+
+   while (responses.hasNext()) {
+       logger.log(Level.INFO, "response: {0}", responses.next().getMessage());
+   }
+} catch (StatusRuntimeException e) {
+    logger.log(Level.WARNING, "error: {0}", e.getStatus());
+} finally {
+   channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
+}
+```
+
+
+In the second client example we demonstrate the use of the same server-streaming service method using a synchronous stub. Likewise, we obtain it from the auto-generated EchoServiceGrpc class using the newStub factory method. As with the previous example, the request is passed as the first method parameter. The difference is that the response is processed as a stream observer, which the client should implement and pass as the second method parameter.
+
+The onNext(EchoResponse) method will be called each time when a client receives a single response from the server. The onError(Throwable) method will be called once when the call to the server ends with an error. The onCompleted() method will be called once when the call to the server has successfully sent all responses and finished the call.
+
+
+```
+ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
 
 EchoServiceGrpc.EchoServiceStub asyncStub = EchoServiceGrpc.newStub(channel);
 EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
-asyncStub.unaryEcho(request, new StreamObserver<EchoResponse>() {
+
+CountDownLatch latch = new CountDownLatch(1);
+asyncStub.serverStreamingEcho(request, new StreamObserver<EchoResponse>() {
    @Override
    public void onNext(EchoResponse response) {
-       System.out.println("next: " + response.getMessage());
+       logger.log(Level.INFO, "next: {0}", response.getMessage());
    }
 
    @Override
    public void onError(Throwable t) {
-       System.out.println("error: " + t);
+       logger.log(Level.WARNING, "error: {0}", Status.fromThrowable(t));
+       latch.countDown();
    }
 
    @Override
    public void onCompleted() {
-       System.out.println("completed");
+       logger.info("completed");
+       latch.countDown();
    }
 });
 
-channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+latch.await();
+channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
 ```
 
 
-
-###### Blocking client
-
-The blocking stub uses synchronous calls that block until the response from the service is available. Blocking stubs implement only unary and server-streaming methods in the service definition. Blocking stubs do not support client-streaming or bidirectional-streaming methods.
+In this case, the client will not be blocked on the serverStreamingEcho method. To wait for the asynchronous exchange to complete, either successfully or with an exception, we use a CountDownLatch as a thread barrier. The main thread will be blocked until the countDown method of the latch will be called once either in the onCompleted or in the onError handler of the stream observer.
 
 
-```
-public EchoResponse unaryEcho(EchoRequest request)
-public Iterator<EchoResponse> serverStreamingEcho(EchoRequest request)
-```
+##### Running the server and client
 
-
->Use blocking stubs for simple applications where blocking calls are justified by simplicity and thread inefficiency is not a concern.
-
-A *simplified* version of the blocking client that consumes the unary echo method looks something like this:
+To build the application, run the Gladle command *./gradlew clean shadowJar*. Then start the server first and then the client.
 
 
 ```
-ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
-
-EchoServiceGrpc.EchoServiceBlockingStub blockingStub = EchoServiceGrpc.newBlockingStub(channel);
-EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
-EchoResponse response = blockingStub.unaryEcho(request);
-System.out.println("result: " + response.getMessage());
-
-channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+java -cp build/libs/examples-all.jar com.example.grpc.echo.server_streaming.ServerStreamingEchoServer
+java -cp build/libs/examples-all.jar com.example.grpc.echo.server_streaming.ServerStreamingEchoBlockingClient
 ```
 
 
-
-###### Future client
-
-The asynchronous stub uses asynchronous calls that wrap the result into the *com.google.common.util.concurrent.ListenableFuture* interface. Future stubs implement only unary methods in the service definition. Future stubs do not support any streaming calls.
+To stop the server, press Ctrl-C to send the SIGINT signal and watch how the server shuts down as its JVM runs registered shutdown hooks (we use *stderr* here since the logger may have been reset by its JVM shutdown hook):
 
 
 ```
-public ListenableFuture<EchoResponse> unaryExample(EchoRequest request)
-```
-
-
->Use asynchronous stubs for high-performance applications that use only unary request/response calls.
-
-A *simplified* version of the future client that consumes the unary echo method looks something like this:
-
-
-```
-ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
-
-EchoServiceGrpc.EchoServiceFutureStub futureStub = EchoServiceGrpc.newFutureStub(channel);
-ListenableFuture<EchoResponse> responseFuture = futureStub.unaryEcho(EchoRequest.newBuilder().setMessage("world").build());
-Futures.addCallback(responseFuture, new FutureCallback<EchoResponse>() {
-   @Override
-   public void onSuccess(EchoResponse response) {
-       System.out.println("success: " + response.getMessage());
-   }
-
-   @Override
-   public void onFailure(Throwable t) {
-       System.out.println("error: " + t);
-   }
-}, MoreExecutors.directExecutor());
-
-channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+server is shutting down
+server has been shut down
 ```
 
 
@@ -356,9 +424,9 @@ However, using REST is a more appropriate solution for the application if it mee
 
 
 * The application is simple and has low loads, and increasing performance is not economically justified.
-* The application has unary requests/responses and does not use streaming. (Or the application *does* use streaming, but you consider that using the WebSockets protocol and an application protocol on top of it does not violate the REST architecture.)
+* The application has unary requests/responses and does not use streaming. (Or the application *does* use streaming, but you consider that using WebSockets does not violate the REST architecture)
 * Requests to the server are made directly from a browser, but using the gRPC-Web proxy is not technically justified.
-* The application has an public API intended for use by a large number of consumers outside your organization. (The technical level of these developers may vary, and some of them may have difficulty adopting HTTP/2 or debugging binary messages.)
+* The application has an public API intended for use by a large number of consumers outside your organization. (The technical level of these developers may vary, and some of them may have difficulty adopting HTTP/2 or debugging packed binary messages)
 * Your organization has proven engineering processes that guarantee successful backward and forward compatibility and versioning during the evolution of the application.
 
-Regardless of whether or not you use gRPC, remember that you should make decisions based on technical requirements, not preconceptions. It may turn out that the best solution to your problem is neither option gRPC nor option REST, but something else entirely — such as GraphQL, a WebSocket-based framework (Socket.IO, RSocket, Spring WebFlux), or even a message-oriented solution.
+Regardless of whether or not you use gRPC, remember that you should make decisions based on technical requirements, not preconceptions. It may turn out that the best solution to your problem is neither gRPC nor REST, but something else entirely — such as GraphQL, a WebSocket-based framework (Socket.IO, RSocket, Spring WebFlux — just to name a few), or even a message-oriented solution.

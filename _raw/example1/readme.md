@@ -1,4 +1,4 @@
-### Introduction to gRPC Remote Procedure Calls
+### Introduction to gRPC for Java developers
 
 
 #### Introduction
@@ -10,7 +10,7 @@ This article will introduce Java developers to the gRPC framework. The first par
 
 gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed to provide high-performance inter-service communication within and between data centers, as well as for resource-constrained mobile and IoT applications.
 
-gRPC uses Protocol Buffers as a binary serialization format and RPC interface description language, and HTTP/2 as the transport layer protocol. Thanks to these features, gRPC can provide qualitative and quantitative characteristics of inter-service communication that are not available with REST (that most often means transferring textual JSONs over the HTTP/1.1 protocol).
+gRPC uses Protocol Buffers as a binary serialization format and RPC interface description language, and HTTP/2 as the application-layer protocol. Thanks to these features, gRPC can provide qualitative and quantitative characteristics of inter-service communication that are not available with REST (that most often means transferring textual JSONs over the HTTP/1.1 protocol).
 
 
 #### Why not REST?
@@ -21,11 +21,11 @@ However, with REST architecture, problems arise when implementing client-server 
 
 
 
-* reading and writing complex data structures, including several resources
+* reading and writing complex data structures comprising multiple resources
 * low-latency and high-throughput communication
 * client streaming or bidirectional streaming
 
-RPC is based on the technique of calling methods in another process as if they were local methods. RPC frameworks provide code generation tools that create client and server stubs based on a given interface. These stubs handle data serialization and network communication. As a result, when a client calls a remote method with parameters and gets a return value, it looks like a local call. RPC frameworks aim to hide the complexity of serialization and network communication from developers.
+RPC is based on the technique of calling methods in another process as if they were local methods. RPC frameworks provide code generation tools that create client and server stubs based on a given RPC interface. These stubs handle data serialization and network communication. As a result, when a client calls a remote method with parameters and gets a return value, it looks like a local call. RPC frameworks aim to hide the complexity of serialization and network communication from developers.
 
 However, it is not possible to completely hide the intermediate network communication in RPC, because [the network is unreliable by its nature](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing):
 
@@ -33,7 +33,7 @@ However, it is not possible to completely hide the intermediate network communic
 
 * the network bandwidth is limited, so client have to minimize the size of parameters and return values
 * the network latency exists, so client have to use maximum timeouts when calling methods
-* the network can fail, so the client stub may throw an exception
+* the network can fail, so client may throw a network-related exception
 * the network can partially fail, so client have to use retries, and server should be idempotent
 
 
@@ -41,7 +41,7 @@ However, it is not possible to completely hide the intermediate network communic
 
 When developing an effective RPC framework, developers had to address two primary challenges. First, developers needed to ensure efficient cross-platform serialization. Solutions, based on textual formats (such as XML, JSON, or YAML), are typically an order of magnitude less efficient than binary formats. They require additional computational resources for serialization and additional network resources for transmitting larger messages. Solutions based on binary formats often face significant challenges in ensuring portability across different languages ​​and platforms.
 
-Second, there was an absence of an efficient application-layer network protocol specifically designed for modern inter-service communication. The HTTP/1.1 protocol was originally designed for browsers to retrieve resources within the hypermedia networks. It was not designed to support high-speed, bidirectional, full-duplex communication. Various workarounds based on this protocol (short and long polling, streaming, webhooks) were inherently inefficient in their utilization of computational and network resources. Solutions built on the TCP transport layer protocol were overly complex due to the low-level nature of the protocol and the lack of portability across different languages ​​and platforms.
+Second, there was an absence of an efficient application-layer network protocol specifically designed for modern inter-service communication. The HTTP/1.1 protocol was originally designed for browsers to retrieve resources within the hypermedia networks. It was not designed to support high-speed, bidirectional, full-duplex communication. Various workarounds based on this protocol (short and long polling, streaming, webhooks) were inherently inefficient in their utilization of computational and network resources. Solutions built on the TCP transport-layer protocol were overly complex due to the low-level nature of the protocol and the lack of portability across different languages ​​and platforms.
 
 
 #### The solution
@@ -61,34 +61,49 @@ The gRPC framework includes three main components:
 
 * Protocol Buffers — a multi-language, cross-platform serialization framework
 * IDL (Interface Definition Language) — an extension of Protocol Buffers for defining RPC interfaces
-* HTTP/2 — an application-level protocol
+* HTTP/2 — an application-layer protocol
 
 
 ##### Protocol Buffers
 
-Protocol Buffers (Protobuf) is a serialization framework. It includes a compact binary serialization format *and* multi-language libraries. This framework is optimized for exchanging short messages that fit entirely within device memory (usually less than a few megabytes).
-
-Messages are described in a file with the *.proto* extension. This file, using the Protobuf compiler, generates domain objects in the selected programming language. Also, Protobuf includes libraries for the conversion of these objects to and from the binary format.
-
-Each message consists of fields with a *type*, *name*, and *identifier* (fields can also have optional *attributes*):
+Protocol Buffers (Protobuf) is a multi-language serialization framework designed to encode structured data into a compact binary format. The resulting binary messages are suitable not only for high-performance network transmission but also for persistent data storage. Each message is composed of fields with a defined *type*, *name*, and numeric *identifier*, and fields may also include optional *attributes*. Messages are defined in *.proto* files, which are processed by the Protobuf compiler (*protoc*) to generate strongly typed domain objects in the target programming language. Protobuf also provides runtime libraries for each supported language that manage serialization between in-memory objects and the binary format.
 
 
 ```
 message Person {
-    int32 id = 1;
-    string name = 2;
-    bool has_photo = 3;
+  string name = 1;
+  int32 score = 2;
+  bool is_verified = 3;
+  bytes photo = 4;
+  double body_mass_index = 5;
+
+  enum Status {
+    UNKNOWN = 1;
+    ACTIVE = 2;
+    INACTIVE = 3;
+  }
+  Status status = 7;
+
+  message Address {
+    string country = 1;
+    string city = 2;
+    string street = 3;
+  }
+  Address address = 8;
+
+  map<string, string> phone_numbers = 9;
+  repeated string email_addresses = 10;
 }
 ```
 
 
-*Types* contain *scalar* types — 32/64 bits integers, 32/64 bits floating-point numbers, boolean, strings (UTF-8 encoded or 7-bit ASCII text), and bytes — and *composite* types — enumerations, structures, maps, and arrays. Interestingly, the type system contains a few types for describing integer data. They allow developers to choose a more compact type depending on whether the number is signed or unsigned and whether these values ​​are mostly small or uniformly distributed across the entire range.
+*Types* include *scalar types* — 32/64-bit integers, 32/64-bit floating-point numbers, booleans, UTF-8 strings, and bytes — as well as *composite types* such as enumerations, structures, maps, and arrays. Interestingly, the type system provides several integer types that allow developers to select the most space-efficient representation based on whether the values are positive, negative, or can include both, and whether they are typically small or span the full range.
 
-*Names* are intended for developer understanding and are not included in the binary message.
+*Names* are intended for developer readability and are not included in the binary message.
 
-*Identifiers* are used to uniquely identify field values in a binary message. These unique identifiers play a crucial role in ensuring backward and forward compatibility during the evolution of Protobuff messages. *Backward* compatibility means that newer code will read older messages. *Forward* compatibility means that older code will read newer messages: new fields that are not present in the old schema will be ignored, and old fields that are deleted in the new schema will have reasonable default values.
+*Identifiers* uniquely identify field values in a binary message. These identifiers are essential for maintaining backward and forward compatibility as messages evolve. *Backward compatibility* ensures that newer code will read older messages. Much complicated *forward compatibility* ensures that older code will read newer messages: new fields will be ignored, and removed fields will have reasonable default values.
 
-*Attributes* are additional metadata that can be added to messages. Previous versions of Protobuf had various attributes, but in version 3, only two remain: *optional* and *repeated*. The *optional* attribute is used to determine whether it was explicitly set or not, even if it's set to its default value. The *repeated* attribute is used to describe arrays.
+*Attributes* provide additional metadata for fields. Previous versions of Protobuf supported several attributes, but in version 3 only *optional* and *repeated* remain. The *optional* attribute is used to determine whether it was explicitly set or not, even to its default value. The *repeated* attribute is used to define arrays.
 
 
 ##### Interface Definition Language

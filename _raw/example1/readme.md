@@ -3,45 +3,43 @@
 
 #### Introduction
 
-When seasoned software developers decide which technology to use for a new project, they will most likely choose the one they know the best. This is the right decision in most cases, except when a new technology offers capabilities that were previously unavailable. In such situations, the time and effort spent learning something new will be justified and paid off.
-
-This article provides developers with an introduction to the gRPC framework. In the first part, we explain what it is, how it originated, and which problems and how  it solves. The second part presents the code fragments for using the gRPC framework in Java clients and servers.
+This article will introduce Java developers to the gRPC framework. The first part will explain what it is, how it came about, and what problems it solves. The second part will demonstrate an example application using the gRPC framework in both client and server applications written in Java.
 
 
 #### What is gRPC
 
-gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed to provide high-performance inter-service interaction within and between data centers, as well as for resource-constrained mobile and IoT applications.
+gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed to provide high-performance inter-service communication within and between data centers, as well as for resource-constrained mobile and IoT applications.
 
-gRPC uses Protocol Buffers as a binary serialization format and RPC interface description language, and HTTP/2 as the transport layer protocol. Due to these features, gRPC can provide qualitative and quantitative characteristics of inter-service communication that are not available to REST (that most often means transferring textual JSONs over the HTTP/1.1 protocol).
+gRPC uses Protocol Buffers as a binary serialization format and RPC interface description language, and HTTP/2 as the transport layer protocol. Thanks to these features, gRPC can provide qualitative and quantitative characteristics of inter-service communication that are not available with REST (that most often means transferring textual JSONs over the HTTP/1.1 protocol).
 
 
 #### Why not REST?
 
-RPC (Remote Procedure Call) is a different architectural style for building interservice interactions than REST (Representational State Transfer). REST is an architectural style that is based on the concept of *resources*. A resource is identified by an URI and clients read or write the *state* of the resource by *transferring* its *representation*.
+RPC (Remote Procedure Call) is a different architectural style for building interservice communication than REST (Representational State Transfer). REST is an architectural style based on the concept of *resources*. A resource is identified by an URI, and clients can read or write the *state* of the resource by *transferring* its *representation*.
 
-However, challenges with REST architecture arise when implementing client-server interactions that go beyond the scope of a client initiating a read or write of the state of a single resource, such as:
+However, with REST architecture, problems arise when implementing client-server interaction that go beyond client-initiated reading or writing of the state of a single resource, for example:
 
 
 
-* complex data structures including several resources
+* reading and writing complex data structures, including several resources
 * low-latency and high-throughput communication
 * client streaming or bidirectional streaming
 
-The foundation of RPC is based on the idea of invoking methods on another process as if they were local methods. RPC frameworks provide code generation tools that, based on the provided interfaces, create stub implementations for the client and server that handle binary serialization and network transmission. So, when a client calls a remote method with parameters and receives a return value, it *looks* like a local call. RPC frameworks try to hide away all the complexity of serializing and network communication.
+RPC is based on the technique of calling methods in another process as if they were local methods. RPC frameworks provide code generation tools that create client and server stubs based on a given interface. These stubs handle data serialization and network communication. As a result, when a client calls a remote method with parameters and gets a return value, it looks like a local call. RPC frameworks aim to hide the complexity of serialization and network communication from developers.
 
-However, in RPC it is impossible to fully avert the intermediate network communication (because *network is unreliable by its nature*) because of:
+However, it is not possible to completely hide the intermediate network communication in RPC, because [the network is unreliable by its nature](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing):
 
 
 
-* network bandwidth is limited so client have to minimize size of parameters and return values
-* network latency exists so client have to use maximum timeouts on method calls
-* network can fail, so client stub can throw an exception
-* network can partially fail, so client have to use retries and server should be idempotent
+* the network bandwidth is limited, so client have to minimize the size of parameters and return values
+* the network latency exists, so client have to use maximum timeouts when calling methods
+* the network can fail, so the client stub may throw an exception
+* the network can partially fail, so client have to use retries, and server should be idempotent
 
 
 #### The problem
 
-When developing an effective RPC framework, developers had to address two primary challenges. First, developers needed to ensure efficient cross-platform serialization. Solutions, based on textual formats (such as XML, JSON, or YAML), are typically an order of magnitude less efficient than binary formats. They require additional computational resources for serialization and additional network resources for transmitting larger messages. Solutions based on binary formats, often face significant challenges in ensuring portability across different languages ​​and platforms.
+When developing an effective RPC framework, developers had to address two primary challenges. First, developers needed to ensure efficient cross-platform serialization. Solutions, based on textual formats (such as XML, JSON, or YAML), are typically an order of magnitude less efficient than binary formats. They require additional computational resources for serialization and additional network resources for transmitting larger messages. Solutions based on binary formats often face significant challenges in ensuring portability across different languages ​​and platforms.
 
 Second, there was an absence of an efficient application-layer network protocol specifically designed for modern inter-service communication. The HTTP/1.1 protocol was originally designed for browsers to retrieve resources within the hypermedia networks. It was not designed to support high-speed, bidirectional, full-duplex communication. Various workarounds based on this protocol (short and long polling, streaming, webhooks) were inherently inefficient in their utilization of computational and network resources. Solutions built on the TCP transport layer protocol were overly complex due to the low-level nature of the protocol and the lack of portability across different languages ​​and platforms.
 
@@ -50,7 +48,7 @@ Second, there was an absence of an efficient application-layer network protocol 
 
 Since 2001, Google had been developing an internal RPC framework called Stubby. It was designed to connect almost all of the internal services both within and across Google data centers. Stubby was a high-performance, cross-platform framework built on Protocol Buffers for serialization.
 
-But only in 2015, with the appearance of the breakthrough HTTP/2 protocol, Google decided to leverage its features in a redesigned version of Stubby. References to Google's internal infrastructure were removed from the framework, and the project was redesigned to comply with public open source standards. The framework has also been adapted for use in mobile, IoT, and cloud-native applications. This revamped version was released as gRPC (which recursively stands for *gRPC Remote Procedure Calls*).
+But only in 2015, with the advent of the innovative HTTP/2 protocol, Google decided to leverage its features in a redesigned version of Stubby. References to Google's internal infrastructure were removed from the framework, and the project was redesigned to comply with public open source standards. The framework has also been adapted for use in mobile, IoT, and cloud-native applications. This updated version was released as gRPC (which recursively stands for "gRPC Remote Procedure Calls").
 
 Today, gRPC remains the primary mechanism for inter-service communication at Google. Also, Google offers gRPC interfaces alongside REST interfaces for many of its public services. This is because gRPC provides notable performance benefits and supports bidirectional streaming - a feature that is not achievable with traditional REST services.
 
@@ -117,7 +115,7 @@ service EchoService {
 ```
 
 
->For backend developers who have long and unsuccessfully tried to implement simultaneous bidirectional inter-service communication with HTTP/1.1, it will be important to note that gRPC allows streaming from server to client, from client to server, and bidirectional simultaneous streaming.
+>You specify a server-side streaming method by placing the *stream* keyword before the response type and a client-side streaming method by placing the *stream* keyword before the request type.
 
 
 ##### HTTP/2
@@ -149,37 +147,34 @@ To implement this, you need to do the following:
 4. implement a client that consumes this service
 
 
-##### The contract
+##### The contract between a server and a client
 
 A *.proto* file is a *contract* between a service and a client, consisting of the following distinct sections:
 
-*Syntax definition* to specify the version of the *proto* language being used.
 
-*Package* to declare the namespace for the definitions to prevent naming conflicts.
 
-*Imports* to allow the inclusion of definitions from other proto files, which is useful for their reusing.
-
-*Options* to provide instructions to the protoc compiler on how to generate the code for various programming languages. <sup>Options can be applied at different scopes: file, message, field, enum, enum value, and service.</sup>
-
-*Messages* to define data structures.
-
-*Services* to define RPC services and the methods the service provides.
+* *Syntax definition* to specify the version of the *proto* language being used.
+* *Package* to declare the namespace for the definitions to prevent naming conflicts.
+* *Imports* to allow the inclusion of definitions from other proto files, which is useful for their reusing.
+* *Options* to provide instructions to the protoc compiler on how to generate the code for various programming languages. <sup>Options can be applied at different scopes: file, message, field, enum, enum value, and service.</sup>
+* *Messages* to define data structures.
+* *Services* to define RPC services and the methods the service provides.
 
 Here is the *.proto* file used in this example:
 
 
-```protobuf
+```
 // syntax definition
 syntax = "proto3";
 
 // package
-package com.sample.grpc.echo;
+package com.sample.grpc;
 
 // imports
 import "another.proto";
 
 // options
-option java_package = "com.example.grpc.echo";
+option java_package = "com.example.grpc";
 option java_multiple_files = true;
 
 // messages
@@ -200,8 +195,6 @@ service EchoService {
 }
 ```
 
-
->You specify a server-side streaming method by placing the *stream* keyword before the response type and a client-side streaming method by placing the *stream* keyword before the request type.
 
 >The *java_package* option overrides the package for the generated Java classes over the *package* keyword. If code is generated in another language, the *java_package* parameter will have no effect.
 
@@ -253,9 +246,21 @@ Then, run a Gradle task (*./gradlew generateProto* or *./gradlew compileJava* or
 
 For the EchoRequest message defined in the *.proto* file will be generated the immutable EchoRequest class for storing and serializing/deserializing these messages, and its inner EchoRequest.Builder class to create the messages using the Builder pattern. Similar classes will also be created for the EchoResponse message.
 
-For the EchoService service defined in the *.proto* file, an EchoServiceGrpc class file will be generated, containing classes for providing and consuming this remote service. For *providing* this service, a server stub will be generated – an abstract inner class EcoServiceImplBase, which you must implement on the server to provide the remote service. For *consuming* this service, three different client stubs will be generated. The inner EcoServiceStub class you should use to make asynchronous remote calls using the StreamObserver interface (it supports all four communication patterns). The inner EcoServiceBlockingStub class you should use to make synchronous remote calls (it supports only unary and server-streaming calls). The inner EcoServiceFutureStub you should use to make asynchronous remote calls using the ListenableFuture interface (it supports only unary calls). And, the EchoServiceGrpc class contains static methods newStub, newBlockingStub, and newFutureStub for creating instances of the various client stubs.
+For the EchoService service defined in the *.proto* file, an EchoServiceGrpc class file will be generated, containing classes for providing and consuming this remote service. For *providing* this service, a server stub will be generated – an abstract inner class EcoServiceImplBase, which you must implement on the server to provide the remote service. For *consuming* this service, three different client stubs will be generated. The inner EcoServiceStub class you should use to make asynchronous remote calls using the StreamObserver interface (it supports all four communication patterns). The inner EcoServiceBlockingStub class you should use to make synchronous remote calls (it supports only unary and server-streaming calls). The inner EcoServiceFutureStub you should use to make asynchronous remote calls using the ListenableFuture interface (it supports only unary calls). And, the EchoServiceGrpc class contains static factory methods newStub, newBlockingStub, and newFutureStub for creating instances of the various client stubs.
 
 Also, the EchoServiceGrpc class contains another blocking stub – the inner EcoServiceBlockingV2Stub class and the newBlockingV2Stub static method – if you want to use the checked StatusException exception instead of the non-checked StatusRuntimeException exception. Use this blocking stub if you want to ensure that potential gRPC errors will not be ignored, which may happen when using runtime exceptions.
+
+The API that the client and server use to manage streaming is the StreamObserver interface. It is used by both the client and server for sending and receiving messages. For outgoing messages, an observer is *provided* by the gRPC library, and the participant calls its methods. For incoming messages, the participant *implements* the observer and passes it to the gRPC library for being called.
+
+
+```
+public interface StreamObserver<V> {
+ void onNext(V value);
+ void onError(Throwable t);
+ void onCompleted();
+}
+```
+
 
 
 ##### Creating the server
@@ -267,11 +272,11 @@ The next step in implementing the application is creating an echo server. To imp
 1. Override the service methods in the generated service stub.
 2. Run a server to listen for the client requests and return the service responses.
 
-This server has a EchoServiceImpl class that extends the generated EchoServiceGrpc.EchoServiceImplBase abstract class.This class overrides the serverStreamingEcho method that gets request as an EchoRequest instance when it should read from, and response as an *provided* instance of EchoResponse stream observer it should write to. In order to fulfill a client's request, we perform the following steps.For each message sent, we construct an EchoResponse using the builder. Then we use the response observer’s onNext() method to return this EchoResponse to the client. When all messages are sent, We use the response observer’s onCompleted() method to specify that we’ve finished the server-side streaming.
+This server has a EchoServiceImpl class that extends the generated EchoServiceGrpcServiceImplBase abstract class.This class overrides the serverStreamingEcho method that gets request as an EchoRequest instance when it should read from, and response as an *provided* instance of EchoResponse stream observer it should write to. In order to fulfill a client's request, we perform the following steps.For each message sent, we construct an EchoResponse using the builder. Then we use the response observer’s onNext() method to return this EchoResponse to the client. When all messages are sent, We use the response observer’s onCompleted() method to specify that we’ve finished the server-side streaming.
 
 
 ```
-class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+class EchoServiceImpl extends EchoServiceGrpcServiceImplBase {
    @Override
    public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
        logger.log(Level.INFO, "request: {0}", request.getMessage());
@@ -332,7 +337,7 @@ Since this is an example of using server-streaming via blocking stub, the reques
 ```
 ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
 try {
-   EchoServiceGrpc.EchoServiceBlockingStub blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+   EchoServiceGrpcServiceBlockingStub blockingStub = EchoServiceGrpc.newBlockingStub(channel);
    EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
    Iterator<EchoResponse> responses = blockingStub.serverStreamingEcho(request);
 
@@ -355,7 +360,7 @@ The onNext(EchoResponse) method will be called each time when a client receives 
 ```
 ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
 
-EchoServiceGrpc.EchoServiceStub asyncStub = EchoServiceGrpc.newStub(channel);
+EchoServiceGrpcServiceStub asyncStub = EchoServiceGrpc.newStub(channel);
 EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
 
 CountDownLatch latch = new CountDownLatch(1);
@@ -388,12 +393,12 @@ In this case, the client will not be blocked on the serverStreamingEcho method. 
 
 ##### Running the server and client
 
-To build the application, run the Gladle command *./gradlew clean shadowJar*. Then start the server first and then the client.
+To build the application, run the Gradle command *./gradlew clean shadowJar*. Then start the server first and then the client.
 
 
 ```
-java -cp build/libs/examples-all.jar com.example.grpc.echo.server_streaming.ServerStreamingEchoServer
-java -cp build/libs/examples-all.jar com.example.grpc.echo.server_streaming.ServerStreamingEchoBlockingClient
+java -cp build/libs/examples-all.jar com.example.grpc.server_streaming.ServerStreamingEchoServer
+java -cp build/libs/examples-all.jar com.example.grpc.server_streaming.ServerStreamingEchoBlockingClient
 ```
 
 
@@ -429,4 +434,4 @@ However, using REST is a more appropriate solution for the application if it mee
 * The application has an public API intended for use by a large number of consumers outside your organization. (The technical level of these developers may vary, and some of them may have difficulty adopting HTTP/2 or debugging packed binary messages)
 * Your organization has proven engineering processes that guarantee successful backward and forward compatibility and versioning during the evolution of the application.
 
-Regardless of whether or not you use gRPC, remember that you should make decisions based on technical requirements, not preconceptions. It may turn out that the best solution to your problem is neither gRPC nor REST, but something else entirely — such as GraphQL, a WebSocket-based framework (Socket.IO, RSocket, Spring WebFlux — just to name a few), or even a message-oriented solution.
+Whether you choose to use gRPC or not, remember that you should make decisions based on technical requirements, not preconceptions. It may turn out that the best solution to your problem is neither gRPC nor REST, but something else entirely — such as GraphQL, a WebSocket-based framework (Socket.IO, RSocket, Spring WebFlux — just to name a few), or even a message-oriented solution.

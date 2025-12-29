@@ -20,9 +20,7 @@ public class BidirectionalStreamingEchoServer {
         Logging.init();
 
         Server server = ServerBuilder.forPort(50051)
-            .addService(new
-                EchoServiceImpl()
-            )
+            .addService(new EchoServiceImpl())
             .build()
             .start();
 
@@ -36,10 +34,8 @@ public class BidirectionalStreamingEchoServer {
             return new StreamObserver<EchoRequest>() {
                 @Override
                 public void onNext(EchoRequest request) {
-//                    logger.info("Received bidirection streaming echo request: " + request.getMessage());
-                    System.out.println("server next: " + "server next: " + request.getMessage());
-                    // Business logic: Echo back immediately or process
-                    EchoResponse response = EchoResponse.newBuilder().setMessage("server next: " + request.getMessage()).build();
+                    System.out.println("server next: " + request.getMessage());
+                    EchoResponse response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
                     responseObserver.onNext(response);
                 }
 

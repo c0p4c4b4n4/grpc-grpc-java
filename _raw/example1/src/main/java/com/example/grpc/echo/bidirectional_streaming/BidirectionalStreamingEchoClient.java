@@ -21,8 +21,8 @@ public class BidirectionalStreamingEchoClient {
         Logging.init();
 
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
-
         EchoServiceGrpc.EchoServiceStub asyncStub = EchoServiceGrpc.newStub(channel);
+
         StreamObserver<EchoRequest> requestObserver = asyncStub.bidirectionalStreamingEcho(new StreamObserver<EchoResponse>() {
             @Override
             public void onNext(EchoResponse value) {

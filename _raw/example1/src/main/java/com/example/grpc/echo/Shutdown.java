@@ -4,7 +4,6 @@ import io.grpc.Server;
 
 import java.util.concurrent.TimeUnit;
 
-
 public class Shutdown {
 
     public static void init(Server server) {

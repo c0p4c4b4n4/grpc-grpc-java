@@ -1,3 +1,0 @@
-include 'grpc-server'
-include 'grpc-client'
-

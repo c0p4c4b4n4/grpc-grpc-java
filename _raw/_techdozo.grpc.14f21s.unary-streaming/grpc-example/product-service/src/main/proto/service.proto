@@ -1,7 +1,0 @@
-syntax = "proto3";
-package dev.techdozo.product.api;
-import "resources.proto";
-
-service ProductService {
-  rpc getProduct(GetProductRequest) returns (GetProductResponse);
-}

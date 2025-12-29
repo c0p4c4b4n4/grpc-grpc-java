@@ -1,4 +1,0 @@
-include 'product-api-gateway'
-include 'product-service'
-include 'commons'
-

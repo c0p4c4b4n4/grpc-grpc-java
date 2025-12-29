@@ -20,9 +20,7 @@ public class ClientStreamingEchoServer {
         Logging.init();
 
         Server server = ServerBuilder.forPort(50051)
-            .addService(
-                new EchoServiceImpl()
-            )
+            .addService(new EchoServiceImpl())
             .build()
             .start();
 

@@ -19,17 +19,7 @@ public class UnaryEchoServer {
         Logging.init();
 
         Server server = ServerBuilder.forPort(50051)
-            .addService(
-                new EchoServiceGrpc.EchoServiceImplBase() {
-                    @Override
-                    public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-                        logger.info("request: " + request.getMessage());
-                        EchoResponse response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
-                        responseObserver.onNext(response);
-                        responseObserver.onCompleted();
-                    }
-                }
-            )
+            .addService(new EchoServiceImpl())
             .build()
             .start();
 
@@ -37,5 +27,15 @@ public class UnaryEchoServer {
 
         Shutdown.init(server);
         server.awaitTermination();
+    }
+
+    static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+        @Override
+        public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
+            logger.info("request: " + request.getMessage());
+            EchoResponse response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        }
     }
 }

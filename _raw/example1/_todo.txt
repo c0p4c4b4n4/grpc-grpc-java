@@ -1,3 +1,0 @@
-gradle properties
-additional features in final
-images ?

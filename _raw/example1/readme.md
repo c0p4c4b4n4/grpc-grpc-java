@@ -31,10 +31,10 @@ However, it is not possible to completely hide the intermediate network communic
 
 
 
-* The network bandwidth is limited, so client have to minimize the size of parameters and return values.
-* The network latency exists, so client have to use maximum timeouts when calling methods.
-* The network can fail, so client may throw a network-related exception.
-* The network can *partially* fail, so client have to use retries, and server should be idempotent.
+* The network bandwidth is limited, so clients have to minimize the size of parameters and return values.
+* The network latency exists, so clients have to use maximum timeouts when calling methods.
+* The network can fail, so clients may throw a network-related exception.
+* The network can *partially* fail, so clients have to use retries, and servers should be idempotent.
 
 
 #### The problem
@@ -122,10 +122,10 @@ Based on whether a method handles a single message or a stream of messages on th
 
 
 
-* *unary*: the client sends a single request, and the server replies with a single response
-* *server-side streaming*: the client sends a single request, and the server replies with multiple responses
-* *client-side streaming*: the client sends multiple requests, and the server replies with a single response
-* *bidirectional streaming*: both the client and server exchange multiple messages simultaneously, enabling full-duplex communication
+* *Unary*: the client sends a single request, and the server replies with a single response.
+* *Server-side streaming*: the client sends a single request, and the server replies with multiple responses.
+* *Client-side streaming*: the client sends multiple requests, and the server replies with a single response.
+* *Bidirectional streaming*: both the client and server exchange multiple messages simultaneously, enabling full-duplex communication.
 
 
 ```
@@ -188,6 +188,9 @@ syntax = "proto3";
 // package
 package example.grpc;
 
+// imports
+import "another.proto";
+
 // options
 option java_package = "com.example.grpc";
 option java_multiple_files = true;
@@ -219,7 +222,7 @@ service EchoService {
 
 To use gRPC in your Gradle project, place your *.proto* file in the *src/main/proto* directory, add the required Gradle dependencies, and configure the Protobuf Gradle plugin.
 
-Next, execute a Gradle task (*./gradlew generateProto* or *./gradlew compileJava* or just *./gradlew build*), and the generated Java classes will be placed in a designated directory (in our example *build/generated/source/proto/main/java*). These generated classes fall into two categories: message definition classes and service definition classes.
+Next, execute a Gradle task (*./gradlew generateProto* or *./gradlew compileJava* or just *./gradlew build*), and the generated Java classes will be placed in a designated directory (in our example, *build/generated/source/proto/main/java*). These generated classes fall into two categories: message definition classes and service definition classes.
 
 For the EchoRequest message, an immutable EchoRequest class is generated to handle data storage and serialization, along with an inner EchoRequest.Builder class to create the EchoRequest class using the builder pattern. Similar classes are generated for the EchoResponse message.
 
@@ -305,15 +308,17 @@ The next step in the application implementation is to create an echo client. To 
 
 We create a channel using the ManagedChannelBuilder class, specifying the server host and port we want to connect. In the first client example, a blocking stub is used. This stub is obtained from the auto-generated EchoServiceGrpc class by calling the newBlockingStub factory method and passing the channel as an argument. With this approach, the client *blocks* while invoking the serverStreamingEcho method and waits for the server’s response. The call either returns a response from the server or throws a StatusRuntimeException, in which a gRPC error is encoded as a Status.
 
-Because this example demonstrates server-side streaming with a blocking stub, the request is provided as a method parameter, and the response is returned as an iterator. After the call is completed, the channel is shut down to ensure that the underlying network resources.
+Because this example demonstrates server-side streaming with a blocking stub, the request is provided as a method parameter, and the response is returned as an iterator. After the call is completed, the channel is shut down to ensure that the underlying network resources are released.
 
 
 ```
 ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
+
 try {
    EchoServiceGrpcServiceBlockingStub blockingStub = EchoServiceGrpc.newBlockingStub(channel);
    EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
    Iterator<EchoResponse> responses = blockingStub.serverStreamingEcho(request);
+
    while (responses.hasNext()) {
        logger.log(Level.INFO, "response: {0}", responses.next().getMessage());
    }

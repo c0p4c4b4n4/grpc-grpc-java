@@ -1,7 +1,7 @@
 plugins {
     id 'java'
-    id 'com.google.protobuf' version '0.9.5'
-    id 'com.gradleup.shadow' version '9.3.0'
+    id 'com.google.protobuf' version "${protobufGradlePluginVersion}"
+    id 'com.gradleup.shadow' version "${shadowGradlePluginVersion}"
 }
 
 repositories {
@@ -14,10 +14,6 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
-def grpcVersion = '1.76.2'
-def protobufVersion = '3.25.8'
-def protocVersion = protobufVersion
-
 dependencies {
     implementation "io.grpc:grpc-protobuf:${grpcVersion}"
     implementation "io.grpc:grpc-services:${grpcVersion}"
@@ -28,7 +24,7 @@ dependencies {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:${protocVersion}"
+        artifact = "com.google.protobuf:protoc:${protobufVersion}"
     }
     plugins {
         grpc {

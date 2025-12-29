@@ -1,0 +1,10 @@
+The Rust Programming Language (the “Rust Book”)
+Rustlings
+https://rustbyexample.io/
+https://doc.rust-lang.org/rust-by-example/
+https://google.github.io/comprehensive-rust/
+https://rust-lang.org/learn/
+
+https://practice.course.rs/
+https://github.com/sunface/rust-by-practice
+https://leanpub.com/rustinpractice2

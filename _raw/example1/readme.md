@@ -3,27 +3,27 @@
 
 #### Introduction
 
-This article will introduce Java developers to the gRPC framework. The first part will explain what it is, how it came about, and what problems it solves. The second part will demonstrate an example application using the gRPC framework in both client and server written in plain Java.
+This article will introduce Java developers to the gRPC framework. The first part will explain what it is, how it came about, and what problems it solves. The second part will demonstrate an example application using the gRPC framework in both client and server, written in plain Java.
 
 
 #### What is gRPC
 
-gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed to provide high-performance inter-service communication within and between data centers, as well as for resource-constrained mobile and IoT applications.
+gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed to provide high-performance inter-service communication within and between data centers, as well as for resource-constrained mobile and IoT applications. <sup>Today, gRPC is governed by the Cloud Native Computing Foundation.</sup>
 
 gRPC uses Protocol Buffers as a binary serialization format and RPC interface description language, and HTTP/2 as the application-layer protocol. Thanks to these features, gRPC can provide qualitative and quantitative characteristics of inter-service communication that are not available with REST (that most often means transferring textual JSONs over the HTTP/1.1 protocol).
 
 
 #### Why not REST?
 
-RPC (Remote Procedure Call) is a different architectural style for building interservice communication than REST (Representational State Transfer). REST is an architectural style based on the concept of *resources*. A resource is identified by an URI, and clients can read or write the *state* of the resource by *transferring* its *representation*.
+RPC (Remote Procedure Call) is a different architectural style for building interservice communication than REST (Representational State Transfer). REST is an architectural style based on the concept of *resources*. A resource is identified by a URI, and clients can read or write the *state* of the resource by *transferring* its *representation*.
 
 However, with REST architecture, problems arise when implementing client-server interaction that go beyond client-initiated reading or writing of the state of a single resource, for example:
 
 
 
-* reading and writing complex data structures comprising multiple resources
-* low-latency and high-throughput communication
-* client streaming or bidirectional streaming
+* Reading and writing complex data structures comprising multiple resources.
+* Low-latency and high-throughput communication.
+* Client streaming or bidirectional streaming.
 
 RPC is based on the technique of calling methods in another process as if they were local methods. RPC frameworks provide code generation tools that create client and server stubs based on a given RPC interface. These stubs handle data serialization and network communication. As a result, when a client calls a remote method with parameters and gets a return value, it looks like a local call. RPC frameworks aim to hide the complexity of serialization and network communication from developers.
 
@@ -31,10 +31,10 @@ However, it is not possible to completely hide the intermediate network communic
 
 
 
-* the network bandwidth is limited, so client have to minimize the size of parameters and return values
-* the network latency exists, so client have to use maximum timeouts when calling methods
-* the network can fail, so client may throw a network-related exception
-* the network can partially fail, so client have to use retries, and server should be idempotent
+* The network bandwidth is limited, so client have to minimize the size of parameters and return values.
+* The network latency exists, so client have to use maximum timeouts when calling methods.
+* The network can fail, so client may throw a network-related exception.
+* The network can *partially* fail, so client have to use retries, and server should be idempotent.
 
 
 #### The problem
@@ -46,7 +46,7 @@ Second, there was an absence of an efficient application-layer network protocol 
 
 #### The solution
 
-Since 2001, Google had been developing an internal RPC framework called Stubby. It was designed to connect almost all of the internal services both within and across Google data centers. Stubby was a high-performance, cross-platform framework built on Protocol Buffers for serialization.
+Since 2001, Google had been developing an internal RPC framework called Stubby. It was designed to connect almost all of the internal services both within and across Google data centers. Stubby was a high-performance, cross-platform framework built on Protobuf for serialization.
 
 But only in 2015, with the advent of the innovative HTTP/2 protocol, Google decided to leverage its features in a redesigned version of Stubby. References to Google's internal infrastructure were removed from the framework, and the project was redesigned to comply with public open source standards. The framework has also been adapted for use in mobile, IoT, and cloud-native applications. This updated version was released as gRPC (which recursively stands for "gRPC Remote Procedure Calls").
 
@@ -66,7 +66,7 @@ The gRPC framework includes three main components:
 
 ##### Protocol Buffers
 
-Protocol Buffers (Protobuf) is a multi-language serialization framework designed to encode structured data into a compact binary format (also being developed by Google). The resulting binary messages are suitable not only for high-performance network transmission but also for persistent data storage. Each message consists of fields that have a required *type*, *name*, *identifier*, and fields can also include optional *attributes*. Messages are defined in *.proto* files, which are processed by the Protobuf compiler (*protoc*) to generate strongly typed domain objects in the target programming language. Protobuf also provides runtime libraries for each supported language that manage serialization between in-memory objects and the binary format.
+Protocol Buffers (Protobuf) is a multi-language serialization framework designed to encode structured data into a compact binary format (also being developed by Google). The resulting binary messages are suitable not only for high-performance network transmission but also for persistent data storage. Each message consists of fields that have a required *type*, *name*, and *identifier*, and fields can also include optional *attributes*. Messages are defined in *.proto* files, which are processed by the Protobuf compiler to generate strongly typed domain objects in the target programming language. Protobuf also provides runtime libraries for each supported language that manage serialization between in-memory objects and the binary format.
 
 
 ```
@@ -75,7 +75,7 @@ message Person {
   int32 id = 1;
   string name = 2;
   bytes photo = 3;
-  bool is_verified = 2;
+  bool is_verified = 4;
 
   // composite types
   enum Status {
@@ -88,11 +88,10 @@ message Person {
   message Address {
     string country = 1;
     string city = 2;
-    string street = 3;
   }
   Address address = 6;
 
-  map<string, string> phone_numbers = 7;
+  map<string, string> social_networks = 7;
   repeated string email_addresses = 8;
 }
 ```
@@ -102,29 +101,29 @@ message Person {
 
 
 
-* *int32 / int64* – for positive or negative integers, encoded using variable-length encoding (optimized for small values, but non-efficient for negative values)
-* *uint32 / uint64* – for non-negative integers only, encoded using variable-length encoding (optimized for small values)
-* *sint32 / sint64* – for positive or negative integers, encoded with [ZigZag encoding](https://en.wikipedia.org/wiki/Variable-length_quantity#Zigzag_encoding) (optimized for small negative values)
-* *fixed32 / fixed64* – for non-negative integers only, encoded with fixed-width encoding (optimized for values that are uniformly distributed)
-* *sfixed32 / sfixed64* – for positive or negative integers, encoded with fixed-width encoding (optimized for values that are uniformly distributed)
+* *int32/64* – for positive or negative integers, encoded using variable-length encoding (optimized for small values, but not efficient for negative values)
+* *uint32/64* – for non-negative integers only, encoded using variable-length encoding (optimized for small values)
+* *sint32/64* – for positive or negative integers, encoded with [ZigZag encoding](https://en.wikipedia.org/wiki/Variable-length_quantity#Zigzag_encoding) (optimized for small negative values)
+* *fixed32/64* – for non-negative integers only, encoded with fixed-width encoding (optimized for values that are uniformly distributed)
+* *sfixed32/64* – for positive or negative integers, encoded with fixed-width encoding (optimized for values that are uniformly distributed)
 
 *Names* are intended for developer readability and are not included in the binary message.
 
 *Identifiers* uniquely identify field values in a binary message. These identifiers are essential for maintaining backward and forward compatibility as messages evolve. *Backward compatibility* ensures that newer code will read older messages. Much complicated *forward compatibility* ensures that older code will read newer messages: new fields will be ignored, and removed fields will have reasonable default values.
 
-*Attributes* provide additional metadata for fields. Previous versions of Protobuf supported several attributes, but in version 3 only *optional* and *repeated* remain. The *optional* attribute allows to track whether a field was explicitly set, even if it was assigned its default value. The *repeated* attribute is used to define arrays.
+*Attributes* provide additional metadata for fields. Previous versions of Protobuf supported several attributes, but in version 3, only *optional* and *repeated* remain. The *optional* attribute allows to track whether a field was explicitly set, even if it was assigned its default value. The *repeated* attribute is used to define arrays.
 
 
 ##### Interface Definition Language
 
-The Interface Description Language (IDL) is used to define RPC method interfaces. Similar to message definitions, interface definitions are stored in *.proto* files. These files are processed by the Protobuf compiler, which generates client and server stubs in the chosen programming language from the defined interface.
+The Interface Description Language (IDL) is used to define RPC interfaces. Similar to message definitions, interface definitions are stored in *.proto* files. These files are processed by the Protobuf compiler, which generates client and server stubs in the chosen programming language from the defined interface.
 
 Based on whether a method handles a single message or a stream of messages on the request and response sides, there are four supported *communication patterns*:
 
 
 
 * *unary*: the client sends a single request, and the server replies with a single response
-* *server-side streaming*: the client sends a single request, and the server server replies with multiple responses
+* *server-side streaming*: the client sends a single request, and the server replies with multiple responses
 * *client-side streaming*: the client sends multiple requests, and the server replies with a single response
 * *bidirectional streaming*: both the client and server exchange multiple messages simultaneously, enabling full-duplex communication
 
@@ -142,41 +141,41 @@ service EchoService {
 
 ##### HTTP/2
 
-HTTP/2 is the next version of the HTTP transport protocol. Initially the HTTP/0.9 protocol was designed to let clients (typically browsers) request resources such as HTML documents, images, and scripts from servers over a hypermedia network. However, using this protocol to implement modern client-server systems with simultaneous bi-directional streaming results in complex and inefficient solutions. Even new features introduced in HTTP/1.1 such as persistent connections, pipelining, and chunked transfer encoding — proved insufficient for these demands.
+HTTP/2 is the next version of the HTTP transport protocol. Initially, the HTTP/0.9 protocol was designed to let clients (typically browsers) request resources such as HTML documents, images, and scripts from servers over a hypermedia network. However, using this protocol to implement modern client-server systems with simultaneous bi-directional streaming results in complex and inefficient solutions. Even new features introduced in HTTP/1.1, such as persistent connections, pipelining, and chunked transfer encoding, proved insufficient for these demands.
 
-HTTP/2 retains the semantics of the previous version of the protocol (methods, response codes, headers), but introduces significant changes in implementation. While HTTP/2 brings several improvements that benefit various environments (browsers, mobile devices, and IoT) only a subset of these changes is relevant to gRPC.
+HTTP/2 retains the semantics of the previous version of the protocol (methods, response codes, headers), but introduces significant changes in implementation. While HTTP/2 brings several improvements that benefit various environments (browsers, mobile devices, and IoT), only a subset of these changes is relevant to gRPC.
 
 The first important improvement is *multiplexing*, which allows multiple concurrent requests and responses to be sent over a single TCP connection. This solves the HTTP *head-of-line blocking* problem, where a slow response to one request delays subsequent requests on the same connection. Multiplexing reduces latency and enables the use of fewer TCP connections. In HTTP/2, requests and responses are divided into frames (small data fragments) that can be transmitted interleaved and independently of each other within a stream. This mechanism supports simultaneous bidirectional streaming between the client and server.
 
-The second important improvement in HTTP/2 is the transition from the text-based request and response headers and bodies to *binary* format. The binary framing layer encodes all communication between the client and server (headers, data, settings, control, etc.) into a structured binary format. Headers are additionally compressed using the HPACK algorithm, which leverages static and dynamic tables along with Huffman encoding to reduce redundancy. This is particularly beneficial when multiple consecutive requests and responses share the same headers (a common scenario in inter-service communication) significantly reducing the number of bytes transmitted and improving overall network efficiency.
+The second important improvement in HTTP/2 is the transition from *text-based* request/response headers and bodies to *binary* format. The binary framing layer encodes all communication between the client and server (headers, data, settings, control, etc.) into a structured binary format. Headers are additionally compressed using the HPACK algorithm, which leverages static and dynamic tables along with Huffman encoding to reduce redundancy. This is particularly beneficial when multiple consecutive requests and responses share the same headers (a common scenario in inter-service communication) significantly reducing the number of bytes transmitted and improving overall network efficiency.
 
 
 #### gRPC in practice
 
-The following example demonstrates how to build a simple gRPC application using plain Java. The application consists of an echo client that sends one or many requests, and an echo server that receives those requests, modifies the data, and returns the response. The client receives the responses and displays them.
+The following example demonstrates how to build a simple server-streaming gRPC application using plain Java. The application consists of an echo client that sends one or many requests, and an echo server that receives those requests, modifies the data, and returns the response. The client receives the responses and displays them.
 
 To implement this application, complete the following steps:
 
 
 
-1. define a remote service in a *.proto* file
-2. generate server and client stubs using the Protobuf compiler
-3. implement a server that provides this service
-4. implement a client that consumes this service
+1. Define a remote service in a *.proto* file.
+2. Generate server and client stubs using the Protobuf compiler.
+3. Implement a server that provides this service.
+4. Implement a client that consumes this service.
 
 
-##### The contract between service and client
+##### The contract between the service and the client
 
-A *.proto* file defines the *contract *between a service and a client. A typical *.proto* file consists of the following sections:
+A *.proto* file defines the *contract* between a service and a client. A typical *.proto* file consists of the following sections:
 
 
 
-* *syntax definition*: specifies the version of the Protbuf language being used
-* *package*: declares a namespace for the definitions to avoid naming conflicts.
-* *imports*: allows reuse of definitions from other *.proto* files.
-* *options*: provides instructions to the Protbuf compiler for code generation across different programming languages. <sup>Options can be applied at different scopes: file, message, field, enum, enum value, and service.</sup>
-* *messages*: defines the data structures exchanged between the client and the service.
-* services: defines RPC services and the methods provided by the service. \
+* *Syntax definition*: specifies the version of the Protobuf language being used.
+* *Package*: declares a namespace for the definitions to avoid naming conflicts.
+* *Imports*: allows reuse of definitions from other *.proto* files.
+* *Options*: provides instructions to the Protobuf compiler for code generation across different programming languages. <sup>Options can be applied at different scopes: file, message, field, enum, enum value, and service.</sup>
+* *Messages*: defines the data structures exchanged between the client and the service.
+* *Services*: defines RPC services and the methods provided by the service. \
 
 
 Below is the *.proto* file used in this example:
@@ -218,56 +217,19 @@ service EchoService {
 
 ##### Generating service and client stubs
 
-To use gRPC in your Gradle project, place your *.proto* file in the *src/main/proto* directory, add the required Gradle dependencies, and [configure](https://www.google.com/) the Protobuf Gradle plugin.
-
-
-```
-plugins {
-  id 'application'
-  id 'com.google.protobuf' version '0.9.5'
-}
-
-def grpcVersion = '1.76.2'
-def protobufVersion = '3.25.8'
-def protocVersion = protobufVersion
-
-dependencies {
-  implementation "io.grpc:grpc-protobuf:${grpcVersion}"
-  implementation "io.grpc:grpc-services:${grpcVersion}"
-  implementation "io.grpc:grpc-stub:${grpcVersion}"
-
-  runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
-}
-
-protobuf {
-  protoc { 
-    artifact = "com.google.protobuf:protoc:${protocVersion}" 
-  }
-  plugins {
-    grpc { 
-      artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}" 
-    }
-  }
-  generateProtoTasks {
-    all()*.plugins { 
-      grpc {} 
-    }
-  }
-}
-```
-
+To use gRPC in your Gradle project, place your *.proto* file in the *src/main/proto* directory, add the required Gradle dependencies, and configure the Protobuf Gradle plugin.
 
 Next, execute a Gradle task (*./gradlew generateProto* or *./gradlew compileJava* or just *./gradlew build*), and the generated Java classes will be placed in a designated directory (in our example *build/generated/source/proto/main/java*). These generated classes fall into two categories: message definition classes and service definition classes.
 
 For the EchoRequest message, an immutable EchoRequest class is generated to handle data storage and serialization, along with an inner EchoRequest.Builder class to create the EchoRequest class using the builder pattern. Similar classes are generated for the EchoResponse message.
 
-For the EchoService, a EchoServiceGrpc class is generated, containing inner classes for both *providing* and *consuming* the remote service. For the server-side, an abstract inner class EchoServiceImplBase is generated as the server stub, which you should extend and implement to provide the service logic. For the client-side, four types of client stubs are generated:
+For the EchoService, an EchoServiceGrpc class is generated, containing inner classes for both *providing* and *consuming* the remote service. For the server-side, an abstract inner class EchoServiceImplBase is generated as the server stub, which you should extend and implement to provide the service logic. For the client-side, four types of client stubs are generated:
 
 
 
 * EchoServiceStub: to make asynchronous calls using the StreamObserver interface (it supports all four communication patterns)
 * EchoServiceBlockingStub: to make synchronous calls (it supports unary and server-streaming calls only)
-* EcoServiceBlockingV2Stub : to make synchronous calls (it also supports unary and server-streaming calls only, but throws checked StatusException instead of the runtime StatusRuntimeException exceptions)<sup>Use this to ensure that potential gRPC errors will not be ignored, which may happen when using runtime exceptions.</sup>
+* EcoServiceBlockingV2Stub: to make synchronous calls (it also supports unary and server-streaming calls only, but throws checked StatusException instead of runtime StatusRuntimeException exceptions). <sup>Use this to ensure that potential gRPC errors are not ignored, which may happen when using runtime exceptions.</sup>
 * EchoServiceFutureStub: to asynchronous calls with the [ListenableFuture](https://javadoc.io/doc/com.google.guava/guava/latest/com/google/common/util/concurrent/ListenableFuture.html) interface (it supports unary calls only)
 
 The [StreamObserver](https://grpc.github.io/grpc-java/javadoc/io/grpc/stub/StreamObserver.html) interface serves as the API for managing streaming between the client and service. It is used by both parties to send and receive messages. For outbound messages, the gRPC library provides an observer instance, and the participant invokes its methods to transmit messages. For inbound messages, the participant implements this interface and passes it to the gRPC library, which then calls the appropriate methods upon message reception.
@@ -404,7 +366,7 @@ In this implementation, the client is not blocked on the serverStreamingEcho met
 
 ##### Running the server and client
 
-To build the application, execute the Gradle task *./gradlew clean shadowJar*. Then start the server first and then start the client:
+To build the application, execute the Gradle task *./gradlew clean shadowJar*. Then start the server first, and then start the client:
 
 
 ```
@@ -434,16 +396,16 @@ gRPC is an effective framework for implementing inter-service communication. How
 * Automatic generation of gRPC service and client stubs is available for all required programming languages and platforms.
 * Both the client and server are developed within the same organization, and the application operates in a controlled environment.
 * Your organization has strong engineering standards that benefit from clearly defined client–server contracts specified in *.proto* files.
-* Developers benefit from built-in capabilities such as advanced request handling — including cancellation, deadlines, retries, flow control, and error handling — as well as authentication, load balancing, and health checking.
+* Developers benefit from built-in capabilities, such as advanced request handling — including cancellation, deadlines, retries, flow control, and error handling — as well as authentication, load balancing, and health checking.
 
 However, REST is a more appropriate architecture if the application meets most of the following conditions:
 
 
 
 * The application is simple and operates under low loads, and increasing performance is not economically justified.
-* The application uses unary requests/responses and does not require streaming. (Or the application *does* use streaming using WebSockets, but you consider this does not violate the REST architecture)
+* The application uses unary requests/responses and does not require streaming. (Or the application *does* use streaming using the WebSockets protocol, but you consider this does not violate the REST architecture.)
 * Requests to the server are made directly from a browser, but using the gRPC-Web proxy is not technically justified.
-* The application exposes a public API intended for a large number of consumers outside your organization. (The technical level of these developers may vary, and some of them may have difficulty adopting HTTP/2 or debugging packed binary messages).
-* Your organization has proven  engineering processes that guarantee successful backward and forward compatibility and versioning during the evolution of the application.
+* The application exposes a public API intended for a large number of consumers outside your organization. (The technical level of these developers may vary, and some of them may have difficulty adopting HTTP/2 or debugging packed binary messages.)
+* Your organization has proven engineering processes that guarantee successful backward and forward compatibility and versioning during the evolution of the application.
 
-As a rule of thumb, you should migrate your RESTful services to gRPC when you need high-performance inter-service communication — such as low-latency or high-throughput with simplex or full-duplex steaming — especially in microservice or distributed architectures that you control.
+As a rule of thumb, you should migrate your RESTful services to gRPC when you need high-performance inter-service communication — such as low-latency or high-throughput with unidirectional or bidirectional streaming — especially in internal (micro)service applications.

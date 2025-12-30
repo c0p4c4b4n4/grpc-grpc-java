@@ -1,4 +1,4 @@
-package com.example.grpc.echo;
+package com.example.grpc;
 
 import io.grpc.BindableService;
 import io.grpc.Server;

@@ -1,9 +1,10 @@
 package com.example.grpc.feature.cancellation;
 
+import com.example.grpc.Delays;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
-import com.example.grpc.echo.Servers;
+import com.example.grpc.Servers;
 import io.grpc.Status;
 import io.grpc.stub.ServerCallStreamObserver;
 import io.grpc.stub.StreamObserver;
@@ -26,16 +27,12 @@ public class ServerStreamingServer {
             var serverObserver = (ServerCallStreamObserver<EchoResponse>) responseObserver;
             for (int i = 1; i <= 7; i++) {
                 if (serverObserver.isCancelled()) {
-                    logger.info("Client cancelled the server streaming");
-                    responseObserver.onError( Status.CANCELLED.withDescription("RPC cancelled").asRuntimeException());
+                    logger.info("Server received cancellation");
+                    responseObserver.onError(Status.CANCELLED.withDescription("Server confirmed cancellation").asRuntimeException());
                     return;
                 }
 
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+                Delays.sleep(1);
 
                 var message = "hello " + request.getMessage() + " " + i;
                 var response = EchoResponse.newBuilder().setMessage(message).build();

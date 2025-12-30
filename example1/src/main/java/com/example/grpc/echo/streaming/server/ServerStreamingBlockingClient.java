@@ -2,7 +2,7 @@ package com.example.grpc.echo.streaming.server;
 
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoServiceGrpc;
-import com.example.grpc.echo.Loggers;
+import com.example.grpc.Loggers;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 

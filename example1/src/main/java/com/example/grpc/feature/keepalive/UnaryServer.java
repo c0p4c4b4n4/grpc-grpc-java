@@ -1,9 +1,9 @@
-package com.example.grpc.features.waitforready;
+package com.example.grpc.feature.keepalive;
 
+import com.example.grpc.Servers;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
-import com.example.grpc.Servers;
 import io.grpc.stub.StreamObserver;
 
 import java.util.logging.Logger;
@@ -19,7 +19,7 @@ public class UnaryServer {
     static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
         @Override
         public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-            logger.info("request: " + request.getMessage());
+            logger.info("request: "+ request.getMessage());
             var response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();

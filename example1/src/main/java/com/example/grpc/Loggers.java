@@ -1,4 +1,4 @@
-package com.example.grpc.echo;
+package com.example.grpc;
 
 public final class Loggers {
 

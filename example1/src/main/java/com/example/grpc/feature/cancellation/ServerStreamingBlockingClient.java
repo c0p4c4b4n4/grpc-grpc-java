@@ -2,9 +2,8 @@ package com.example.grpc.feature.cancellation;
 
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoServiceGrpc;
-import com.example.grpc.echo.Loggers;
+import com.example.grpc.Loggers;
 import io.grpc.Context;
-import io.grpc.Deadline;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 
@@ -34,7 +33,7 @@ public class ServerStreamingBlockingClient {
                         logger.info("response: " + responses.next().getMessage());
 
                         if (++i > 3) {
-                            cancellableContext.cancel(new Exception("Client cancelled the server streaming"));
+                            cancellableContext.cancel(new Exception("Client cancelled streaming"));
                         }
                     }
                 });

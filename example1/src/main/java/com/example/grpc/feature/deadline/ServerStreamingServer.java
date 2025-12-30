@@ -1,9 +1,10 @@
 package com.example.grpc.feature.deadline;
 
+import com.example.grpc.Delays;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
-import com.example.grpc.echo.Servers;
+import com.example.grpc.Servers;
 import io.grpc.stub.StreamObserver;
 
 import java.util.logging.Logger;
@@ -21,11 +22,7 @@ public class ServerStreamingServer {
         public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
             logger.info("request: " + request.getMessage());
             for (int i = 1; i <= 7; i++) {
-                try {
-                    Thread.sleep(1000*i);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+                Delays.sleep(i);
 
                 var message = "hello " + request.getMessage() + " " + i;
                 var response = EchoResponse.newBuilder().setMessage(message).build();

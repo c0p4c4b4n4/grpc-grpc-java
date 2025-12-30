@@ -1,31 +1,30 @@
-package com.example.grpc.features.waitforready;
+package com.example.grpc.features.deadline;
 
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoServiceGrpc;
 import com.example.grpc.echo.Loggers;
-import io.grpc.Deadline;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-public class UnaryBlockingClient {
+public class ServerStreamingBlockingClient {
 
-    private static final Logger logger = Logger.getLogger(UnaryBlockingClient.class.getName());
+    private static final Logger logger = Logger.getLogger(ServerStreamingBlockingClient.class.getName());
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws InterruptedException {
         Loggers.init();
 
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
-
         try {
-            var blockingStub = EchoServiceGrpc.newBlockingStub(channel)
-                .withWaitForReady()
-                .withDeadline(Deadline.after(30, TimeUnit.SECONDS));
+            var blockingStub = EchoServiceGrpc.newBlockingStub(channel);
             var request = EchoRequest.newBuilder().setMessage("world").build();
-            var response = blockingStub.unaryEcho(request);
-            logger.info("response: " + response.getMessage());
+            var responses = blockingStub.serverStreamingEcho(request);
+
+            while (responses.hasNext()) {
+                logger.info("response: " + responses.next().getMessage());
+            }
         } catch (StatusRuntimeException e) {
             logger.warning("error: " + e.getStatus());
         } finally {

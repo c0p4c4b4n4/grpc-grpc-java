@@ -1,0 +1,28 @@
+graph TD
+    subgraph Client_Stack [Client Side]
+        direction TB
+        C1[Client]
+        C2[Client stub]
+        C3[RPC runtime]
+    end
+
+    subgraph Server_Stack [Server Side]
+        direction TB
+        S1[Server]
+        S2[Server stub]
+        S3[RPC runtime]
+    end
+
+    N[Network]
+
+%% Client Connections
+    C1 <--> C2
+    C2 <--> C3
+
+%% Server Connections
+    S1 <--> S2
+    S2 <--> S3
+
+%% Network Connections
+    C3 <--> N
+    N <--> S3

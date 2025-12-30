@@ -6,7 +6,6 @@ import com.example.grpc.echo.EchoServiceGrpc;
 import com.example.grpc.echo.Server2;
 import io.grpc.stub.StreamObserver;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ServerStreamingServer {
@@ -20,7 +19,7 @@ public class ServerStreamingServer {
     static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
         @Override
         public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-            logger.log(Level.INFO, "request: {0}", request.getMessage());
+            logger.info("request: " + request.getMessage());
             for (int i = 1; i <= 7; i++) {
                 String value = "hello " + request.getMessage() + " " + i;
                 EchoResponse response = EchoResponse.newBuilder().setMessage(value).build();

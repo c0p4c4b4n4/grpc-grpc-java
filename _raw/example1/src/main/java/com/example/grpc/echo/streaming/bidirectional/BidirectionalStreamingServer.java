@@ -23,7 +23,7 @@ public class BidirectionalStreamingServer {
             return new StreamObserver<EchoRequest>() {
                 @Override
                 public void onNext(EchoRequest request) {
-                    System.out.println("server next: " + request.getMessage());
+                    logger.info("next: " + request.getMessage());
                     EchoResponse response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
                     responseObserver.onNext(response);
                 }
@@ -35,8 +35,7 @@ public class BidirectionalStreamingServer {
 
                 @Override
                 public void onCompleted() {
-//                    logger.info("Bidirectional stream completed from client side");
-                    System.out.println("server completed");
+                    logger.info("completed");
                     responseObserver.onCompleted();
                 }
             };

@@ -6,7 +6,6 @@ import io.grpc.ServerBuilder;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class Server2 {
@@ -20,7 +19,7 @@ public final class Server2 {
             .build()
             .start();
 
-        logger.log(Level.INFO, "server started, listening on {0}", port);
+        logger.info("server started, listening on {0}", port);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.err.println("server is shutting down");

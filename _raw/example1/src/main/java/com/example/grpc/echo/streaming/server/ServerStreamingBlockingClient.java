@@ -10,7 +10,6 @@ import io.grpc.StatusRuntimeException;
 
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ServerStreamingBlockingClient {
@@ -27,10 +26,10 @@ public class ServerStreamingBlockingClient {
             Iterator<EchoResponse> responses = blockingStub.serverStreamingEcho(request);
 
             while (responses.hasNext()) {
-                logger.log(Level.INFO, "response: {0}", responses.next().getMessage());
+                logger.info("response: " + responses.next().getMessage());
             }
         } catch (StatusRuntimeException e) {
-            logger.log(Level.WARNING, "error: {0}", e.getStatus());
+            logger.warning("error: " + e.getStatus());
         } finally {
             channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
         }

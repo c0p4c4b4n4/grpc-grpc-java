@@ -11,7 +11,6 @@ import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ServerStreamingAsynchronousClient {
@@ -30,12 +29,12 @@ public class ServerStreamingAsynchronousClient {
         asyncStub.serverStreamingEcho(request, new StreamObserver<EchoResponse>() {
             @Override
             public void onNext(EchoResponse response) {
-                logger.log(Level.INFO, "next: {0}", response.getMessage());
+                logger.info("next: " + response.getMessage());
             }
 
             @Override
             public void onError(Throwable t) {
-                logger.log(Level.WARNING, "error: {0}", Status.fromThrowable(t));
+                logger.warning("error: " + Status.fromThrowable(t));
                 latch.countDown();
             }
 

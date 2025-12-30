@@ -25,10 +25,8 @@ public class ClientStreamingServer {
 
                 @Override
                 public void onNext(EchoRequest request) {
-//                    logger.info("Received client streaming echo request: " + request.getMessage());
-                    String message = request.getMessage();
-                    System.out.println("server next: " + message);
-                    result.append(message).append(" ");
+                    logger.info("request: " + request.getMessage());
+                    result.append(request.getMessage()).append(" ");
                 }
 
                 @Override
@@ -39,7 +37,7 @@ public class ClientStreamingServer {
                 @Override
                 public void onCompleted() {
 //                    logger.info("Client streaming complete");
-                    System.out.println("server completed: " + result.toString().trim());
+                    logger.info(("server completed: " + result.toString().trim());
                     responseObserver.onNext(EchoResponse.newBuilder()
                         .setMessage("server completed: " + result.toString().trim())
                         .build());

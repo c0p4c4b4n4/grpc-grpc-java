@@ -26,7 +26,7 @@ public class ClientStreamingClient {
         StreamObserver<EchoRequest> requestObserver = asyncStub.clientStreamingEcho(new StreamObserver<EchoResponse>() {
             @Override
             public void onNext(EchoResponse value) {
-                System.out.println("client next: " + value.getMessage());
+                logger.info(("client next: " + value.getMessage());
             }
 
             @Override
@@ -36,7 +36,7 @@ public class ClientStreamingClient {
 
             @Override
             public void onCompleted() {
-                System.out.println("client completed");
+                logger.info(("client completed");
             }
         });
 

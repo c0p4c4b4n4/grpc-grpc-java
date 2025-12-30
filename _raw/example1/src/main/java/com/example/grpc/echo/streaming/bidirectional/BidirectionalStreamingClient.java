@@ -26,7 +26,7 @@ public class BidirectionalStreamingClient {
         StreamObserver<EchoRequest> requestObserver = asyncStub.bidirectionalStreamingEcho(new StreamObserver<EchoResponse>() {
             @Override
             public void onNext(EchoResponse value) {
-                System.out.println("client next: " + value.getMessage());
+                logger.info("next: " + value.getMessage());
             }
 
             @Override
@@ -36,7 +36,7 @@ public class BidirectionalStreamingClient {
 
             @Override
             public void onCompleted() {
-                System.out.println("client completed: stream closed by server");
+                logger.info("completed");
             }
         });
 

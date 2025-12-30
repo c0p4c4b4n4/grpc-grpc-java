@@ -16,9 +16,6 @@ import java.util.logging.Logger;
 public class LoadBalanceClient {
     private static final Logger logger = Logger.getLogger(LoadBalanceClient.class.getName());
 
-    public static final String exampleScheme = "example";
-    public static final String exampleServiceName = "lb.example.grpc.io";
-
     private final EchoServiceGrpc.EchoServiceBlockingStub blockingStub;
 
     public LoadBalanceClient(Channel channel) {
@@ -41,7 +38,7 @@ public class LoadBalanceClient {
     public static void main(String[] args) throws Exception {
         NameResolverRegistry.getDefaultRegistry().register(new ExampleNameResolverProvider());
 
-        String target = String.format("%s:///%s", exampleScheme, exampleServiceName);
+        String target = String.format("%s:///%s", Settings.exampleScheme, Settings.exampleServiceName);
 
         logger.info("Use default first_pick load balance policy");
         ManagedChannel channel = ManagedChannelBuilder.forTarget(target)

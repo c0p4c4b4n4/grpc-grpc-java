@@ -14,14 +14,15 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import static com.example.grpc.feature.loadbalance.Settings.SERVER_PORTS;
+
 public class LoadBalanceServer {
     private static final Logger logger = Logger.getLogger(LoadBalanceServer.class.getName());
-    static final int[] SERVER_PORTS = {50051, 50052, 50053};
     private List<Server> servers;
 
     private void start() throws IOException {
         servers = new ArrayList<>();
-        for (int port : SERVER_PORTS) {
+        for (int port : Settings.SERVER_PORTS) {
             servers.add(
                 ServerBuilder.forPort(port)
                     .addService(new GreeterImpl(port))

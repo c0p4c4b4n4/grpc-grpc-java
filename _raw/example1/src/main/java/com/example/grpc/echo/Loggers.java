@@ -1,6 +1,6 @@
 package com.example.grpc.echo;
 
-public class Logging {
+public final class Loggers {
 
     public static void init() {
         System.setProperty("java.util.logging.SimpleFormatter.format",

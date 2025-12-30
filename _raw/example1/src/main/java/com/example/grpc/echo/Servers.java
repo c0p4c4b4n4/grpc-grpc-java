@@ -8,10 +8,10 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-public final class Server2 {
+public final class Servers {
 
     public static void start(BindableService bindableService, Logger logger) throws IOException, InterruptedException {
-        Logging.init();
+        Loggers.init();
 
         int port = 50051;
         Server server = ServerBuilder.forPort(port)
@@ -19,7 +19,7 @@ public final class Server2 {
             .build()
             .start();
 
-        logger.info("server started, listening on {0}", port);
+        logger.info("server started, listening on "+ port);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.err.println("server is shutting down");

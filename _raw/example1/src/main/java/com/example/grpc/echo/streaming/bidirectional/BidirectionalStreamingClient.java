@@ -3,10 +3,9 @@ package com.example.grpc.echo.streaming.bidirectional;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
-import com.example.grpc.echo.Logging;
-import io.grpc.Grpc;
-import io.grpc.InsecureChannelCredentials;
+import com.example.grpc.echo.Loggers;
 import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
@@ -18,9 +17,9 @@ public class BidirectionalStreamingClient {
     private static final Logger logger = Logger.getLogger(BidirectionalStreamingClient.class.getName());
 
     public static void main(String[] args) throws InterruptedException {
-        Logging.init();
+        Loggers.init();
 
-        ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         EchoServiceGrpc.EchoServiceStub asyncStub = EchoServiceGrpc.newStub(channel);
 
         StreamObserver<EchoRequest> requestObserver = asyncStub.bidirectionalStreamingEcho(new StreamObserver<EchoResponse>() {
@@ -45,6 +44,6 @@ public class BidirectionalStreamingClient {
         requestObserver.onNext(EchoRequest.newBuilder().setMessage("three").build());
         requestObserver.onCompleted();
 
-        channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
+        channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
     }
 }

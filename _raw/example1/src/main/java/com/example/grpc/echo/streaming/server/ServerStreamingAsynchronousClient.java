@@ -3,7 +3,7 @@ package com.example.grpc.echo.streaming.server;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
-import com.example.grpc.echo.Logging;
+import com.example.grpc.echo.Loggers;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Status;
@@ -18,7 +18,7 @@ public class ServerStreamingAsynchronousClient {
     private static final Logger logger = Logger.getLogger(ServerStreamingAsynchronousClient.class.getName());
 
     public static void main(String[] args) throws InterruptedException {
-        Logging.init();
+        Loggers.init();
 
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
 
@@ -46,6 +46,6 @@ public class ServerStreamingAsynchronousClient {
         });
 
         latch.await();
-        channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
+        channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
     }
 }

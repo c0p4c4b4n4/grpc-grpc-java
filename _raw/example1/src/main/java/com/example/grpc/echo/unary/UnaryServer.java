@@ -3,7 +3,7 @@ package com.example.grpc.echo.unary;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
-import com.example.grpc.echo.Server2;
+import com.example.grpc.echo.Servers;
 import io.grpc.stub.StreamObserver;
 
 import java.util.logging.Logger;
@@ -13,7 +13,7 @@ public class UnaryServer {
     private static final Logger logger = Logger.getLogger(UnaryServer.class.getName());
 
     public static void main(String[] args) throws Exception {
-        Server2.start(new EchoServiceImpl(), logger);
+        Servers.start(new EchoServiceImpl(), logger);
     }
 
     static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {

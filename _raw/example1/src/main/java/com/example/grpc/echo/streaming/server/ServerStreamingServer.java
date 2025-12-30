@@ -21,8 +21,8 @@ public class ServerStreamingServer {
         public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
             logger.info("request: " + request.getMessage());
             for (int i = 1; i <= 7; i++) {
-                String value = "hello " + request.getMessage() + " " + i;
-                EchoResponse response = EchoResponse.newBuilder().setMessage(value).build();
+                var message = "hello " + request.getMessage() + " " + i;
+                var response = EchoResponse.newBuilder().setMessage(message).build();
                 responseObserver.onNext(response);
             }
             responseObserver.onCompleted();

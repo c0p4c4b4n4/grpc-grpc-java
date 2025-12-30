@@ -20,11 +20,11 @@ public class BidirectionalStreamingServer {
     static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
         @Override
         public StreamObserver<EchoRequest> bidirectionalStreamingEcho(StreamObserver<EchoResponse> responseObserver) {
-            return new StreamObserver<EchoRequest>() {
+            return new StreamObserver<>() {
                 @Override
                 public void onNext(EchoRequest request) {
                     logger.info("next: " + request.getMessage());
-                    EchoResponse response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
+                    var response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
                     responseObserver.onNext(response);
                 }
 

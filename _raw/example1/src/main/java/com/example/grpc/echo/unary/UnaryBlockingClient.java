@@ -1,10 +1,9 @@
 package com.example.grpc.echo.unary;
 
 import com.example.grpc.echo.EchoRequest;
-import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
 import com.example.grpc.echo.Loggers;
-import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 
 import java.util.concurrent.TimeUnit;
@@ -17,12 +16,12 @@ public class UnaryBlockingClient {
     public static void main(String[] args) throws Exception {
         Loggers.init();
 
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
+        var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
 
         try {
-            EchoServiceGrpc.EchoServiceBlockingStub blockingStub = EchoServiceGrpc.newBlockingStub(channel);
-            EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
-            EchoResponse response = blockingStub.unaryEcho(request);
+            var blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+            var request = EchoRequest.newBuilder().setMessage("world").build();
+            var response = blockingStub.unaryEcho(request);
             logger.info("response: " + response.getMessage());
         } catch (StatusRuntimeException e) {
             logger.warning("error: " + e.getStatus());

@@ -4,7 +4,7 @@ import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
 import com.example.grpc.echo.Loggers;
-import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
@@ -19,13 +19,13 @@ public class UnaryAsynchronousClient {
     public static void main(String[] args) throws Exception {
         Loggers.init();
 
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
+        var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
 
-        EchoServiceGrpc.EchoServiceStub asyncStub = EchoServiceGrpc.newStub(channel);
-        EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
+        var asyncStub = EchoServiceGrpc.newStub(channel);
+        var request = EchoRequest.newBuilder().setMessage("world").build();
 
-        CountDownLatch latch = new CountDownLatch(1);
-        asyncStub.unaryEcho(request, new StreamObserver<EchoResponse>() {
+        var latch = new CountDownLatch(1);
+        asyncStub.unaryEcho(request, new StreamObserver<>() {
             @Override
             public void onNext(EchoResponse response) {
                 logger.info("next: " + response.getMessage());

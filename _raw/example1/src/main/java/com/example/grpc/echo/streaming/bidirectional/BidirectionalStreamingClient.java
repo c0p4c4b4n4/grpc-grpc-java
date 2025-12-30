@@ -4,7 +4,6 @@ import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
 import com.example.grpc.echo.Loggers;
-import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
@@ -19,13 +18,13 @@ public class BidirectionalStreamingClient {
     public static void main(String[] args) throws InterruptedException {
         Loggers.init();
 
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
-        EchoServiceGrpc.EchoServiceStub asyncStub = EchoServiceGrpc.newStub(channel);
+        var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
+        var asyncStub = EchoServiceGrpc.newStub(channel);
 
-        StreamObserver<EchoRequest> requestObserver = asyncStub.bidirectionalStreamingEcho(new StreamObserver<EchoResponse>() {
+        var requestObserver = asyncStub.bidirectionalStreamingEcho(new StreamObserver<>() {
             @Override
-            public void onNext(EchoResponse value) {
-                logger.info("next: " + value.getMessage());
+            public void onNext(EchoResponse response) {
+                logger.info("next: " + response.getMessage());
             }
 
             @Override

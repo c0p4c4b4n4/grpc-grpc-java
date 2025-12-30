@@ -20,13 +20,13 @@ public class ClientStreamingServer {
     static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
         @Override
         public StreamObserver<EchoRequest> clientStreamingEcho(StreamObserver<EchoResponse> responseObserver) {
-            return new StreamObserver<EchoRequest>() {
-                StringBuilder result = new StringBuilder();
+            return new StreamObserver<>() {
+                StringBuilder accumulator = new StringBuilder();
 
                 @Override
                 public void onNext(EchoRequest request) {
                     logger.info("request: " + request.getMessage());
-                    result.append(request.getMessage()).append(" ");
+                    accumulator.append(request.getMessage()).append(" ");
                 }
 
                 @Override
@@ -36,11 +36,9 @@ public class ClientStreamingServer {
 
                 @Override
                 public void onCompleted() {
-//                    logger.info("Client streaming complete");
-                    logger.info(("server completed: " + result.toString().trim());
-                    responseObserver.onNext(EchoResponse.newBuilder()
-                        .setMessage("server completed: " + result.toString().trim())
-                        .build());
+                    var message = accumulator.toString().trim();
+                    logger.info("completed: " + message);
+                    responseObserver.onNext(EchoResponse.newBuilder().setMessage(message).build());
                     responseObserver.onCompleted();
                 }
             };

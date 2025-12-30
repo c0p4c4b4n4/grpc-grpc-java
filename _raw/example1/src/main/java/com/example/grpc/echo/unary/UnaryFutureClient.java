@@ -6,9 +6,8 @@ import com.example.grpc.echo.EchoServiceGrpc;
 import com.example.grpc.echo.Loggers;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import io.grpc.Status;
 
 import java.util.concurrent.CountDownLatch;
@@ -22,14 +21,14 @@ public class UnaryFutureClient {
     public static void main(String[] args) throws Exception {
         Loggers.init();
 
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
+        var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
 
-        EchoServiceGrpc.EchoServiceFutureStub futureStub = EchoServiceGrpc.newFutureStub(channel);
-        EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
-        ListenableFuture<EchoResponse> responseFuture = futureStub.unaryEcho(request);
+        var futureStub = EchoServiceGrpc.newFutureStub(channel);
+        var request = EchoRequest.newBuilder().setMessage("world").build();
+        var responseFuture = futureStub.unaryEcho(request);
 
-        CountDownLatch latch = new CountDownLatch(1);
-        Futures.addCallback(responseFuture, new FutureCallback<EchoResponse>() {
+        var latch = new CountDownLatch(1);
+        Futures.addCallback(responseFuture, new FutureCallback<>() {
             @Override
             public void onSuccess(EchoResponse response) {
                 logger.info("result: " + response.getMessage());

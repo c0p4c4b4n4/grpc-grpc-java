@@ -29,31 +29,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.example.grpc.feature.loadbalance.Settings.exampleServiceName;
-
 public class ExampleNameResolver extends NameResolver {
+
+    private final URI uri;
+    private final Map<String, List<InetSocketAddress>> addrStore;
 
     private Listener2 listener;
 
-    private final URI uri;
-
-    private final Map<String,List<InetSocketAddress>> addrStore;
-
     public ExampleNameResolver(URI targetUri) {
         this.uri = targetUri;
-        // This is a fake name resolver, so we just hard code the address here.
-        addrStore = ImmutableMap.<String,List<InetSocketAddress>>builder()
-            .put(exampleServiceName,
+        addrStore = ImmutableMap.<String, List<InetSocketAddress>>builder()
+            .put(Settings.SERVICE_NAME,
                 Arrays.stream(Settings.SERVER_PORTS)
-                    .mapToObj(port->new InetSocketAddress("localhost",port))
+                    .mapToObj(port -> new InetSocketAddress("localhost", port))
                     .collect(Collectors.toList())
             )
-                .build();
+            .build();
     }
 
     @Override
     public String getServiceAuthority() {
-        // Be consistent with behavior in grpc-go, authority is saved in Host field of URI.
         if (uri.getHost() != null) {
             return uri.getHost();
         }
@@ -79,21 +74,18 @@ public class ExampleNameResolver extends NameResolver {
         List<InetSocketAddress> addresses = addrStore.get(uri.getPath().substring(1));
         try {
             List<EquivalentAddressGroup> equivalentAddressGroup = addresses.stream()
-                    // convert to socket address
-                    .map(this::toSocketAddress)
-                    // every socket address is a single EquivalentAddressGroup, so they can be accessed randomly
-                    .map(Arrays::asList)
-                    .map(this::addrToEquivalentAddressGroup)
-                    .collect(Collectors.toList());
+                .map(this::toSocketAddress)
+                .map(Arrays::asList)
+                .map(this::addrToEquivalentAddressGroup)
+                .collect(Collectors.toList());
 
             ResolutionResult resolutionResult = ResolutionResult.newBuilder()
-                    .setAddresses(equivalentAddressGroup)
-                    .build();
+                .setAddresses(equivalentAddressGroup)
+                .build();
 
             this.listener.onResult(resolutionResult);
 
-        } catch (Exception e){
-            // when error occurs, notify listener
+        } catch (Exception e) {
             this.listener.onError(Status.UNAVAILABLE.withDescription("Unable to resolve host ").withCause(e));
         }
     }

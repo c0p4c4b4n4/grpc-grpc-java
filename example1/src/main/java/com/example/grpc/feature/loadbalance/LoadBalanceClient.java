@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class LoadBalanceClient {
+
     private static final Logger logger = Logger.getLogger(LoadBalanceClient.class.getName());
 
     private final EchoServiceGrpc.EchoServiceBlockingStub blockingStub;
@@ -28,18 +29,22 @@ public class LoadBalanceClient {
         try {
             response = blockingStub.unaryEcho(request);
         } catch (StatusRuntimeException e) {
-            logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
+            logger.log(Level.WARNING, "error: {0}", e.getStatus());
             return;
         }
-        logger.info("Greeting: " + response.getMessage());
+        logger.info("response: " + response.getMessage());
     }
 
 
     public static void main(String[] args) throws Exception {
         NameResolverRegistry.getDefaultRegistry().register(new ExampleNameResolverProvider());
+        String target = String.format("%s:///%s", Settings.SCHEME, Settings.SERVICE_NAME);
 
-        String target = String.format("%s:///%s", Settings.exampleScheme, Settings.exampleServiceName);
+        useFirctPickPolicy(target);
+        useRoundRobinPolicy(target);
+    }
 
+    private static void useFirctPickPolicy(String target) throws InterruptedException {
         logger.info("Use default first_pick load balance policy");
         ManagedChannel channel = ManagedChannelBuilder.forTarget(target)
                 .usePlaintext()
@@ -52,9 +57,11 @@ public class LoadBalanceClient {
         } finally {
             channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
         }
+    }
 
+    private static void useRoundRobinPolicy(String target) throws InterruptedException {
         logger.info("Change to round_robin policy");
-        channel = ManagedChannelBuilder.forTarget(target)
+        ManagedChannel channel = ManagedChannelBuilder.forTarget(target)
                 .defaultLoadBalancingPolicy("round_robin")
                 .usePlaintext()
                 .build();

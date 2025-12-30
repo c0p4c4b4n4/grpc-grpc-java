@@ -5,9 +5,8 @@ import io.grpc.NameResolverProvider;
 
 import java.net.URI;
 
-import com.example.grpc.feature.loadbalance.Settings.*;
-
 public class ExampleNameResolverProvider extends NameResolverProvider {
+
     @Override
     public NameResolver newNameResolver(URI targetUri, NameResolver.Args args) {
         return new ExampleNameResolver(targetUri);
@@ -24,8 +23,7 @@ public class ExampleNameResolverProvider extends NameResolverProvider {
     }
 
     @Override
-    // gRPC choose the first NameResolverProvider that supports the target URI scheme.
     public String getDefaultScheme() {
-        return Settings.exampleScheme;
+        return Settings.SCHEME;
     }
 }

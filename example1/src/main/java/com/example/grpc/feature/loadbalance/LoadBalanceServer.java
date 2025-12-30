@@ -17,7 +17,9 @@ import java.util.logging.Logger;
 import static com.example.grpc.feature.loadbalance.Settings.SERVER_PORTS;
 
 public class LoadBalanceServer {
+
     private static final Logger logger = Logger.getLogger(LoadBalanceServer.class.getName());
+
     private List<Server> servers;
 
     private void start() throws IOException {
@@ -30,6 +32,7 @@ public class LoadBalanceServer {
                     .start());
             logger.info("Server started, listening on " + port);
         }
+
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.err.println("*** shutting down gRPC server since JVM is shutting down");
             try {
@@ -69,8 +72,7 @@ public class LoadBalanceServer {
 
         @Override
         public void unaryEcho(EchoRequest req, StreamObserver<EchoResponse> responseObserver) {
-            EchoResponse reply = EchoResponse.newBuilder()
-                .setMessage("Echo " + req.getMessage() + " from server<" + this.port + ">").build();
+            EchoResponse reply = EchoResponse.newBuilder().setMessage("Echo " + req.getMessage() + " from server<" + this.port + ">").build();
             responseObserver.onNext(reply);
             responseObserver.onCompleted();
         }

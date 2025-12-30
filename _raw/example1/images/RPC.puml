@@ -10,7 +10,8 @@ rectangle "Server" as S1
 rectangle "Service stub" as S2
 rectangle "gRPC runtime" as S3
 
-rectangle "HTTP/2" as N
+rectangle ".proto" as P
+rectangle "HTTP/2" as H
 
 C1 -down- C2
 C2 -down- C3
@@ -18,7 +19,10 @@ C2 -down- C3
 S1 -down- S2
 S2 -down- S3
 
-C3 -right- N
-N -right- S3
+C2 ..right.. P
+P ..right.. S2
+
+C3 -right- H
+H -right- S3
 
 @enduml

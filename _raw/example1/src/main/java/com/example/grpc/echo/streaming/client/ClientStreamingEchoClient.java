@@ -1,4 +1,4 @@
-package com.example.grpc.echo.bidirectional_streaming;
+package com.example.grpc.echo.streaming.client;
 
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
@@ -13,9 +13,9 @@ import io.grpc.stub.StreamObserver;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-public class BidirectionalStreamingEchoClient {
+public class ClientStreamingEchoClient {
 
-    private static final Logger logger = Logger.getLogger(BidirectionalStreamingEchoClient.class.getName());
+    private static final Logger logger = Logger.getLogger(ClientStreamingEchoClient.class.getName());
 
     public static void main(String[] args) throws InterruptedException {
         Logging.init();
@@ -23,7 +23,7 @@ public class BidirectionalStreamingEchoClient {
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
         EchoServiceGrpc.EchoServiceStub asyncStub = EchoServiceGrpc.newStub(channel);
 
-        StreamObserver<EchoRequest> requestObserver = asyncStub.bidirectionalStreamingEcho(new StreamObserver<EchoResponse>() {
+        StreamObserver<EchoRequest> requestObserver = asyncStub.clientStreamingEcho(new StreamObserver<EchoResponse>() {
             @Override
             public void onNext(EchoResponse value) {
                 System.out.println("client next: " + value.getMessage());
@@ -36,7 +36,7 @@ public class BidirectionalStreamingEchoClient {
 
             @Override
             public void onCompleted() {
-                System.out.println("client completed: stream closed by server");
+                System.out.println("client completed");
             }
         });
 

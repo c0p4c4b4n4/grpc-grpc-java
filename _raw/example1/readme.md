@@ -1,21 +1,16 @@
 ### Introduction to gRPC for Java developers
 
 
-#### Introduction
+#### What is gRPC?
 
-This article will introduce Java developers to the gRPC framework. The first part will explain what it is, how it came about, and what problems it solves. The second part will demonstrate an example application using the gRPC framework in both client and server, written in plain Java.
-
-
-#### What is gRPC
-
-gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed to provide high-performance inter-service communication within and between data centers, as well as for resource-constrained mobile and IoT applications. <sup>Today, gRPC is governed by the Cloud Native Computing Foundation.</sup>
+gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google and currently governed by the Cloud Native Computing Foundation. gRPC is designed to provide high-performance inter-service communication within and between data centers, as well as for resource-constrained mobile and IoT applications.
 
 gRPC uses Protocol Buffers as a binary serialization format and RPC interface description language, and HTTP/2 as the application-layer protocol. Thanks to these features, gRPC can provide qualitative and quantitative characteristics of inter-service communication that are not available with REST (that most often means transferring textual JSONs over the HTTP/1.1 protocol).
 
 
 #### Why not REST?
 
-RPC (Remote Procedure Call) is a different architectural style for building interservice communication than REST (Representational State Transfer). REST is an architectural style based on the concept of *resources*. A resource is identified by a URI, and clients can read or write the *state* of the resource by *transferring* its *representation*.
+RPC (Remote Procedure Call) is a different architectural style for building inter-service communication than REST (Representational State Transfer). REST is an architectural style based on the concept of *resources*. A resource is identified by a URI, and clients can create, read, update, or delete the *state* of the resource by *transferring* its *representation*.
 
 However, with REST architecture, problems arise when implementing client-server interaction that go beyond client-initiated reading or writing of the state of a single resource, for example:
 
@@ -41,14 +36,14 @@ However, it is not possible to completely hide the intermediate network communic
 
 When developing an effective RPC framework, developers had to address two primary challenges. First, developers needed to ensure efficient cross-platform serialization. Solutions, based on textual formats (such as XML, JSON, or YAML), are typically an order of magnitude less efficient than binary formats. They require additional computational resources for serialization and additional network resources for transmitting larger messages. Solutions based on binary formats often face significant challenges in ensuring portability across different languages ​​and platforms.
 
-Second, there was an absence of an efficient application-layer network protocol specifically designed for modern inter-service communication. The HTTP/1.1 protocol was originally designed for browsers to retrieve resources within the hypermedia networks. It was not designed to support high-speed, full-duplex communication. Various workarounds based on this protocol (short and long polling, streaming, webhooks) were inherently inefficient in their utilization of computational and network resources. Solutions built on the TCP transport-layer protocol were overly complex due to the low-level nature of the protocol and the lack of portability across different languages ​​and platforms.
+Second, there was an absence of an efficient application-layer network protocol specifically designed for modern inter-service communication. The HTTP protocol was originally designed for browsers to retrieve resources within the hypermedia networks. It was not designed to support high-speed, full-duplex communication. Various workarounds based on this protocol (short and long polling, streaming, webhooks) were inherently inefficient in their utilization of computational and network resources. Solutions built on the TCP transport-layer protocol were overly complex due to the low-level nature of the protocol and the lack of portability across different languages ​​and platforms.
 
 
 #### The solution
 
 Since 2001, Google had been developing an internal RPC framework called Stubby. It was designed to connect almost all of the internal services both within and across Google data centers. Stubby was a high-performance, cross-platform framework built on Protobuf for serialization.
 
-But only in 2015, with the advent of the innovative HTTP/2 protocol, Google decided to leverage its features in a redesigned version of Stubby. References to Google's internal infrastructure were removed from the framework, and the project was redesigned to comply with public open source standards. The framework has also been adapted for use in mobile, IoT, and cloud-native applications. This updated version was released as gRPC (which recursively stands for "gRPC Remote Procedure Calls").
+Only in 2015, with the emergence of the innovative HTTP/2 protocol, Google decided to leverage its features in a redesigned version of Stubby. References to Google's internal infrastructure were removed from the framework, and the project was redesigned to comply with public open source standards. The framework has also been adapted for use in mobile devices, IoT, and cloud-native applications. This updated version was released as gRPC (which recursively stands for "gRPC Remote Procedure Calls").
 
 Today, gRPC remains the primary mechanism for inter-service communication at Google. Also, Google offers gRPC interfaces alongside REST interfaces for many of its public services. This is because gRPC provides notable performance benefits and supports bidirectional streaming — a feature that is not achievable with traditional REST services.
 
@@ -71,25 +66,23 @@ Protocol Buffers (Protobuf) is a multi-language serialization framework designed
 
 ```
 message Person {
-  // scalar types
   int32 id = 1;
-  string name = 2;
+  string login = 2;
   bytes photo = 3;
-  bool is_verified = 4;
+  bool is_active = 4;
 
-  // composite types
   enum Status {
-    UNKNOWN = 1;
-    ACTIVE = 2;
-    INACTIVE = 3;
+    ACTIVE = 1;
+    INACTIVE = 2;
   }
   Status status = 5;
 
-  message Address {
-    string country = 1;
-    string city = 2;
+  message Name {
+    string given_name = 1;
+    string middle_name = 2;
+    string family_name = 3;
   }
-  Address address = 6;
+  Name name = 6;
 
   map<string, string> social_networks = 7;
   repeated string email_addresses = 8;
@@ -97,7 +90,7 @@ message Person {
 ```
 
 
-*Types* include *scalar types* — 32/64-bit integers, 32/64-bit floating-point numbers, booleans, UTF-8 strings, and bytes, and *composite types* — enumerations, structures, maps, and arrays. Interestingly, the type system provides several integer types that allow developers to select the most space-efficient representation based on whether the values are positive, negative, or can include both, and whether they are typically small or distributed over the entire range:
+*Types* include *scalar types* — 32/64-bit integers, 32/64-bit floating-point numbers, booleans, UTF-8 strings, and bytes, and *composite types* — enumerations, structures, maps, and arrays. Interestingly, the type system provides several integer types that allow developers to select the most space-efficient representation based on whether the values are positive, negative, or can include both, and whether they are typically small or uniformly distributed:
 
 
 
@@ -141,7 +134,7 @@ service EchoService {
 
 ##### HTTP/2
 
-HTTP/2 is the next version of the HTTP transport protocol. Initially, the HTTP/0.9 protocol was designed to let clients (typically browsers) request resources such as HTML documents, images, and scripts from servers over a hypermedia network. However, using this protocol to implement modern client-server systems with simultaneous bi-directional streaming results in complex and inefficient solutions. Even new features introduced in HTTP/1.1, such as persistent connections, pipelining, and chunked transfer encoding, proved insufficient for these demands.
+HTTP/2 is the next version of the HTTP transport protocol. Initially, the HTTP protocol was designed to let clients (typically browsers) request resources such as HTML documents, images, and scripts from servers over a hypermedia network. However, using this protocol to implement modern client-server systems with simultaneous bi-directional streaming results in complex and inefficient solutions. Even new features introduced in HTTP/1.1, such as persistent connections, pipelining, and chunked transfer encoding, proved insufficient for these demands.
 
 HTTP/2 retains the semantics of the previous version of the protocol (methods, response codes, headers), but introduces significant changes in implementation. While HTTP/2 brings several improvements that benefit various environments (browsers, mobile devices, and IoT), only a subset of these changes is relevant to gRPC.
 
@@ -253,11 +246,11 @@ To process a client request, the server performs the following steps: for each m
 
 
 ```
-class EchoServiceImpl extends EchoServiceGrpcServiceImplBase {
+class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
    @Override
    public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
        logger.log(Level.INFO, "request: {0}", request.getMessage());
-       for (int i = 1; i <= 7; i++) {
+       for (int i = 1; i <= 3; i++) {
            String value = "hello " + request.getMessage() + " " + i;
            EchoResponse response = EchoResponse.newBuilder().setMessage(value).build();
            responseObserver.onNext(response);
@@ -315,7 +308,7 @@ Because this example demonstrates server-side streaming with a blocking stub, th
 ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
 
 try {
-   EchoServiceGrpcServiceBlockingStub blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+   EchoServiceGrpc.EchoServiceBlockingStub blockingStub = EchoServiceGrpc.newBlockingStub(channel);
    EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
    Iterator<EchoResponse> responses = blockingStub.serverStreamingEcho(request);
 
@@ -338,7 +331,7 @@ The onNext method is called each time the client receives a single response from
 ```
 ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
 
-EchoServiceGrpcServiceStub asyncStub = EchoServiceGrpc.newStub(channel);
+EchoServiceGrpc.EchoServiceStub asyncStub = EchoServiceGrpc.newStub(channel);
 EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
 
 CountDownLatch latch = new CountDownLatch(1);
@@ -410,7 +403,7 @@ However, REST is a more appropriate architecture if the application meets most o
 * The application is simple and operates under low loads, and increasing performance is not economically justified.
 * The application uses unary requests/responses and does not require streaming. (Or the application *does* use streaming using the WebSockets protocol, but you consider this does not violate the REST architecture.)
 * Requests to the server are made directly from a browser, but using the gRPC-Web proxy is not technically justified.
-* The application exposes a public API intended for a large number of consumers outside your organization. (The technical level of these developers may vary, and some of them may have difficulty adopting HTTP/2 or debugging packed binary messages.)
+* The application provides a public API intended for use by a wide range of users outside your organization.
 * Your organization has proven engineering processes that guarantee successful backward and forward compatibility and versioning during the evolution of the application.
 
-As a rule of thumb, you should migrate your RESTful services to gRPC when you need high-performance inter-service communication — such as low-latency or high-throughput with unidirectional or bidirectional streaming — especially in internal (micro)service applications.
+As a rule of thumb, you should migrate your RESTful services to gRPC when you need high-performance inter-service communication — such as low-latency or high-throughput with unidirectional or bidirectional streaming — especially in internal microservice applications.

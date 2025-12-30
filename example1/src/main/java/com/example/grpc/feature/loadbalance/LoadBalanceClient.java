@@ -1,5 +1,8 @@
 package com.example.grpc.feature.loadbalance;
 
+import com.example.grpc.echo.EchoRequest;
+import com.example.grpc.echo.EchoResponse;
+import com.example.grpc.echo.EchoServiceGrpc;
 import io.grpc.Channel;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -16,17 +19,17 @@ public class LoadBalanceClient {
     public static final String exampleScheme = "example";
     public static final String exampleServiceName = "lb.example.grpc.io";
 
-    private final GreeterGrpc.GreeterBlockingStub blockingStub;
+    private final EchoServiceGrpc.EchoServiceBlockingStub blockingStub;
 
     public LoadBalanceClient(Channel channel) {
-        blockingStub = GreeterGrpc.newBlockingStub(channel);
+        blockingStub = EchoServiceGrpc.newBlockingStub(channel);
     }
 
     public void greet(String name) {
-        HelloRequest request = HelloRequest.newBuilder().setName(name).build();
-        HelloReply response;
+        EchoRequest request = EchoRequest.newBuilder().setMessage(name).build();
+        EchoResponse response;
         try {
-            response = blockingStub.sayHello(request);
+            response = blockingStub.unaryEcho(request);
         } catch (StatusRuntimeException e) {
             logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
             return;

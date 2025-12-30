@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static io.grpc.examples.loadbalance.LoadBalanceClient.exampleServiceName;
+import static com.example.grpc.feature.loadbalance.LoadBalanceClient.exampleServiceName;
 
 public class ExampleNameResolver extends NameResolver {
 

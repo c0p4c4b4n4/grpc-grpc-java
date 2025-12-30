@@ -21,7 +21,7 @@ import io.grpc.NameResolverProvider;
 
 import java.net.URI;
 
-import static io.grpc.examples.loadbalance.LoadBalanceClient.exampleScheme;
+import static com.example.grpc.feature.loadbalance.LoadBalanceClient.exampleScheme;
 
 public class ExampleNameResolverProvider extends NameResolverProvider {
     @Override

@@ -1,8 +1,8 @@
-package com.example.grpc.features.waitforready;
+package com.example.grpc.feature.waitforready;
 
+import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoServiceGrpc;
-import com.example.grpc.Loggers;
 import io.grpc.Deadline;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;

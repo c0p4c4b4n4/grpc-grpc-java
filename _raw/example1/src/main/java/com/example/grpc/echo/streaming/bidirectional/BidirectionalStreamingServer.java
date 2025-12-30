@@ -10,6 +10,7 @@ import io.grpc.ServerBuilder;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class BidirectionalStreamingServer {
@@ -19,10 +20,13 @@ public class BidirectionalStreamingServer {
     public static void main(String[] args) throws Exception {
         Logging.init();
 
-        Server server = ServerBuilder.forPort(50051)
+        int port = 50051;
+        Server server = ServerBuilder.forPort(port)
             .addService(new EchoServiceImpl())
             .build()
             .start();
+
+        logger.log(Level.INFO, "server started, listening on {0}", port);
 
         Shutdown.init(server);
         server.awaitTermination();

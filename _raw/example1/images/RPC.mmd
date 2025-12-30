@@ -1,5 +1,9 @@
-graph LR
-    A[Client] --> B[Client stub] --> C[Server stub]  --> D[Server]
-    D --> C
-    C --> B
-    B --> A
+flowchart LR
+    subgraph Client
+        direction TB
+        A1[Client] --> B1[Client stub] --> C1[RPC runtime]
+    end
+    subgraph Server
+        direction TB
+        A2[Client] --> B2[Client stub] --> C2[RPC runtime]
+    end

@@ -1,4 +1,4 @@
-package com.example.grpc.features.deadline;
+package com.example.grpc.feature.deadline;
 
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
@@ -21,6 +21,12 @@ public class ServerStreamingServer {
         public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
             logger.info("request: " + request.getMessage());
             for (int i = 1; i <= 7; i++) {
+                try {
+                    Thread.sleep(1000*i);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
                 var message = "hello " + request.getMessage() + " " + i;
                 var response = EchoResponse.newBuilder().setMessage(message).build();
                 responseObserver.onNext(response);

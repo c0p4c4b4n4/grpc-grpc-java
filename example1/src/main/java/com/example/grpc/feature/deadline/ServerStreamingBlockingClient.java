@@ -1,8 +1,9 @@
-package com.example.grpc.features.deadline;
+package com.example.grpc.feature.deadline;
 
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoServiceGrpc;
 import com.example.grpc.echo.Loggers;
+import io.grpc.Deadline;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 
@@ -18,7 +19,8 @@ public class ServerStreamingBlockingClient {
 
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         try {
-            var blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+            var blockingStub = EchoServiceGrpc.newBlockingStub(channel)
+                .withDeadline(Deadline.after(3, TimeUnit.SECONDS));
             var request = EchoRequest.newBuilder().setMessage("world").build();
             var responses = blockingStub.serverStreamingEcho(request);
 

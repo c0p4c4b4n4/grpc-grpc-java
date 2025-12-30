@@ -11,9 +11,9 @@ import io.grpc.stub.StreamObserver;
 
 import java.util.logging.Logger;
 
-public class UnaryEchoServer {
+public class UnaryServer {
 
-    private static final Logger logger = Logger.getLogger(UnaryEchoServer.class.getName());
+    private static final Logger logger = Logger.getLogger(UnaryServer.class.getName());
 
     public static void main(String[] args) throws Exception {
         Logging.init();

@@ -13,9 +13,9 @@ import io.grpc.stub.StreamObserver;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-public class ClientStreamingEchoClient {
+public class ClientStreamingClient {
 
-    private static final Logger logger = Logger.getLogger(ClientStreamingEchoClient.class.getName());
+    private static final Logger logger = Logger.getLogger(ClientStreamingClient.class.getName());
 
     public static void main(String[] args) throws InterruptedException {
         Logging.init();

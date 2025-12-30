@@ -13,9 +13,9 @@ import io.grpc.stub.StreamObserver;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-public class BidirectionalStreamingEchoClient {
+public class BidirectionalStreamingClient {
 
-    private static final Logger logger = Logger.getLogger(BidirectionalStreamingEchoClient.class.getName());
+    private static final Logger logger = Logger.getLogger(BidirectionalStreamingClient.class.getName());
 
     public static void main(String[] args) throws InterruptedException {
         Logging.init();

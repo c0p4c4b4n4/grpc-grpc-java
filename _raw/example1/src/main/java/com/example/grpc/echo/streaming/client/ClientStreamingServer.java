@@ -12,9 +12,9 @@ import io.grpc.stub.StreamObserver;
 
 import java.util.logging.Logger;
 
-public class ClientStreamingEchoServer {
+public class ClientStreamingServer {
 
-    private static final Logger logger = Logger.getLogger(ClientStreamingEchoServer.class.getName());
+    private static final Logger logger = Logger.getLogger(ClientStreamingServer.class.getName());
 
     public static void main(String[] args) throws Exception {
         Logging.init();

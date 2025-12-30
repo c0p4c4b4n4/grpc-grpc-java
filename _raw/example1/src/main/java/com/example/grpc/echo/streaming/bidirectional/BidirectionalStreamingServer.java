@@ -12,9 +12,9 @@ import io.grpc.stub.StreamObserver;
 
 import java.util.logging.Logger;
 
-public class BidirectionalStreamingEchoServer {
+public class BidirectionalStreamingServer {
 
-    private static final Logger logger = Logger.getLogger(BidirectionalStreamingEchoServer.class.getName());
+    private static final Logger logger = Logger.getLogger(BidirectionalStreamingServer.class.getName());
 
     public static void main(String[] args) throws Exception {
         Logging.init();

@@ -14,9 +14,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-public class UnaryEchoAsynchronousClient {
+public class UnaryAsynchronousClient {
 
-    private static final Logger logger = Logger.getLogger(UnaryEchoAsynchronousClient.class.getName());
+    private static final Logger logger = Logger.getLogger(UnaryAsynchronousClient.class.getName());
 
     public static void main(String[] args) throws Exception {
         Logging.init();

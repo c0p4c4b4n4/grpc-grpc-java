@@ -7,8 +7,10 @@ import com.example.grpc.echo.Logging;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
+import io.grpc.StatusRuntimeException;
 
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class UnaryEchoBlockingClient {
@@ -21,10 +23,12 @@ public class UnaryEchoBlockingClient {
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
 
         try {
-            EchoServiceGrpc.EchoServiceBlockingV2Stub blockingStub = EchoServiceGrpc.newBlockingV2Stub(channel);
+            EchoServiceGrpc.EchoServiceBlockingStub blockingStub = EchoServiceGrpc.newBlockingStub(channel);
             EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
             EchoResponse response = blockingStub.unaryEcho(request);
             logger.info("response: " + response.getMessage());
+        } catch (StatusRuntimeException e) {
+            logger.log(Level.WARNING, "error: {0}", e.getStatus());
         } finally {
             channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
         }

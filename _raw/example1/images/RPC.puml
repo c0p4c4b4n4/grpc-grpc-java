@@ -1,5 +1,7 @@
 @startuml
 
+skinparam linetype ortho
+
 rectangle "Client" as C1
 rectangle "Client stub" as C2
 rectangle "RPC runtime" as C3
@@ -10,15 +12,15 @@ rectangle "RPC runtime" as S3
 
 rectangle "Network" as N
 
-C1 --down-> C2
-C2 --up-> C1
-C2 --down-> C3
-C3 --up-> C2
+C1 -down-> C2
+C2 -up-> C1
+C2 -down-> C3
+C3 -up-> C2
 
-S1 --down-> S2
-S2 --up-> S1
-S2 --down-> S3
-S3 --up-> S2
+S1 -down-> S2
+S2 -up-> S1
+S2 -down-> S3
+S3 -up-> S2
 
 C3 -right-> N
 N -left-> C3

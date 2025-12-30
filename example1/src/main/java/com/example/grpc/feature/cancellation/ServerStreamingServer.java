@@ -4,6 +4,8 @@ import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
 import com.example.grpc.echo.Servers;
+import io.grpc.Status;
+import io.grpc.stub.ServerCallStreamObserver;
 import io.grpc.stub.StreamObserver;
 
 import java.util.logging.Logger;
@@ -20,7 +22,15 @@ public class ServerStreamingServer {
         @Override
         public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
             logger.info("request: " + request.getMessage());
+
+            var serverObserver = (ServerCallStreamObserver<EchoResponse>) responseObserver;
             for (int i = 1; i <= 7; i++) {
+                if (serverObserver.isCancelled()) {
+                    logger.info("Client cancelled the server streaming");
+                    responseObserver.onError( Status.CANCELLED.withDescription("RPC cancelled").asRuntimeException());
+                    return;
+                }
+
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {

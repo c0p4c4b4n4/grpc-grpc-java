@@ -4,45 +4,56 @@ import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
 import com.google.common.base.Verify;
+import com.google.common.base.VerifyException;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.Uninterruptibles;
+import com.google.rpc.DebugInfo;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.InsecureServerCredentials;
 import io.grpc.ManagedChannel;
+import io.grpc.Metadata;
 import io.grpc.Server;
 import io.grpc.Status;
+import io.grpc.protobuf.ProtoUtils;
 import io.grpc.stub.StreamObserver;
 
-import javax.annotation.Nullable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
-/**
- * Shows how to extract error information from a failed RPC.
- */
-public class ErrorHandlingClient {
+public class ErrorHandlingResponseTrailers {
+
+    private static final Metadata.Key<DebugInfo> DEBUG_INFO_TRAILER_KEY =
+        ProtoUtils.keyForProto(DebugInfo.getDefaultInstance());
+
+    private static final DebugInfo DEBUG_INFO =
+        DebugInfo.newBuilder()
+            .addStackEntries("stack_entry_1")
+            .addStackEntries("stack_entry_2")
+            .addStackEntries("stack_entry_3")
+            .setDetail("detailed error info.").build();
+
+    private static final String DEBUG_DESC = "detailed error description";
 
     public static void main(String[] args) throws Exception {
-        new ErrorHandlingClient().run();
+        new ErrorHandlingResponseTrailers().run();
     }
 
     private ManagedChannel channel;
 
     void run() throws Exception {
-        // Port 0 means that the operating system will pick an available port to use.
         Server server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
             .addService(new EchoServiceGrpc.EchoServiceImplBase() {
                 @Override
                 public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-                    // The server will always fail, and we'll see this failure on client-side. The exception is
-                    // not sent to the client, only the status code (i.e., INTERNAL) and description.
-                    responseObserver.onError(Status.INTERNAL.withDescription("Eggplant Xerxes Crybaby Overbite Narwhal").asRuntimeException());
+                    Metadata trailers = new Metadata();
+                    trailers.put(DEBUG_INFO_TRAILER_KEY, DEBUG_INFO);
+                    responseObserver.onError(Status.INTERNAL.withDescription(DEBUG_DESC).asRuntimeException(trailers));
                 }
             })
             .build()
@@ -60,21 +71,31 @@ public class ErrorHandlingClient {
         server.awaitTermination();
     }
 
+    static void verifyErrorReply(Throwable t) {
+        Status status = Status.fromThrowable(t);
+        Metadata trailers = Status.trailersFromThrowable(t);
+        Verify.verify(status.getCode() == Status.Code.INTERNAL);
+        Verify.verify(trailers.containsKey(DEBUG_INFO_TRAILER_KEY));
+        Verify.verify(status.getDescription().equals(DEBUG_DESC));
+        try {
+            Verify.verify(trailers.get(DEBUG_INFO_TRAILER_KEY).equals(DEBUG_INFO));
+        } catch (IllegalArgumentException e) {
+            throw new VerifyException(e);
+        }
+    }
+
     void blockingCall() {
         EchoServiceGrpc.EchoServiceBlockingStub stub = EchoServiceGrpc.newBlockingStub(channel);
         try {
-            stub.unaryEcho(EchoRequest.newBuilder().setMessage("Bart").build());
+            stub.unaryEcho(EchoRequest.newBuilder().build());
         } catch (Exception e) {
-            Status status = Status.fromThrowable(e);
-            Verify.verify(status.getCode() == Status.Code.INTERNAL);
-            Verify.verify(status.getDescription().contains("Eggplant"));
-            // Cause is not transmitted over the wire.
+            verifyErrorReply(e);
         }
     }
 
     void futureCallDirect() {
         EchoServiceGrpc.EchoServiceFutureStub stub = EchoServiceGrpc.newFutureStub(channel);
-        ListenableFuture<EchoResponse> response = stub.unaryEcho(EchoRequest.newBuilder().setMessage("Lisa").build());
+        ListenableFuture<EchoResponse> response = stub.unaryEcho(EchoRequest.newBuilder().build());
 
         try {
             response.get();
@@ -82,33 +103,26 @@ public class ErrorHandlingClient {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
-            Status status = Status.fromThrowable(e.getCause());
-            Verify.verify(status.getCode() == Status.Code.INTERNAL);
-            Verify.verify(status.getDescription().contains("Xerxes"));
-            // Cause is not transmitted over the wire.
+            verifyErrorReply(e.getCause());
         }
     }
 
     void futureCallCallback() {
         EchoServiceGrpc.EchoServiceFutureStub stub = EchoServiceGrpc.newFutureStub(channel);
-        ListenableFuture<EchoResponse> response = stub.unaryEcho(EchoRequest.newBuilder().setMessage("Maggie").build());
+        ListenableFuture<EchoResponse> response = stub.unaryEcho(EchoRequest.newBuilder().build());
 
-        final CountDownLatch latch = new CountDownLatch(1);
-
+        CountDownLatch latch = new CountDownLatch(1);
         Futures.addCallback(
             response,
             new FutureCallback<EchoResponse>() {
                 @Override
-                public void onSuccess(@Nullable EchoResponse result) {
+                public void onSuccess(EchoResponse result) {
                     // Won't be called, since the server in this example always fails.
                 }
 
                 @Override
                 public void onFailure(Throwable t) {
-                    Status status = Status.fromThrowable(t);
-                    Verify.verify(status.getCode() == Status.Code.INTERNAL);
-                    Verify.verify(status.getDescription().contains("Crybaby"));
-                    // Cause is not transmitted over the wire..
+                    verifyErrorReply(t);
                     latch.countDown();
                 }
             },
@@ -121,11 +135,10 @@ public class ErrorHandlingClient {
 
     void asyncCall() {
         EchoServiceGrpc.EchoServiceStub stub = EchoServiceGrpc.newStub(channel);
-        EchoRequest request = EchoRequest.newBuilder().setMessage("Homer").build();
+        EchoRequest request = EchoRequest.newBuilder().build();
 
         CountDownLatch latch = new CountDownLatch(1);
         StreamObserver<EchoResponse> responseObserver = new StreamObserver<EchoResponse>() {
-
             @Override
             public void onNext(EchoResponse value) {
                 // Won't be called.
@@ -133,10 +146,7 @@ public class ErrorHandlingClient {
 
             @Override
             public void onError(Throwable t) {
-                Status status = Status.fromThrowable(t);
-                Verify.verify(status.getCode() == Status.Code.INTERNAL);
-                Verify.verify(status.getDescription().contains("Overbite"));
-                // Cause is not transmitted over the wire..
+                verifyErrorReply(t);
                 latch.countDown();
             }
 
@@ -151,5 +161,6 @@ public class ErrorHandlingClient {
             throw new RuntimeException("timeout!");
         }
     }
+
 }
 

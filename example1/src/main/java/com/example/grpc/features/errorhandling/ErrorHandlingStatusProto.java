@@ -23,12 +23,11 @@ import io.grpc.Server;
 import io.grpc.protobuf.StatusProto;
 import io.grpc.stub.StreamObserver;
 
-import javax.annotation.Nullable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class ErrorDetailsExample {
+public class ErrorHandlingStatusProto {
 
     private static final DebugInfo DEBUG_INFO =
         DebugInfo.newBuilder()
@@ -43,8 +42,7 @@ public class ErrorDetailsExample {
 
         try {
             server = launchServer();
-            channel = Grpc.newChannelBuilderForAddress(
-                "localhost", server.getPort(), InsecureChannelCredentials.create()).build();
+            channel = Grpc.newChannelBuilderForAddress("localhost", server.getPort(), InsecureChannelCredentials.create()).build();
 
             runClientTests(channel);
         } finally {
@@ -52,13 +50,12 @@ public class ErrorDetailsExample {
         }
     }
 
-
     static Server launchServer() throws Exception {
         return Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
             .addService(new EchoServiceGrpc.EchoServiceImplBase() {
                 @Override
                 public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-                    // This is com.google.rpc.Status, not io.grpc.Status
+                    // this is com.google.rpc.Status, not io.grpc.Status
                     Status status = Status.newBuilder()
                         .setCode(Code.INVALID_ARGUMENT.getNumber())
                         .setMessage("Email or password malformed")
@@ -143,7 +140,7 @@ public class ErrorDetailsExample {
             response,
             new FutureCallback<EchoResponse>() {
                 @Override
-                public void onSuccess(@Nullable EchoResponse result) {
+                public void onSuccess(EchoResponse result) {
                     // Won't be called, since the server in this example always fails.
                 }
 

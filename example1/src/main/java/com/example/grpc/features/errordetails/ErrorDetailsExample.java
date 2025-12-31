@@ -1,4 +1,4 @@
-package com.example.grpc.features.errorstatus;
+package com.example.grpc.features.errordetails;
 
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
@@ -28,7 +28,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class ErrorStatusExample {
+public class ErrorDetailsExample {
 
     private static final DebugInfo DEBUG_INFO =
         DebugInfo.newBuilder()

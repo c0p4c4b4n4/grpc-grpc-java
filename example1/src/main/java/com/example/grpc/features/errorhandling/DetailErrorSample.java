@@ -2,6 +2,9 @@ package com.example.grpc.features.errorhandling;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
+import com.example.grpc.echo.EchoRequest;
+import com.example.grpc.echo.EchoResponse;
+import com.example.grpc.echo.EchoServiceGrpc;
 import com.google.common.base.Verify;
 import com.google.common.base.VerifyException;
 import com.google.common.util.concurrent.FutureCallback;
@@ -53,9 +56,9 @@ public class DetailErrorSample {
 
   void run() throws Exception {
     Server server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
-        .addService(new GreeterGrpc.GreeterImplBase() {
+        .addService(new EchoServiceGrpc.GreeterImplBase() {
       @Override
-      public void sayHello(HelloRequest request, StreamObserver<HelloReply> responseObserver) {
+      public void sayHello(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
         Metadata trailers = new Metadata();
         trailers.put(DEBUG_INFO_TRAILER_KEY, DEBUG_INFO);
         responseObserver.onError(Status.INTERNAL.withDescription(DEBUG_DESC)
@@ -91,18 +94,18 @@ public class DetailErrorSample {
   }
 
   void blockingCall() {
-    GreeterBlockingStub stub = GreeterGrpc.newBlockingStub(channel);
+    EchoServiceGrpc.EchoServiceBlockingStub stub = EchoServiceGrpc.newBlockingStub(channel);
     try {
-      stub.sayHello(HelloRequest.newBuilder().build());
+      stub.unaryEcho(EchoRequest.newBuilder().build());
     } catch (Exception e) {
       verifyErrorReply(e);
     }
   }
 
   void futureCallDirect() {
-    GreeterFutureStub stub = GreeterGrpc.newFutureStub(channel);
-    ListenableFuture<HelloReply> response =
-        stub.sayHello(HelloRequest.newBuilder().build());
+    EchoServiceGrpc.EchoServiceFutureStub stub = EchoServiceGrpc.newFutureStub(channel);
+    ListenableFuture<EchoResponse> response =
+        stub.unaryEcho(EchoRequest.newBuilder().build());
 
     try {
       response.get();
@@ -115,17 +118,17 @@ public class DetailErrorSample {
   }
 
   void futureCallCallback() {
-    GreeterFutureStub stub = GreeterGrpc.newFutureStub(channel);
-    ListenableFuture<HelloReply> response =
-        stub.sayHello(HelloRequest.newBuilder().build());
+    GreeterFutureStub stub = EchoServiceGrpc.newFutureStub(channel);
+    ListenableFuture<EchoResponse> response =
+        stub.sayHello(EchoRequest.newBuilder().build());
 
     final CountDownLatch latch = new CountDownLatch(1);
 
     Futures.addCallback(
         response,
-        new FutureCallback<HelloReply>() {
+        new FutureCallback<EchoResponse>() {
           @Override
-          public void onSuccess(@Nullable HelloReply result) {
+          public void onSuccess(@Nullable EchoResponse result) {
             // Won't be called, since the server in this example always fails.
           }
 
@@ -143,13 +146,13 @@ public class DetailErrorSample {
   }
 
   void asyncCall() {
-    GreeterStub stub = GreeterGrpc.newStub(channel);
-    HelloRequest request = HelloRequest.newBuilder().build();
+    GreeterStub stub = EchoServiceGrpc.newStub(channel);
+    EchoRequest request = EchoRequest.newBuilder().build();
     final CountDownLatch latch = new CountDownLatch(1);
-    StreamObserver<HelloReply> responseObserver = new StreamObserver<HelloReply>() {
+    StreamObserver<EchoResponse> responseObserver = new StreamObserver<EchoResponse>() {
 
       @Override
-      public void onNext(HelloReply value) {
+      public void onNext(EchoResponse value) {
         // Won't be called.
       }
 
@@ -177,12 +180,12 @@ public class DetailErrorSample {
    * this, but here is how you would.
    */
   void advancedAsyncCall() {
-    ClientCall<HelloRequest, HelloReply> call =
-        channel.newCall(GreeterGrpc.getSayHelloMethod(), CallOptions.DEFAULT);
+    ClientCall<EchoRequest, EchoResponse> call =
+        channel.newCall(EchoServiceGrpc.getSayHelloMethod(), CallOptions.DEFAULT);
 
     final CountDownLatch latch = new CountDownLatch(1);
 
-    call.start(new ClientCall.Listener<HelloReply>() {
+    call.start(new ClientCall.Listener<EchoResponse>() {
 
       @Override
       public void onClose(Status status, Metadata trailers) {
@@ -198,7 +201,7 @@ public class DetailErrorSample {
       }
     }, new Metadata());
 
-    call.sendMessage(HelloRequest.newBuilder().build());
+    call.sendMessage(EchoRequest.newBuilder().build());
     call.halfClose();
 
     if (!Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS)) {

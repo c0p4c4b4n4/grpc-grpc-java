@@ -1,7 +1,8 @@
 package com.example.grpc.features.errorhandling;
 
-import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-
+import com.example.grpc.echo.EchoRequest;
+import com.example.grpc.echo.EchoResponse;
+import com.example.grpc.echo.EchoServiceGrpc;
 import com.google.common.base.Verify;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -17,169 +18,171 @@ import io.grpc.Metadata;
 import io.grpc.Server;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
+
+import javax.annotation.Nullable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.Nullable;
+
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
 /**
  * Shows how to extract error information from a failed RPC.
  */
 public class ErrorHandlingClient {
-  public static void main(String [] args) throws Exception {
-    new ErrorHandlingClient().run();
-  }
-
-  private ManagedChannel channel;
-
-  void run() throws Exception {
-    // Port 0 means that the operating system will pick an available port to use.
-    Server server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
-        .addService(new GreeterGrpc.GreeterImplBase() {
-      @Override
-      public void sayHello(HelloRequest request, StreamObserver<HelloReply> responseObserver) {
-        // The server will always fail, and we'll see this failure on client-side. The exception is
-        // not sent to the client, only the status code (i.e., INTERNAL) and description.
-        responseObserver.onError(Status.INTERNAL
-            .withDescription("Eggplant Xerxes Crybaby Overbite Narwhal").asRuntimeException());
-      }
-    }).build().start();
-    channel = Grpc.newChannelBuilderForAddress(
-        "localhost", server.getPort(), InsecureChannelCredentials.create()).build();
-
-    blockingCall();
-    futureCallDirect();
-    futureCallCallback();
-    asyncCall();
-    advancedAsyncCall();
-
-    channel.shutdown();
-    server.shutdown();
-    channel.awaitTermination(1, TimeUnit.SECONDS);
-    server.awaitTermination();
-  }
-
-  void blockingCall() {
-    GreeterBlockingStub stub = GreeterGrpc.newBlockingStub(channel);
-    try {
-      stub.sayHello(HelloRequest.newBuilder().setName("Bart").build());
-    } catch (Exception e) {
-      Status status = Status.fromThrowable(e);
-      Verify.verify(status.getCode() == Status.Code.INTERNAL);
-      Verify.verify(status.getDescription().contains("Eggplant"));
-      // Cause is not transmitted over the wire.
+    public static void main(String[] args) throws Exception {
+        new ErrorHandlingClient().run();
     }
-  }
 
-  void futureCallDirect() {
-    GreeterFutureStub stub = GreeterGrpc.newFutureStub(channel);
-    ListenableFuture<HelloReply> response =
-        stub.sayHello(HelloRequest.newBuilder().setName("Lisa").build());
+    private ManagedChannel channel;
 
-    try {
-      response.get();
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      throw new RuntimeException(e);
-    } catch (ExecutionException e) {
-      Status status = Status.fromThrowable(e.getCause());
-      Verify.verify(status.getCode() == Status.Code.INTERNAL);
-      Verify.verify(status.getDescription().contains("Xerxes"));
-      // Cause is not transmitted over the wire.
+    void run() throws Exception {
+        // Port 0 means that the operating system will pick an available port to use.
+        Server server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
+            .addService(new EchoServiceGrpc.EchoServiceImplBase() {
+                @Override
+                public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
+                    // The server will always fail, and we'll see this failure on client-side. The exception is
+                    // not sent to the client, only the status code (i.e., INTERNAL) and description.
+                    responseObserver.onError(Status.INTERNAL
+                        .withDescription("Eggplant Xerxes Crybaby Overbite Narwhal").asRuntimeException());
+                }
+            }).build().start();
+        channel = Grpc.newChannelBuilderForAddress(
+            "localhost", server.getPort(), InsecureChannelCredentials.create()).build();
+
+        blockingCall();
+        futureCallDirect();
+        futureCallCallback();
+        asyncCall();
+        advancedAsyncCall();
+
+        channel.shutdown();
+        server.shutdown();
+        channel.awaitTermination(1, TimeUnit.SECONDS);
+        server.awaitTermination();
     }
-  }
 
-  void futureCallCallback() {
-    GreeterFutureStub stub = GreeterGrpc.newFutureStub(channel);
-    ListenableFuture<HelloReply> response =
-        stub.sayHello(HelloRequest.newBuilder().setName("Maggie").build());
-
-    final CountDownLatch latch = new CountDownLatch(1);
-
-    Futures.addCallback(
-        response,
-        new FutureCallback<HelloReply>() {
-          @Override
-          public void onSuccess(@Nullable HelloReply result) {
-            // Won't be called, since the server in this example always fails.
-          }
-
-          @Override
-          public void onFailure(Throwable t) {
-            Status status = Status.fromThrowable(t);
+    void blockingCall() {
+        EchoServiceGrpc.EchoServiceBlockingStub stub = EchoServiceGrpc.newBlockingStub(channel);
+        try {
+            stub.unaryEcho(EchoRequest.newBuilder().setMessage("Bart").build());
+        } catch (Exception e) {
+            Status status = Status.fromThrowable(e);
             Verify.verify(status.getCode() == Status.Code.INTERNAL);
-            Verify.verify(status.getDescription().contains("Crybaby"));
-            // Cause is not transmitted over the wire..
-            latch.countDown();
-          }
-        },
-        directExecutor());
-
-    if (!Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS)) {
-      throw new RuntimeException("timeout!");
+            Verify.verify(status.getDescription().contains("Eggplant"));
+            // Cause is not transmitted over the wire.
+        }
     }
-  }
 
-  void asyncCall() {
-    GreeterStub stub = GreeterGrpc.newStub(channel);
-    HelloRequest request = HelloRequest.newBuilder().setName("Homer").build();
-    final CountDownLatch latch = new CountDownLatch(1);
-    StreamObserver<HelloReply> responseObserver = new StreamObserver<HelloReply>() {
+    void futureCallDirect() {
+        EchoServiceGrpc.EchoServiceFutureStub stub = EchoServiceGrpc.newFutureStub(channel);
+        ListenableFuture<EchoResponse> response = stub.unaryEcho(EchoRequest.newBuilder().setMessage("Lisa").build());
 
-      @Override
-      public void onNext(HelloReply value) {
-        // Won't be called.
-      }
-
-      @Override
-      public void onError(Throwable t) {
-        Status status = Status.fromThrowable(t);
-        Verify.verify(status.getCode() == Status.Code.INTERNAL);
-        Verify.verify(status.getDescription().contains("Overbite"));
-        // Cause is not transmitted over the wire..
-        latch.countDown();
-      }
-
-      @Override
-      public void onCompleted() {
-        // Won't be called, since the server in this example always fails.
-      }
-    };
-    stub.sayHello(request, responseObserver);
-
-    if (!Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS)) {
-      throw new RuntimeException("timeout!");
+        try {
+            response.get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            Status status = Status.fromThrowable(e.getCause());
+            Verify.verify(status.getCode() == Status.Code.INTERNAL);
+            Verify.verify(status.getDescription().contains("Xerxes"));
+            // Cause is not transmitted over the wire.
+        }
     }
-  }
 
+    void futureCallCallback() {
+        EchoServiceGrpc.EchoServiceFutureStub stub = EchoServiceGrpc.newFutureStub(channel);
+        ListenableFuture<EchoResponse> response = stub.unaryEcho(EchoRequest.newBuilder().setMessage("Maggie").build());
 
-  /**
-   * This is more advanced and does not make use of the stub.  You should not normally need to do
-   * this, but here is how you would.
-   */
-  void advancedAsyncCall() {
-    ClientCall<HelloRequest, HelloReply> call =
-        channel.newCall(GreeterGrpc.getSayHelloMethod(), CallOptions.DEFAULT);
+        final CountDownLatch latch = new CountDownLatch(1);
 
-    final CountDownLatch latch = new CountDownLatch(1);
+        Futures.addCallback(
+            response,
+            new FutureCallback<EchoResponse>() {
+                @Override
+                public void onSuccess(@Nullable EchoResponse result) {
+                    // Won't be called, since the server in this example always fails.
+                }
 
-    call.start(new ClientCall.Listener<HelloReply>() {
+                @Override
+                public void onFailure(Throwable t) {
+                    Status status = Status.fromThrowable(t);
+                    Verify.verify(status.getCode() == Status.Code.INTERNAL);
+                    Verify.verify(status.getDescription().contains("Crybaby"));
+                    // Cause is not transmitted over the wire..
+                    latch.countDown();
+                }
+            },
+            directExecutor());
 
-      @Override
-      public void onClose(Status status, Metadata trailers) {
-        Verify.verify(status.getCode() == Status.Code.INTERNAL);
-        Verify.verify(status.getDescription().contains("Narwhal"));
-        // Cause is not transmitted over the wire.
-        latch.countDown();
-      }
-    }, new Metadata());
-
-    call.sendMessage(HelloRequest.newBuilder().setName("Marge").build());
-    call.halfClose();
-
-    if (!Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS)) {
-      throw new RuntimeException("timeout!");
+        if (!Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS)) {
+            throw new RuntimeException("timeout!");
+        }
     }
-  }
+
+    void asyncCall() {
+        EchoServiceGrpc.EchoServiceStub stub = EchoServiceGrpc.newStub(channel);
+        EchoRequest request = EchoRequest.newBuilder().setMessage("Homer").build();
+
+        CountDownLatch latch = new CountDownLatch(1);
+        StreamObserver<EchoResponse> responseObserver = new StreamObserver<EchoResponse>() {
+
+            @Override
+            public void onNext(EchoResponse value) {
+                // Won't be called.
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                Status status = Status.fromThrowable(t);
+                Verify.verify(status.getCode() == Status.Code.INTERNAL);
+                Verify.verify(status.getDescription().contains("Overbite"));
+                // Cause is not transmitted over the wire..
+                latch.countDown();
+            }
+
+            @Override
+            public void onCompleted() {
+                // Won't be called, since the server in this example always fails.
+            }
+        };
+        stub.unaryEcho(request, responseObserver);
+
+        if (!Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS)) {
+            throw new RuntimeException("timeout!");
+        }
+    }
+
+
+    /**
+     * This is more advanced and does not make use of the stub.  You should not normally need to do
+     * this, but here is how you would.
+     */
+    void advancedAsyncCall() {
+        ClientCall<EchoRequest, EchoResponse> call =
+            channel.newCall(EchoServiceGrpc.getSayHelloMethod(), CallOptions.DEFAULT);
+
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        call.start(new ClientCall.Listener<EchoResponse>() {
+
+            @Override
+            public void onClose(Status status, Metadata trailers) {
+                Verify.verify(status.getCode() == Status.Code.INTERNAL);
+                Verify.verify(status.getDescription().contains("Narwhal"));
+                // Cause is not transmitted over the wire.
+                latch.countDown();
+            }
+        }, new Metadata());
+
+        call.sendMessage(EchoRequest.newBuilder().setMessage("Marge").build());
+        call.halfClose();
+
+        if (!Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS)) {
+            throw new RuntimeException("timeout!");
+        }
+    }
 }
 

@@ -82,7 +82,7 @@ public class HealthServiceServer {
         @Override
         public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
             if (!isServing) {
-                responseObserver.onError(               Status.INTERNAL.withDescription("Not Serving right now").asRuntimeException());
+                responseObserver.onError(Status.INTERNAL.withDescription("Not Serving right now").asRuntimeException());
                 return;
             }
 

@@ -4,6 +4,7 @@ import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoServiceGrpc;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.StatusException;
 import io.grpc.StatusRuntimeException;
 
 import java.util.concurrent.TimeUnit;
@@ -19,11 +20,11 @@ public class UnaryBlockingV2Client {
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
 
         try {
-            var blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+            var blockingStub = EchoServiceGrpc.newBlockingV2Stub(channel);
             var request = EchoRequest.newBuilder().setMessage("world").build();
             var response = blockingStub.unaryEcho(request);
             logger.info("response: " + response.getMessage());
-        } catch (StatusRuntimeException e) {
+        } catch (StatusException e) {
             logger.warning("error: " + e.getStatus());
         } finally {
             channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);

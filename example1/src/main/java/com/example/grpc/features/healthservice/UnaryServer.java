@@ -56,7 +56,7 @@ public class UnaryServer extends Loggable {
     private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
 
         private final HealthStatusManager health;
-        private final AtomicBoolean serving = new AtomicBoolean(true);
+        private final AtomicBoolean isServing = new AtomicBoolean(true);
 
         public EchoServiceImpl(HealthStatusManager health) {
             this.health = health;
@@ -64,7 +64,7 @@ public class UnaryServer extends Loggable {
 
         @Override
         public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-            if (!serving.get()) {
+            if (!isServing.get()) {
                 responseObserver.onError(Status.INTERNAL.withDescription("not serving right now").asRuntimeException());
                 return;
             }
@@ -77,13 +77,13 @@ public class UnaryServer extends Loggable {
                 logger.warning("short message received, will not serve for 10 seconds");
                 health.setStatus("", ServingStatus.NOT_SERVING);
 
-                serving.set(false);
+                isServing.set(false);
 
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         Delays.sleep(10);
-                        serving.set(true);
+                        isServing.set(true);
 
                         logger.info("continue to serve");
                         health.setStatus("", ServingStatus.SERVING);
@@ -95,7 +95,7 @@ public class UnaryServer extends Loggable {
         }
 
         private boolean shouldServe(EchoRequest request) {
-            return serving.get() && request.getMessage().length() >= 5;
+            return isServing.get() && request.getMessage().length() >= 5;
         }
     }
 }

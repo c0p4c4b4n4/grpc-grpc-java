@@ -51,14 +51,14 @@ public class UnaryBlockingClient extends Loggable {
         }
     }
 
-    private static void checkHealth(HealthGrpc.HealthBlockingStub healthBlockingStub, String name) {
+    private static void checkHealth(HealthGrpc.HealthBlockingStub healthBlockingStub, String prefix) {
         var request = HealthCheckRequest.getDefaultInstance();
         var response = healthBlockingStub.check(request);
-        logger.info(name + ", current health is: " + response.getStatus());
+        logger.info(prefix + ", health is: " + response.getStatus());
     }
 
     public static void greet(EchoServiceGrpc.EchoServiceBlockingStub echoBlockingStub, String name) {
-        logger.info("Will try to greet " + name + " ...");
+        logger.info("will try to request " + name + " ...");
         var request = EchoRequest.newBuilder().setMessage(name).build();
         EchoResponse response;
         try {
@@ -67,6 +67,6 @@ public class UnaryBlockingClient extends Loggable {
             logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
             return;
         }
-        logger.info("Greeting: " + response.getMessage());
+        logger.info("response: " + response.getMessage());
     }
 }

@@ -10,8 +10,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.rpc.DebugInfo;
-import io.grpc.CallOptions;
-import io.grpc.ClientCall;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.InsecureServerCredentials;
@@ -62,18 +60,17 @@ public class DetailErrorSample {
                 public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
                     Metadata trailers = new Metadata();
                     trailers.put(DEBUG_INFO_TRAILER_KEY, DEBUG_INFO);
-                    responseObserver.onError(Status.INTERNAL.withDescription(DEBUG_DESC)
-                        .asRuntimeException(trailers));
+                    responseObserver.onError(Status.INTERNAL.withDescription(DEBUG_DESC).asRuntimeException(trailers));
                 }
-            }).build().start();
-        channel = Grpc.newChannelBuilderForAddress(
-            "localhost", server.getPort(), InsecureChannelCredentials.create()).build();
+            })
+            .build()
+            .start();
+        channel = Grpc.newChannelBuilderForAddress("localhost", server.getPort(), InsecureChannelCredentials.create()).build();
 
         blockingCall();
         futureCallDirect();
         futureCallCallback();
         asyncCall();
-        advancedAsyncCall();
 
         channel.shutdown();
         server.shutdown();
@@ -147,7 +144,7 @@ public class DetailErrorSample {
         EchoServiceGrpc.EchoServiceStub stub = EchoServiceGrpc.newStub(channel);
         EchoRequest request = EchoRequest.newBuilder().build();
 
-         CountDownLatch latch = new CountDownLatch(1);
+        CountDownLatch latch = new CountDownLatch(1);
         StreamObserver<EchoResponse> responseObserver = new StreamObserver<EchoResponse>() {
             @Override
             public void onNext(EchoResponse value) {
@@ -172,38 +169,5 @@ public class DetailErrorSample {
         }
     }
 
-
-    /**
-     * This is more advanced and does not make use of the stub.  You should not normally need to do
-     * this, but here is how you would.
-     */
-    void advancedAsyncCall() {
-        ClientCall<EchoRequest, EchoResponse> call = channel.newCall(EchoServiceGrpc.getUnaryEchoMethod(), CallOptions.DEFAULT);
-
-        final CountDownLatch latch = new CountDownLatch(1);
-
-        call.start(new ClientCall.Listener<EchoResponse>() {
-
-            @Override
-            public void onClose(Status status, Metadata trailers) {
-                Verify.verify(status.getCode() == Status.Code.INTERNAL);
-                Verify.verify(trailers.containsKey(DEBUG_INFO_TRAILER_KEY));
-                try {
-                    Verify.verify(trailers.get(DEBUG_INFO_TRAILER_KEY).equals(DEBUG_INFO));
-                } catch (IllegalArgumentException e) {
-                    throw new VerifyException(e);
-                }
-
-                latch.countDown();
-            }
-        }, new Metadata());
-
-        call.sendMessage(EchoRequest.newBuilder().build());
-        call.halfClose();
-
-        if (!Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS)) {
-            throw new RuntimeException("timeout!");
-        }
-    }
 }
 

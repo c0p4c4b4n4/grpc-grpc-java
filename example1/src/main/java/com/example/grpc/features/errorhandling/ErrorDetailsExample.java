@@ -1,4 +1,4 @@
-package com.example.grpc.features.errordetails;
+package com.example.grpc.features.errorhandling;
 
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
@@ -53,9 +53,6 @@ public class ErrorDetailsExample {
     }
 
 
-    /**
-     * Create server and start it
-     */
     static Server launchServer() throws Exception {
         return Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
             .addService(new EchoServiceGrpc.EchoServiceImplBase() {

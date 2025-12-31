@@ -6,6 +6,7 @@ import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
+import com.example.grpc.features.keepalive.UnaryBlockingClient;
 import io.grpc.Grpc;
 import io.grpc.InsecureServerCredentials;
 import io.grpc.Server;
@@ -16,17 +17,19 @@ import io.grpc.stub.StreamObserver;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 public class UnaryServer extends Loggable {
 
-    private Server server;
-    private HealthStatusManager health;
+    private static final Logger logger = Logger.getLogger(UnaryServer.class.getName());
 
-    private void start() throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
+        Loggers.init();
+
         int port = 50051;
-        health = new HealthStatusManager();
+        HealthStatusManager health = new HealthStatusManager();
 
-        server = Grpc.newServerBuilderForPort(port, InsecureServerCredentials.create())
+        Server server = Grpc.newServerBuilderForPort(port, InsecureServerCredentials.create())
             .addService(new EchoServiceImpl())
             .addService(health.getHealthService())
             .build()
@@ -46,29 +49,11 @@ public class UnaryServer extends Loggable {
         }));
 
         health.setStatus("", ServingStatus.SERVING);
+
+        server.awaitTermination();
     }
 
-    private void stop() throws InterruptedException {
-        if (server != null) {
-            server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
-        }
-    }
-
-    private void blockUntilShutdown() throws InterruptedException {
-        if (server != null) {
-            server.awaitTermination();
-        }
-    }
-
-    public static void main(String[] args) throws IOException, InterruptedException {
-        Loggers.init();
-
-        UnaryServer server = new UnaryServer();
-        server.start();
-        server.blockUntilShutdown();
-    }
-
-    private class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
 
         boolean serving = true;
 

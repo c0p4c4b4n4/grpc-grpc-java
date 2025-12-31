@@ -1,5 +1,6 @@
 package com.example.grpc.features.healthservice;
 
+import com.example.grpc.Delays;
 import com.example.grpc.Loggable;
 import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;
@@ -10,8 +11,6 @@ import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
 import io.grpc.StatusRuntimeException;
 import io.grpc.health.v1.HealthCheckRequest;
-import io.grpc.health.v1.HealthCheckResponse;
-import io.grpc.health.v1.HealthCheckResponse.ServingStatus;
 import io.grpc.health.v1.HealthGrpc;
 
 import java.util.concurrent.TimeUnit;
@@ -25,33 +24,26 @@ public class UnaryBlockingClient extends Loggable {
     public static void main(String[] args) throws Exception {
         Loggers.init();
 
-        String target = "localhost:50051";
-        String[] users = {"Alpha", "Beta", "Gamma"};
-
-        ManagedChannel channel = Grpc.newChannelBuilder(target, InsecureChannelCredentials.create()).build();
+        ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
 
         try {
-            EchoServiceGrpc.EchoServiceBlockingStub echoBlockingStub;
+            EchoServiceGrpc.EchoServiceBlockingStub echoBlockingStub = EchoServiceGrpc.newBlockingStub(channel);
+            HealthGrpc.HealthBlockingStub healthBlockingStub = HealthGrpc.newBlockingStub(channel);
 
-            HealthGrpc.HealthStub healthStub= HealthGrpc.newStub(channel);
-            HealthGrpc.HealthBlockingStub healthBlockingStub;
+            String[] users = {"Alpha", "Beta", "Gamma"};
 
-            echoBlockingStub = EchoServiceGrpc.newBlockingStub(channel);
-            healthBlockingStub = HealthGrpc.newBlockingStub(channel);
-
-//            UnaryBlockingClient client = new UnaryBlockingClient(channel);
-            checkHealth(healthBlockingStub, "Before call");
+            checkHealth(healthBlockingStub, "before all users");
             greet(echoBlockingStub, users[0]);
-            checkHealth(healthBlockingStub, "After user " + users[0]);
+            checkHealth(healthBlockingStub, "after user " + users[0]);
 
             for (String user : users) {
                 greet(echoBlockingStub, user);
                 Thread.sleep(100);
             }
+            checkHealth(healthBlockingStub, "after all users");
 
-            checkHealth(healthBlockingStub, "After all users");
-            Thread.sleep(10000);
-            checkHealth(healthBlockingStub, "After 10 second wait");
+            Delays.sleep(10);
+            checkHealth(healthBlockingStub, "after 10 second wait");
 
             greet(echoBlockingStub, "Delta");
         } finally {
@@ -59,28 +51,22 @@ public class UnaryBlockingClient extends Loggable {
         }
     }
 
-
-    private static ServingStatus checkHealth(HealthGrpc.HealthBlockingStub healthBlockingStub, String prefix) {
-        HealthCheckRequest healthRequest = HealthCheckRequest.getDefaultInstance();
-        HealthCheckResponse response = healthBlockingStub.check(healthRequest);
-        logger.info(prefix + ", current health is: " + response.getStatus());
-        return response.getStatus();
+    private static void checkHealth(HealthGrpc.HealthBlockingStub healthBlockingStub, String name) {
+        var request = HealthCheckRequest.getDefaultInstance();
+        var response = healthBlockingStub.check(request);
+        logger.info(name + ", current health is: " + response.getStatus());
     }
 
     public static void greet(EchoServiceGrpc.EchoServiceBlockingStub echoBlockingStub, String name) {
         logger.info("Will try to greet " + name + " ...");
-        EchoRequest request = EchoRequest.newBuilder().setMessage(name).build();
+        var request = EchoRequest.newBuilder().setMessage(name).build();
         EchoResponse response;
         try {
             response = echoBlockingStub.unaryEcho(request);
         } catch (StatusRuntimeException e) {
             logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
             return;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return;
         }
         logger.info("Greeting: " + response.getMessage());
     }
-
 }

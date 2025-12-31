@@ -1,4 +1,4 @@
-package com.example.grpc.feature.waitforready;
+package com.example.grpc.features.waitforready;
 
 import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;

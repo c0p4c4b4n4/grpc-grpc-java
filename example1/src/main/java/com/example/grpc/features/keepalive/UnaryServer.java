@@ -1,4 +1,4 @@
-package com.example.grpc.feature.keepalive;
+package com.example.grpc.features.keepalive;
 
 import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;

@@ -1,10 +1,9 @@
-package com.example.grpc.feature.loadbalance;
+package com.example.grpc.features.loadbalance;
 
 import com.example.grpc.echo.EchoResponse;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
-import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoServiceGrpc;
 
@@ -13,8 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
-
-import static com.example.grpc.feature.loadbalance.Settings.SERVER_PORTS;
 
 public class LoadBalanceServer {
 

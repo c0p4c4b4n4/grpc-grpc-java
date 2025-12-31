@@ -1,4 +1,4 @@
-package com.example.grpc.feature.loadbalance;
+package com.example.grpc.features.loadbalance;
 
 public final class Settings {
 

@@ -1,9 +1,9 @@
-package com.example.grpc.feature.cancellation;
+package com.example.grpc.features.deadline;
 
 import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoServiceGrpc;
-import io.grpc.Context;
+import io.grpc.Deadline;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 
@@ -19,28 +19,14 @@ public class ServerStreamingBlockingClient {
 
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         try {
-            var blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+            var blockingStub = EchoServiceGrpc.newBlockingStub(channel)
+                .withDeadline(Deadline.after(3, TimeUnit.SECONDS));
             var request = EchoRequest.newBuilder().setMessage("world").build();
+            var responses = blockingStub.serverStreamingEcho(request);
 
-            Context.CancellableContext cancellableContext = Context.current().withCancellation();
-
-            try {
-                cancellableContext.run(() -> {
-                    var responses = blockingStub.serverStreamingEcho(request);
-
-                    int i = 0;
-                    while (responses.hasNext()) {
-                        logger.info("response: " + responses.next().getMessage());
-
-                        if (++i > 3) {
-                            cancellableContext.cancel(new Exception("Client cancelled streaming"));
-                        }
-                    }
-                });
-            } finally {
-                cancellableContext.cancel(null);
+            while (responses.hasNext()) {
+                logger.info("response: " + responses.next().getMessage());
             }
-
         } catch (StatusRuntimeException e) {
             logger.warning("error: " + e.getStatus());
         } finally {

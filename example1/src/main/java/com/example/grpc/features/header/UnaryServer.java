@@ -1,4 +1,4 @@
-package com.example.grpc.feature.header;
+package com.example.grpc.features.header;
 
 import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;

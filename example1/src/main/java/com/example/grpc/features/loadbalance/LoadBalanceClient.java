@@ -1,4 +1,4 @@
-package com.example.grpc.feature.loadbalance;
+package com.example.grpc.features.loadbalance;
 
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;

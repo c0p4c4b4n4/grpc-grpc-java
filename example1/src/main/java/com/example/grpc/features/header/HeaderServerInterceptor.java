@@ -1,6 +1,5 @@
-package com.example.grpc.feature.header;
+package com.example.grpc.features.header;
 
-import com.google.common.annotations.VisibleForTesting;
 import io.grpc.ForwardingServerCall.SimpleForwardingServerCall;
 import io.grpc.Metadata;
 import io.grpc.ServerCall;
@@ -13,7 +12,6 @@ public class HeaderServerInterceptor implements ServerInterceptor {
 
     private static final Logger logger = Logger.getLogger(HeaderServerInterceptor.class.getName());
 
-    @VisibleForTesting
     static final Metadata.Key<String> CUSTOM_HEADER_KEY =
         Metadata.Key.of("custom_server_header_key", Metadata.ASCII_STRING_MARSHALLER);
 

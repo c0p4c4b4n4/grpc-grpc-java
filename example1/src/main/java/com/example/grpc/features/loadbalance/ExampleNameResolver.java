@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.grpc.feature.loadbalance;
+package com.example.grpc.features.loadbalance;
 
 import com.google.common.collect.ImmutableMap;
 import io.grpc.EquivalentAddressGroup;

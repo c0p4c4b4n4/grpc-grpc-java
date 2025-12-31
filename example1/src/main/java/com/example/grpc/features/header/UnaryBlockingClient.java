@@ -1,11 +1,11 @@
-package com.example.grpc.feature.keepalive;
+package com.example.grpc.features.header;
 
-import com.example.grpc.Delays;
 import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoServiceGrpc;
-import io.grpc.Grpc;
-import io.grpc.InsecureChannelCredentials;
+import io.grpc.ClientInterceptor;
+import io.grpc.ClientInterceptors;
+import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 
 import java.util.concurrent.TimeUnit;
@@ -16,21 +16,16 @@ public class UnaryBlockingClient {
     private static final Logger logger = Logger.getLogger(UnaryBlockingClient.class.getName());
 
     public static void main(String[] args) throws Exception {
-        Loggers.initWithGrpcLogs();
+        Loggers.init();
 
-        var channel = Grpc.newChannelBuilderForAddress("localhost", 50051, InsecureChannelCredentials.create())
-            .keepAliveTime(10, TimeUnit.SECONDS)
-            .keepAliveTimeout(1, TimeUnit.SECONDS)
-            .keepAliveWithoutCalls(true)
-            .build();
+        var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
 
         try {
-            var blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+            ClientInterceptor interceptor = new HeaderClientInterceptor();
+            var blockingStub = EchoServiceGrpc.newBlockingStub(ClientInterceptors.intercept(channel, interceptor));
             var request = EchoRequest.newBuilder().setMessage("world").build();
             var response = blockingStub.unaryEcho(request);
             logger.info("response: " + response.getMessage());
-
-            Delays.sleep(30);
         } catch (StatusRuntimeException e) {
             logger.warning("error: " + e.getStatus());
         } finally {

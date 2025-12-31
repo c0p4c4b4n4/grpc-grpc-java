@@ -19,7 +19,7 @@ public final class Servers {
             .build()
             .start();
 
-        logger.info("server started, listening on "+ port);
+        logger.info("server started, listening on " + port);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.err.println("server is shutting down");

@@ -1,11 +1,11 @@
 package com.example.grpc.features.loadbalance;
 
+import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
+import com.example.grpc.echo.EchoServiceGrpc;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
-import com.example.grpc.echo.EchoRequest;
-import com.example.grpc.echo.EchoServiceGrpc;
 
 import java.io.IOException;
 import java.util.ArrayList;

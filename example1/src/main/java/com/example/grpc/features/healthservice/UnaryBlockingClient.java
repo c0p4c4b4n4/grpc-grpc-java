@@ -4,7 +4,6 @@ import com.example.grpc.Delays;
 import com.example.grpc.Loggable;
 import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;
-import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
@@ -58,15 +57,14 @@ public class UnaryBlockingClient extends Loggable {
     }
 
     public static void greet(EchoServiceGrpc.EchoServiceBlockingStub echoBlockingStub, String name) {
-        logger.info("will try to request " + name + " ...");
-        var request = EchoRequest.newBuilder().setMessage(name).build();
-        EchoResponse response;
+        logger.info("will try to greet " + name + " ...");
         try {
-            response = echoBlockingStub.unaryEcho(request);
+            var request = EchoRequest.newBuilder().setMessage(name).build();
+            var response = echoBlockingStub.unaryEcho(request);
+            logger.info("greeting: " + response.getMessage());
         } catch (StatusRuntimeException e) {
             logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
             return;
         }
-        logger.info("response: " + response.getMessage());
     }
 }

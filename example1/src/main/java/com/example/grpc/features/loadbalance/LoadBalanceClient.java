@@ -47,8 +47,8 @@ public class LoadBalanceClient {
     private static void useFirctPickPolicy(String target) throws InterruptedException {
         logger.info("Use default first_pick load balance policy");
         ManagedChannel channel = ManagedChannelBuilder.forTarget(target)
-                .usePlaintext()
-                .build();
+            .usePlaintext()
+            .build();
         try {
             LoadBalanceClient client = new LoadBalanceClient(channel);
             for (int i = 0; i < 5; i++) {
@@ -62,9 +62,9 @@ public class LoadBalanceClient {
     private static void useRoundRobinPolicy(String target) throws InterruptedException {
         logger.info("Change to round_robin policy");
         ManagedChannel channel = ManagedChannelBuilder.forTarget(target)
-                .defaultLoadBalancingPolicy("round_robin")
-                .usePlaintext()
-                .build();
+            .defaultLoadBalancingPolicy("round_robin")
+            .usePlaintext()
+            .build();
         try {
             LoadBalanceClient client = new LoadBalanceClient(channel);
             for (int i = 0; i < 5; i++) {

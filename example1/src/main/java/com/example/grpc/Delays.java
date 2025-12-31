@@ -1,7 +1,6 @@
 package com.example.grpc;
 
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 public final class Delays {
 

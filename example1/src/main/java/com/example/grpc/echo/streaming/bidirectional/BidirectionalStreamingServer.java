@@ -1,9 +1,9 @@
 package com.example.grpc.echo.streaming.bidirectional;
 
+import com.example.grpc.Servers;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
-import com.example.grpc.Servers;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 

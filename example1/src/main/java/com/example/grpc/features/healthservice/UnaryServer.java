@@ -1,6 +1,8 @@
 package com.example.grpc.features.healthservice;
 
+import com.example.grpc.Delays;
 import com.example.grpc.Loggable;
+import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
@@ -14,7 +16,6 @@ import io.grpc.stub.StreamObserver;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 public class UnaryServer extends Loggable {
 
@@ -24,16 +25,18 @@ public class UnaryServer extends Loggable {
     private void start() throws IOException {
         int port = 50051;
         health = new HealthStatusManager();
+
         server = Grpc.newServerBuilderForPort(port, InsecureServerCredentials.create())
             .addService(new EchoServiceImpl())
             .addService(health.getHealthService())
             .build()
             .start();
+
         logger.info("Server started, listening on " + port);
+
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                // Use stderr here since the logger may have been reset by its JVM shutdown hook.
                 System.err.println("*** shutting down gRPC server since JVM is shutting down");
                 try {
                     UnaryServer.this.stop();
@@ -53,24 +56,14 @@ public class UnaryServer extends Loggable {
         }
     }
 
-    /**
-     * Await termination on the main thread since the grpc library uses daemon threads.
-     */
     private void blockUntilShutdown() throws InterruptedException {
         if (server != null) {
             server.awaitTermination();
         }
     }
 
-    /**
-     * Main launches the server from the command line.
-     */
     public static void main(String[] args) throws IOException, InterruptedException {
-        System.setProperty("java.util.logging.SimpleFormatter.format",
-            "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$s %2$s - %5$s%6$s%n");
-
-        System.setProperty("java.util.logging.SimpleFormatter.format",
-            "%1$tH:%1$tM:%1$tS %4$s %2$s: %5$s%6$s%n");
+        Loggers.init();
 
         final UnaryServer server = new UnaryServer();
         server.start();
@@ -78,46 +71,43 @@ public class UnaryServer extends Loggable {
     }
 
     private class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
-        boolean isServing = true;
+
+        boolean serving = true;
 
         @Override
         public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-            if (!isServing) {
-                responseObserver.onError(Status.INTERNAL.withDescription("Not Serving right now").asRuntimeException());
+            if (!serving) {
+                responseObserver.onError(Status.INTERNAL.withDescription("not serving right now").asRuntimeException());
                 return;
             }
 
-            if (isNameLongEnough(request)) {
-                EchoResponse reply = EchoResponse.newBuilder().setMessage("Echo " + request.getMessage()).build();
-                responseObserver.onNext(reply);
+            if (shouldHandle(request)) {
+                EchoResponse response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
+                responseObserver.onNext(response);
                 responseObserver.onCompleted();
             } else {
-                logger.warning("Tiny message received, throwing a temper tantrum");
+                logger.warning("short message received, will not serve for 10 seconds");
                 health.setStatus("", ServingStatus.NOT_SERVING);
-                isServing = false;
 
-                // In 10 seconds set it back to serving
+                serving = false;
+
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        try {
-                            Thread.sleep(10000);
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                            return;
-                        }
-                        isServing = true;
+                        Delays.sleep(10);
+                        serving = true;
+
                         health.setStatus("", ServingStatus.SERVING);
-                        logger.info("tantrum complete");
+                        logger.info("continue to serve");
                     }
                 }).start();
-                responseObserver.onError(
-                    Status.INVALID_ARGUMENT.withDescription("Offended by short name").asRuntimeException());
+
+                responseObserver.onError(Status.INVALID_ARGUMENT.withDescription("offended by short message").asRuntimeException());
             }
         }
 
-        private boolean isNameLongEnough(EchoRequest req) {
-            return isServing && req.getMessage().length() >= 5;
+        private boolean shouldHandle(EchoRequest req) {
+            return serving && req.getMessage().length() >= 5;
         }
     }
 }

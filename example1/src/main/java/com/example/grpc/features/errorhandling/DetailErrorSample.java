@@ -121,8 +121,7 @@ public class DetailErrorSample {
         EchoServiceGrpc.EchoServiceFutureStub stub = EchoServiceGrpc.newFutureStub(channel);
         ListenableFuture<EchoResponse> response = stub.unaryEcho(EchoRequest.newBuilder().build());
 
-        final CountDownLatch latch = new CountDownLatch(1);
-
+        CountDownLatch latch = new CountDownLatch(1);
         Futures.addCallback(
             response,
             new FutureCallback<EchoResponse>() {
@@ -147,9 +146,9 @@ public class DetailErrorSample {
     void asyncCall() {
         EchoServiceGrpc.EchoServiceStub stub = EchoServiceGrpc.newStub(channel);
         EchoRequest request = EchoRequest.newBuilder().build();
-        final CountDownLatch latch = new CountDownLatch(1);
-        StreamObserver<EchoResponse> responseObserver = new StreamObserver<EchoResponse>() {
 
+         CountDownLatch latch = new CountDownLatch(1);
+        StreamObserver<EchoResponse> responseObserver = new StreamObserver<EchoResponse>() {
             @Override
             public void onNext(EchoResponse value) {
                 // Won't be called.

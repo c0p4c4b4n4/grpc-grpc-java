@@ -44,12 +44,12 @@ public class ErrorHandlingClient {
                 public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
                     // The server will always fail, and we'll see this failure on client-side. The exception is
                     // not sent to the client, only the status code (i.e., INTERNAL) and description.
-                    responseObserver.onError(Status.INTERNAL
-                        .withDescription("Eggplant Xerxes Crybaby Overbite Narwhal").asRuntimeException());
+                    responseObserver.onError(Status.INTERNAL                        .withDescription("Eggplant Xerxes Crybaby Overbite Narwhal").asRuntimeException());
                 }
-            }).build().start();
-        channel = Grpc.newChannelBuilderForAddress(
-            "localhost", server.getPort(), InsecureChannelCredentials.create()).build();
+            })
+            .build()
+            .start();
+        channel = Grpc.newChannelBuilderForAddress(            "localhost", server.getPort(), InsecureChannelCredentials.create()).build();
 
         blockingCall();
         futureCallDirect();
@@ -162,7 +162,7 @@ public class ErrorHandlingClient {
      */
     void advancedAsyncCall() {
         ClientCall<EchoRequest, EchoResponse> call =
-            channel.newCall(EchoServiceGrpc.getSayHelloMethod(), CallOptions.DEFAULT);
+            channel.newCall(EchoServiceGrpc.getUnaryEchoMethod(), CallOptions.DEFAULT);
 
         final CountDownLatch latch = new CountDownLatch(1);
 

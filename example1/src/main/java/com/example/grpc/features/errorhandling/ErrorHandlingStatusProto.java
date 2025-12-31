@@ -83,7 +83,7 @@ public class ErrorHandlingStatusProto {
         }
     }
 
-    static void verifyErrorReply(Throwable t) {
+    static void verifyErrorResponse(Throwable t) {
         Status status = StatusProto.fromThrowable(t);
         Verify.verify(status.getCode() == Code.INVALID_ARGUMENT.getNumber());
         Verify.verify(status.getMessage().equals("Email or password malformed"));
@@ -100,7 +100,7 @@ public class ErrorHandlingStatusProto {
         try {
             stub.unaryEcho(EchoRequest.newBuilder().build());
         } catch (Exception e) {
-            verifyErrorReply(e);
+            verifyErrorResponse(e);
             System.out.println("Blocking call received expected error details");
         }
     }
@@ -115,7 +115,7 @@ public class ErrorHandlingStatusProto {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
-            verifyErrorReply(e.getCause());
+            verifyErrorResponse(e.getCause());
             System.out.println("Future call direct received expected error details");
         }
     }
@@ -125,7 +125,7 @@ public class ErrorHandlingStatusProto {
         ListenableFuture<EchoResponse> response = stub.unaryEcho(EchoRequest.newBuilder().build());
 
         CountDownLatch latch = new CountDownLatch(1);
-        Futures.addCallback(            response,            new FutureCallback<EchoResponse>() {
+        Futures.addCallback(response, new FutureCallback<EchoResponse>() {
                 @Override
                 public void onSuccess(EchoResponse result) {
                     // won't be called
@@ -133,7 +133,7 @@ public class ErrorHandlingStatusProto {
 
                 @Override
                 public void onFailure(Throwable t) {
-                    verifyErrorReply(t);
+                    verifyErrorResponse(t);
                     System.out.println("Future callback received expected error details");
                     latch.countDown();
                 }
@@ -159,7 +159,7 @@ public class ErrorHandlingStatusProto {
 
             @Override
             public void onError(Throwable t) {
-                verifyErrorReply(t);
+                verifyErrorResponse(t);
                 System.out.println("Async call received expected error details");
                 latch.countDown();
             }

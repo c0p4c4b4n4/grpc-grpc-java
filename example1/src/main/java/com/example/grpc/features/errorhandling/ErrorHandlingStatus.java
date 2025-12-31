@@ -34,7 +34,7 @@ public class ErrorHandlingStatus {
             .addService(new EchoServiceGrpc.EchoServiceImplBase() {
                 @Override
                 public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-                    responseObserver.onError(Status.INTERNAL.withDescription("Eggplant Xerxes Crybaby Overbite Narwhal").asRuntimeException());
+                    responseObserver.onError(Status.INTERNAL.withDescription("Eggplant").asRuntimeException());
                 }
             })
             .build()
@@ -53,14 +53,18 @@ public class ErrorHandlingStatus {
         server.awaitTermination();
     }
 
+    private void verifyErrorResponse(Throwable t) {
+        Status status = Status.fromThrowable(t);
+        Verify.verify(status.getCode() == Status.Code.INTERNAL);
+        Verify.verify(status.getDescription().equals("Eggplant"));
+    }
+
     void blockingCall() {
         EchoServiceGrpc.EchoServiceBlockingStub stub = EchoServiceGrpc.newBlockingStub(channel);
         try {
             stub.unaryEcho(EchoRequest.newBuilder().setMessage("Bart").build());
         } catch (Exception e) {
-            Status status = Status.fromThrowable(e);
-            Verify.verify(status.getCode() == Status.Code.INTERNAL);
-            Verify.verify(status.getDescription().contains("Eggplant"));
+            verifyErrorResponse(e);
         }
     }
 
@@ -74,9 +78,7 @@ public class ErrorHandlingStatus {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
-            Status status = Status.fromThrowable(e.getCause());
-            Verify.verify(status.getCode() == Status.Code.INTERNAL);
-            Verify.verify(status.getDescription().contains("Xerxes"));
+            verifyErrorResponse(e.getCause());
         }
     }
 
@@ -84,8 +86,8 @@ public class ErrorHandlingStatus {
         EchoServiceGrpc.EchoServiceFutureStub stub = EchoServiceGrpc.newFutureStub(channel);
         ListenableFuture<EchoResponse> response = stub.unaryEcho(EchoRequest.newBuilder().setMessage("Maggie").build());
 
-         CountDownLatch latch = new CountDownLatch(1);
-        Futures.addCallback(            response,            new FutureCallback<EchoResponse>() {
+        CountDownLatch latch = new CountDownLatch(1);
+        Futures.addCallback(response, new FutureCallback<EchoResponse>() {
                 @Override
                 public void onSuccess(EchoResponse result) {
                     // won't be called
@@ -93,9 +95,7 @@ public class ErrorHandlingStatus {
 
                 @Override
                 public void onFailure(Throwable t) {
-                    Status status = Status.fromThrowable(t);
-                    Verify.verify(status.getCode() == Status.Code.INTERNAL);
-                    Verify.verify(status.getDescription().contains("Crybaby"));
+                    verifyErrorResponse(t);
                     latch.countDown();
                 }
             },
@@ -119,9 +119,7 @@ public class ErrorHandlingStatus {
 
             @Override
             public void onError(Throwable t) {
-                Status status = Status.fromThrowable(t);
-                Verify.verify(status.getCode() == Status.Code.INTERNAL);
-                Verify.verify(status.getDescription().contains("Overbite"));
+                verifyErrorResponse(t);
                 latch.countDown();
             }
 

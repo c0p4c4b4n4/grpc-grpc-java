@@ -71,7 +71,7 @@ public class ErrorHandlingTrailers {
         server.awaitTermination();
     }
 
-    static void verifyErrorReply(Throwable t) {
+    void verifyErrorResponse(Throwable t) {
         Status status = Status.fromThrowable(t);
         Metadata trailers = Status.trailersFromThrowable(t);
         Verify.verify(status.getCode() == Status.Code.INTERNAL);
@@ -89,7 +89,7 @@ public class ErrorHandlingTrailers {
         try {
             stub.unaryEcho(EchoRequest.newBuilder().build());
         } catch (Exception e) {
-            verifyErrorReply(e);
+            verifyErrorResponse(e);
         }
     }
 
@@ -103,7 +103,7 @@ public class ErrorHandlingTrailers {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
-            verifyErrorReply(e.getCause());
+            verifyErrorResponse(e.getCause());
         }
     }
 
@@ -122,7 +122,7 @@ public class ErrorHandlingTrailers {
 
                 @Override
                 public void onFailure(Throwable t) {
-                    verifyErrorReply(t);
+                    verifyErrorResponse(t);
                     latch.countDown();
                 }
             },
@@ -146,7 +146,7 @@ public class ErrorHandlingTrailers {
 
             @Override
             public void onError(Throwable t) {
-                verifyErrorReply(t);
+                verifyErrorResponse(t);
                 latch.countDown();
             }
 

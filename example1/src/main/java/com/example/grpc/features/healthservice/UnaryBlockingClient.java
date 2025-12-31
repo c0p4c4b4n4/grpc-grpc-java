@@ -1,13 +1,12 @@
 package com.example.grpc.features.healthservice;
 
+import com.example.grpc.Loggable;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
 import io.grpc.Channel;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
-import io.grpc.LoadBalancerProvider;
-import io.grpc.LoadBalancerRegistry;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
@@ -23,8 +22,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class HealthServiceClient {
-    private static final Logger logger = Logger.getLogger(HealthServiceClient.class.getName());
+public class UnaryBlockingClient extends Loggable {
 
     private final EchoServiceGrpc.EchoServiceBlockingStub echoBlockingStub;
 
@@ -33,18 +31,11 @@ public class HealthServiceClient {
 
     private final HealthCheckRequest healthRequest;
 
-    /**
-     * Construct client for accessing HelloWorld server using the existing channel.
-     */
-    public HealthServiceClient(Channel channel) {
+    public UnaryBlockingClient(Channel channel) {
         echoBlockingStub = EchoServiceGrpc.newBlockingStub(channel);
         healthStub = HealthGrpc.newStub(channel);
         healthBlockingStub = HealthGrpc.newBlockingStub(channel);
         healthRequest = HealthCheckRequest.getDefaultInstance();
-        LoadBalancerProvider roundRobin = LoadBalancerRegistry
-            .getDefaultRegistry()
-            .getProvider("round_robin");
-
     }
 
     private ServingStatus checkHealth(String prefix) {
@@ -53,9 +44,6 @@ public class HealthServiceClient {
         return response.getStatus();
     }
 
-    /**
-     * Say hello to server.
-     */
     public void greet(String name) {
         logger.info("Will try to greet " + name + " ...");
         EchoRequest request = EchoRequest.newBuilder().setMessage(name).build();
@@ -73,54 +61,26 @@ public class HealthServiceClient {
     }
 
 
-    private static void runTest(String target, String[] users)
-        throws InterruptedException {
-        ManagedChannelBuilder<?> builder =
-            Grpc.newChannelBuilder(target, InsecureChannelCredentials.create());
-
-        // Round Robin, when a healthCheckConfig is present in the default service configuration, runs
-        // a watch on the health service and when picking an endpoint will
-        // consider a transport to a server whose service is not in SERVING state to be unavailable.
-        // Since we only have a single server we are connecting to, then the load balancer will
-        // return an error without sending the RPC.
-        if (false) {
-            builder = builder
-                .defaultLoadBalancingPolicy("round_robin")
-                .defaultServiceConfig(generateHealthConfig(""));
-        }
-
-        ManagedChannel channel = builder.build();
-
-        System.out.println("\nDoing test with" + (false ? "" : "out")
-            + " the Round Robin load balancer\n");
+    private static void runTest(String target, String[] users) throws InterruptedException {
+        ManagedChannel channel = Grpc.newChannelBuilder(target, InsecureChannelCredentials.create()).build();
 
         try {
-            HealthServiceClient client = new HealthServiceClient(channel);
-            if (!false) {
-                client.checkHealth("Before call");
-            }
+            UnaryBlockingClient client = new UnaryBlockingClient(channel);
+            client.checkHealth("Before call");
             client.greet(users[0]);
-            if (!false) {
-                client.checkHealth("After user " + users[0]);
-            }
+            client.checkHealth("After user " + users[0]);
 
             for (String user : users) {
                 client.greet(user);
-                Thread.sleep(100); // Since the health update is asynchronous give it time to propagate
+                Thread.sleep(100);
             }
 
-            if (!false) {
-                client.checkHealth("After all users");
-                Thread.sleep(10000);
-                client.checkHealth("After 10 second wait");
-            } else {
-                Thread.sleep(10000);
-            }
+            client.checkHealth("After all users");
+            Thread.sleep(10000);
+            client.checkHealth("After 10 second wait");
+
             client.greet("Larry");
         } finally {
-            // ManagedChannels use resources like threads and TCP connections. To prevent leaking these
-            // resources the channel should be shut down when it will no longer be used. If it may be used
-            // again leave it running.
             channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
         }
     }
@@ -134,17 +94,6 @@ public class HealthServiceClient {
         return config;
     }
 
-    /**
-     * Uses a server with both a greet service and the health service.
-     * If provided, the first element of {@code args} is the name to use in the
-     * greeting. The second argument is the target server.
-     * This has an example of using the health service directly through the unary call
-     * <a href="https://github.com/grpc/grpc-java/blob/master/services/src/main/proto/grpc/health/v1/health.proto">check</a>
-     * to get the current health.  It also utilizes the health of the server's greet service
-     * indirectly through the round robin load balancer, which uses the streaming rpc
-     * <strong>watch</strong> (you can see how it is done in
-     * {@link  io.grpc.protobuf.services.HealthCheckingLoadBalancerFactory}).
-     */
     public static void main(String[] args) throws Exception {
         System.setProperty("java.util.logging.SimpleFormatter.format",
             "%1$tH:%1$tM:%1$tS %4$s %2$s: %5$s%6$s%n");

@@ -10,12 +10,12 @@ skinparam linetype ortho
 'skinparam noteBackgroundColor #white
 'skinparam sequenceGroupBackgroundColor #white
 
-rectangle "Client" as C1
-rectangle "Client stub" as C2
+rectangle "client" as C1
+rectangle "client stub" as C2
 rectangle "gRPC runtime" as C3
 
-rectangle "Server" as S1
-rectangle "Service stub" as S2
+rectangle "server" as S1
+rectangle "service stub" as S2
 rectangle "gRPC runtime" as S3
 
 file ".proto" as P

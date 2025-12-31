@@ -8,6 +8,7 @@ import com.google.common.base.VerifyException;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.rpc.DebugInfo;
 import io.grpc.Grpc;
@@ -23,8 +24,6 @@ import io.grpc.stub.StreamObserver;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-
-import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
 public class ErrorHandlingTrailers {
 
@@ -58,6 +57,7 @@ public class ErrorHandlingTrailers {
             })
             .build()
             .start();
+
         channel = Grpc.newChannelBuilderForAddress("localhost", server.getPort(), InsecureChannelCredentials.create()).build();
 
         blockingCall();
@@ -117,7 +117,7 @@ public class ErrorHandlingTrailers {
             new FutureCallback<EchoResponse>() {
                 @Override
                 public void onSuccess(EchoResponse result) {
-                    // Won't be called, since the server in this example always fails.
+                    // won't be called
                 }
 
                 @Override
@@ -126,7 +126,7 @@ public class ErrorHandlingTrailers {
                     latch.countDown();
                 }
             },
-            directExecutor());
+            MoreExecutors.directExecutor());
 
         if (!Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS)) {
             throw new RuntimeException("timeout!");
@@ -141,7 +141,7 @@ public class ErrorHandlingTrailers {
         StreamObserver<EchoResponse> responseObserver = new StreamObserver<EchoResponse>() {
             @Override
             public void onNext(EchoResponse value) {
-                // Won't be called.
+                // won't be called
             }
 
             @Override
@@ -152,7 +152,7 @@ public class ErrorHandlingTrailers {
 
             @Override
             public void onCompleted() {
-                // Won't be called, since the server in this example always fails.
+                // won't be called
             }
         };
         stub.unaryEcho(request, responseObserver);

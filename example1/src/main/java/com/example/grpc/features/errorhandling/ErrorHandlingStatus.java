@@ -7,6 +7,7 @@ import com.google.common.base.Verify;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.Uninterruptibles;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
@@ -20,11 +21,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-
-/**
- * Shows how to extract error information from a failed RPC.
- */
 public class ErrorHandlingStatus {
 
     public static void main(String[] args) throws Exception {
@@ -34,18 +30,16 @@ public class ErrorHandlingStatus {
     private ManagedChannel channel;
 
     void run() throws Exception {
-        // Port 0 means that the operating system will pick an available port to use.
         Server server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
             .addService(new EchoServiceGrpc.EchoServiceImplBase() {
                 @Override
                 public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-                    // The server will always fail, and we'll see this failure on client-side. The exception is
-                    // not sent to the client, only the status code (i.e., INTERNAL) and description.
                     responseObserver.onError(Status.INTERNAL.withDescription("Eggplant Xerxes Crybaby Overbite Narwhal").asRuntimeException());
                 }
             })
             .build()
             .start();
+
         channel = Grpc.newChannelBuilderForAddress("localhost", server.getPort(), InsecureChannelCredentials.create()).build();
 
         blockingCall();
@@ -67,7 +61,6 @@ public class ErrorHandlingStatus {
             Status status = Status.fromThrowable(e);
             Verify.verify(status.getCode() == Status.Code.INTERNAL);
             Verify.verify(status.getDescription().contains("Eggplant"));
-            // Cause is not transmitted over the wire.
         }
     }
 
@@ -84,7 +77,6 @@ public class ErrorHandlingStatus {
             Status status = Status.fromThrowable(e.getCause());
             Verify.verify(status.getCode() == Status.Code.INTERNAL);
             Verify.verify(status.getDescription().contains("Xerxes"));
-            // Cause is not transmitted over the wire.
         }
     }
 
@@ -92,14 +84,11 @@ public class ErrorHandlingStatus {
         EchoServiceGrpc.EchoServiceFutureStub stub = EchoServiceGrpc.newFutureStub(channel);
         ListenableFuture<EchoResponse> response = stub.unaryEcho(EchoRequest.newBuilder().setMessage("Maggie").build());
 
-        final CountDownLatch latch = new CountDownLatch(1);
-
-        Futures.addCallback(
-            response,
-            new FutureCallback<EchoResponse>() {
+         CountDownLatch latch = new CountDownLatch(1);
+        Futures.addCallback(            response,            new FutureCallback<EchoResponse>() {
                 @Override
                 public void onSuccess(EchoResponse result) {
-                    // Won't be called, since the server in this example always fails.
+                    // won't be called
                 }
 
                 @Override
@@ -107,11 +96,10 @@ public class ErrorHandlingStatus {
                     Status status = Status.fromThrowable(t);
                     Verify.verify(status.getCode() == Status.Code.INTERNAL);
                     Verify.verify(status.getDescription().contains("Crybaby"));
-                    // Cause is not transmitted over the wire..
                     latch.countDown();
                 }
             },
-            directExecutor());
+            MoreExecutors.directExecutor());
 
         if (!Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS)) {
             throw new RuntimeException("timeout!");
@@ -124,10 +112,9 @@ public class ErrorHandlingStatus {
 
         CountDownLatch latch = new CountDownLatch(1);
         StreamObserver<EchoResponse> responseObserver = new StreamObserver<EchoResponse>() {
-
             @Override
             public void onNext(EchoResponse value) {
-                // Won't be called.
+                // won't be called
             }
 
             @Override
@@ -135,13 +122,12 @@ public class ErrorHandlingStatus {
                 Status status = Status.fromThrowable(t);
                 Verify.verify(status.getCode() == Status.Code.INTERNAL);
                 Verify.verify(status.getDescription().contains("Overbite"));
-                // Cause is not transmitted over the wire..
                 latch.countDown();
             }
 
             @Override
             public void onCompleted() {
-                // Won't be called, since the server in this example always fails.
+                // won't be called
             }
         };
         stub.unaryEcho(request, responseObserver);

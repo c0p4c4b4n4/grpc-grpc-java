@@ -41,43 +41,33 @@ public class ErrorHandlingStatusProto {
         ManagedChannel channel = null;
 
         try {
-            server = launchServer();
+            server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
+                .addService(new EchoServiceGrpc.EchoServiceImplBase() {
+                    @Override
+                    public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
+                        Status status = Status.newBuilder()
+                            .setCode(Code.INVALID_ARGUMENT.getNumber())
+                            .setMessage("Email or password malformed")
+                            .addDetails(Any.pack(DEBUG_INFO))
+                            .build();
+                        responseObserver.onError(StatusProto.toStatusRuntimeException(status));
+                    }
+                })
+                .build()
+                .start();
+
             channel = Grpc.newChannelBuilderForAddress("localhost", server.getPort(), InsecureChannelCredentials.create()).build();
 
-            runClientTests(channel);
+            blockingCall(channel);
+            futureCallDirect(channel);
+            futureCallCallback(channel);
+            asyncCall(channel);
         } finally {
             cleanup(channel, server);
         }
     }
 
-    static Server launchServer() throws Exception {
-        return Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
-            .addService(new EchoServiceGrpc.EchoServiceImplBase() {
-                @Override
-                public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-                    // this is com.google.rpc.Status, not io.grpc.Status
-                    Status status = Status.newBuilder()
-                        .setCode(Code.INVALID_ARGUMENT.getNumber())
-                        .setMessage("Email or password malformed")
-                        .addDetails(Any.pack(DEBUG_INFO))
-                        .build();
-                    responseObserver.onError(StatusProto.toStatusRuntimeException(status));
-                }
-            })
-            .build()
-            .start();
-    }
-
-    private static void runClientTests(Channel channel) {
-        blockingCall(channel);
-        futureCallDirect(channel);
-        futureCallCallback(channel);
-        asyncCall(channel);
-    }
-
     private static void cleanup(ManagedChannel channel, Server server) throws InterruptedException {
-
-        // Shutdown client and server for resources to be cleanly released
         if (channel != null) {
             channel.shutdown();
         }
@@ -85,7 +75,6 @@ public class ErrorHandlingStatusProto {
             server.shutdown();
         }
 
-        // Wait for cleanup to complete
         if (channel != null) {
             channel.awaitTermination(1, TimeUnit.SECONDS);
         }
@@ -136,12 +125,10 @@ public class ErrorHandlingStatusProto {
         ListenableFuture<EchoResponse> response = stub.unaryEcho(EchoRequest.newBuilder().build());
 
         CountDownLatch latch = new CountDownLatch(1);
-        Futures.addCallback(
-            response,
-            new FutureCallback<EchoResponse>() {
+        Futures.addCallback(            response,            new FutureCallback<EchoResponse>() {
                 @Override
                 public void onSuccess(EchoResponse result) {
-                    // Won't be called, since the server in this example always fails.
+                    // won't be called
                 }
 
                 @Override
@@ -167,7 +154,7 @@ public class ErrorHandlingStatusProto {
 
             @Override
             public void onNext(EchoResponse value) {
-                // Won't be called.
+                // won't be called
             }
 
             @Override
@@ -179,7 +166,7 @@ public class ErrorHandlingStatusProto {
 
             @Override
             public void onCompleted() {
-                // Won't be called, since the server in this example always fails.
+                // won't be called
             }
         };
         stub.unaryEcho(request, responseObserver);

@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
-public class ErrorHandlingResponseTrailers {
+public class ErrorHandlingTrailers {
 
     private static final Metadata.Key<DebugInfo> DEBUG_INFO_TRAILER_KEY =
         ProtoUtils.keyForProto(DebugInfo.getDefaultInstance());
@@ -41,7 +41,7 @@ public class ErrorHandlingResponseTrailers {
     private static final String DEBUG_DESC = "detailed error description";
 
     public static void main(String[] args) throws Exception {
-        new ErrorHandlingResponseTrailers().run();
+        new ErrorHandlingTrailers().run();
     }
 
     private ManagedChannel channel;

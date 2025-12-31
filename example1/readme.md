@@ -36,7 +36,7 @@ However, it is not possible to completely hide the intermediate network communic
 
 When developing an effective RPC framework, developers had to address two primary challenges. First, developers needed to ensure efficient cross-platform serialization. Solutions, based on textual formats (such as XML, JSON, or YAML), are typically an order of magnitude less efficient than binary formats. They require additional computational resources for serialization and additional network resources for transmitting larger messages. Solutions based on binary formats often face significant challenges in ensuring portability across different languages.
 
-Second, there was an absence of an efficient application-layer network protocol specifically designed for modern inter-service communication. The HTTP protocol was originally designed for browsers to retrieve resources within the hypermedia networks. It was not designed to support high-speed, bidirectional, simultenous communication. Various workarounds based on this protocol (short and long polling, streaming, webhooks) were inherently inefficient in their utilization of computational and network resources. Solutions built on the TCP transport-layer protocol were overly complex due to the low-level nature of the protocol.
+Second, there was an absence of an efficient application-layer network protocol specifically designed for modern inter-service communication. The HTTP protocol was originally designed for browsers to retrieve resources within the hypermedia networks. It was not designed to support high-speed, bidirectional, simultaneous communication. Various workarounds based on this protocol (short and long polling, streaming, webhooks) were inherently inefficient in their utilization of computational and network resources. Solutions built on the TCP transport-layer protocol were overly complex due to the low-level nature of the protocol.
 
 
 #### The solution
@@ -90,7 +90,7 @@ message Person {
 ```
 
 
-*Types* include *scalar* types — 32/64-bit integers, 32/64-bit floating-point numbers, booleans, UTF-8 strings, and bytes, and *composite* types — enumerations, structures, maps, and arrays. Interestingly, the type system provides several integer types that allow developers to select the most space-efficient representation based on whether the values are positive, negative, or can include both, and whether they are typically small or can have different values:
+*Types* include *scalar* types — 32/64-bit integers, 32/64-bit floating-point numbers, booleans, UTF-8 strings, bytes, and *composite* types — enumerations, structures, maps, and arrays. Interestingly, the type system provides several integer types that allow developers to select the most space-efficient representation based on whether the values are positive, negative, or can include both, and whether they are typically small or can have different values:
 
 
 
@@ -140,7 +140,7 @@ HTTP/2 retains the semantics of the previous version of the protocol (methods, r
 
 The first important improvement is *multiplexing*, which allows multiple concurrent requests and responses to be sent over a single TCP connection. This solves the HTTP *head-of-line blocking* problem, where a slow response to one request delays subsequent requests on the same connection. Multiplexing reduces latency and enables the use of fewer TCP connections. In HTTP/2, requests and responses are divided into frames (small data fragments) that can be transmitted interleaved and independently of each other within a stream. This mechanism supports simultaneous bidirectional streaming between the client and server.
 
-The second important improvement in HTTP/2 is the transition from text-based request/response headers and bodies to *binary format*. The binary framing layer encodes all communication between the client and server (headers, data, settings, control, etc.) into a structured binary format. Headers are additionally compressed using the HPACK algorithm, which leverages static and dynamic tables along with Huffman encoding to reduce redundancy. This is particularly beneficial when multiple consecutive requests and responses share the same headers (a common scenario in inter-service communication) significantly reducing the number of bytes transmitted and improving overall network efficiency.
+The second important improvement in HTTP/2 is the transition from text-based request/response headers and bodies to a *binary format*. The binary framing layer encodes all communication between the client and server (headers, data, settings, control, etc.) into a structured binary format. Headers are additionally compressed using the HPACK algorithm, which leverages static and dynamic tables along with Huffman encoding to reduce redundancy. This is particularly beneficial when multiple consecutive requests and responses share the same headers (a common scenario in inter-service communication), significantly reducing the number of bytes transmitted and improving overall network efficiency.
 
 
 #### gRPC in practice
@@ -159,29 +159,12 @@ To implement this application, complete the following steps:
 
 ##### The contract between the service and the client
 
-A *.proto* file defines the *contract* between a service and a client. A typical *.proto* file consists of the following sections:
-
-
-
-* *Syntax definition*: specifies the version of the Protobuf language being used.
-* *Package*: declares a namespace for the definitions to avoid naming conflicts.
-* *Imports*: allows reuse of definitions from other *.proto* files.
-* *Options*: provides instructions to the Protobuf compiler for code generation across different programming languages. <sup>Options can be applied at different scopes: file, message, field, enum, enum value, and service.</sup>
-* *Messages*: defines the data structures exchanged between the client and the service.
-* *Services*: defines RPC services and the methods provided by the service.
-
-Below is the *.proto* file used in this example:
+A *.proto* file defines the *contract* between a service and a client. This example shows the *.proto* file used by both clients and servers in the application. Beyond the *message* and *service* definitions discussed earlier, the file also includes additional metadata. Specifically, it declares the use of Protobuf language version 3, and defines options specific to Java applications:
 
 
 ```
-// syntax definition
+// syntax
 syntax = "proto3";
-
-// package
-package example.grpc;
-
-// imports
-import "another.proto";
 
 // options
 option java_package = "com.example.grpc";
@@ -207,8 +190,6 @@ service EchoService {
 
 }
 
->The *java_package* option overrides the package name used for the generated Java classes when a *package* declaration is also present in the *.proto* file.
-
 
 ##### Generating service and client stubs
 
@@ -224,10 +205,20 @@ For the EchoService, an EchoServiceGrpc class is generated, containing inner cla
 
 * EchoServiceStub: to make asynchronous calls using the StreamObserver interface (it supports all four communication patterns)
 * EchoServiceBlockingStub: to make synchronous calls (it supports unary and server-streaming calls only)
-* EchoServiceBlockingV2Stub: to make synchronous calls (it also supports unary and server-streaming calls only, but throws checked StatusException instead of runtime StatusRuntimeException exceptions). <sup>Use this to ensure that potential gRPC errors are not ignored, which may happen when using runtime exceptions.</sup>
+* EchoServiceBlockingV2Stub: to make synchronous calls (it also supports unary and server-streaming calls only, but throws checked StatusException instead of runtime StatusRuntimeException). <sup>Use this to ensure that potential gRPC errors are not ignored, which may happen when using runtime exceptions.</sup>
 * EchoServiceFutureStub: to asynchronous calls with the [ListenableFuture](https://javadoc.io/doc/com.google.guava/guava/latest/com/google/common/util/concurrent/ListenableFuture.html) interface (it supports unary calls only)
 
 The [StreamObserver](https://grpc.github.io/grpc-java/javadoc/io/grpc/stub/StreamObserver.html) interface serves as the API for managing streaming between the client and service. It is used by both parties to send and receive messages. For outbound messages, the gRPC library provides an observer instance, and the participant invokes its methods to transmit messages. For inbound messages, the participant implements this interface and passes it to the gRPC library, which then calls the appropriate methods upon message reception.
+
+
+```
+public interface StreamObserver<V> {
+  void onNext(V value);
+  void onError(Throwable t);
+  void onCompleted();
+}
+```
+
 
 
 ##### Creating the server
@@ -245,7 +236,7 @@ To process a client request, the server performs the following steps: for each m
 
 
 ```
-class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
    @Override
    public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
        logger.log(Level.INFO, "request: {0}", request.getMessage());
@@ -393,7 +384,7 @@ gRPC is an effective framework for implementing inter-service communication. How
 * Automatic generation of gRPC service and client stubs is available for all required programming languages and platforms.
 * Both the client and server are developed within the same organization, and the application operates in a controlled environment.
 * Your organization has strong standards that benefit from clearly defined client–server contracts specified in *.proto* files.
-* Developers benefit from built-in capabilities, such as advanced request handling — including cancellation, deadlines, retries, flow control, and error handling — as well as authentication, load balancing, and health checking.
+* Developers benefit from built-in gRPC capabilities, such as advanced request handling — including cancellation, deadlines, retries, flow control, and error handling — as well as authentication, load balancing, and health checking.
 
 However, REST is a more appropriate architecture if the application meets most of the following conditions:
 
@@ -402,7 +393,7 @@ However, REST is a more appropriate architecture if the application meets most o
 * The application is simple and operates under low loads, and increasing performance is not economically justified.
 * The application uses unary requests/responses and does not require streaming. (Or the application *does* use streaming using the WebSockets protocol, but you consider this does not violate the REST architecture.)
 * Requests to the server are made directly from a browser, but using the gRPC-Web proxy is not technically justified.
-* The application provides a public API intended for use by a wide range of users outside your organization.
+* The application exposes a public API designed for consumption by a broad audience of external developers beyond your organization.
 * Your organization can achieve successful backward and forward compatibility and versioning without strict constraints.
 
 As a rule of thumb, you should migrate your RESTful services to gRPC when you need high-performance inter-service communication — such as low-latency or high-throughput with unidirectional or bidirectional streaming — especially in internal microservice applications.

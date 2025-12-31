@@ -11,7 +11,7 @@ rectangle "Service stub" as S2
 rectangle "gRPC runtime" as S3
 
 file ".proto" as P
-cloud "HTTP/2" as H
+card "HTTP/2" as H
 
 C1 -down- C2
 C2 -down- C3

@@ -1,21 +1,8 @@
-/*
- * Copyright 2017 The gRPC Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+package com.example.grpc.features.manualflowcontrol;
 
-package io.grpc.examples.manualflowcontrol;
-
+import com.example.grpc.echo.EchoRequest;
+import com.example.grpc.echo.EchoResponse;
+import com.example.grpc.echo.EchoServiceGrpc;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.Status;
@@ -32,13 +19,13 @@ public class ManualFlowControlServer {
 
   public static void main(String[] args) throws InterruptedException, IOException {
     // Service class implementation
-    StreamingGreeterGrpc.StreamingGreeterImplBase svc = new StreamingGreeterGrpc.StreamingGreeterImplBase() {
+    EchoServiceGrpc.EchoServiceImplBase svc = new EchoServiceGrpc.EchoServiceImplBase() {
       @Override
-      public StreamObserver<HelloRequest> sayHelloStreaming(final StreamObserver<HelloReply> responseObserver) {
+      public StreamObserver<EchoRequest> bidirectionalStreamingEcho(final StreamObserver<EchoResponse> responseObserver) {
         // Set up manual flow control for the request stream. It feels backwards to configure the request
         // stream's flow control using the response stream's observer, but this is the way it is.
-        final ServerCallStreamObserver<HelloReply> serverCallStreamObserver =
-            (ServerCallStreamObserver<HelloReply>) responseObserver;
+        final ServerCallStreamObserver<EchoResponse> serverCallStreamObserver =
+            (ServerCallStreamObserver<EchoResponse>) responseObserver;
         serverCallStreamObserver.disableAutoRequest();
 
         // Set up a back-pressure-aware consumer for the request stream. The onReadyHandler will be invoked
@@ -71,14 +58,14 @@ public class ManualFlowControlServer {
         serverCallStreamObserver.setOnReadyHandler(onReadyHandler);
 
         // Give gRPC a StreamObserver that can observe and process incoming requests.
-        return new StreamObserver<HelloRequest>() {
+        return new StreamObserver<EchoRequest>() {
           int cnt = 0;
           @Override
-          public void onNext(HelloRequest request) {
+          public void onNext(EchoRequest request) {
             // Process the request and send a response or an error.
             try {
               // Accept and enqueue the request.
-              String name = request.getName();
+              String name = request.getMessage();
               logger.info("--> " + name);
 
               // Simulate server "work"
@@ -88,7 +75,7 @@ public class ManualFlowControlServer {
               // Send a response.
               String message = "Hello " + name;
               logger.info("<-- " + message);
-              HelloReply reply = HelloReply.newBuilder().setMessage(message).build();
+              EchoResponse reply = EchoResponse.newBuilder().setMessage(message).build();
               responseObserver.onNext(reply);
 
               // Check the provided ServerCallStreamObserver to see if it is still ready to accept more messages.

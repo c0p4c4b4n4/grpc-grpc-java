@@ -1,27 +1,13 @@
-/*
- * Copyright 2023 The gRPC Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+package com.example.grpc.features.manualflowcontrol;
 
-package io.grpc.examples.manualflowcontrol;
-
+import com.example.grpc.echo.EchoRequest;
+import com.example.grpc.echo.EchoResponse;
+import com.example.grpc.echo.EchoServiceGrpc;
 import com.google.protobuf.ByteString;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
 import io.grpc.StatusException;
-import io.grpc.examples.manualflowcontrol.StreamingGreeterGrpc.StreamingGreeterBlockingV2Stub;
 import io.grpc.stub.BlockingClientCall;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -68,7 +54,7 @@ public class BidiBlockingClient {
     // use TLS, use TlsChannelCredentials instead.
     ManagedChannel channel = Grpc.newChannelBuilder(target, InsecureChannelCredentials.create())
         .build();
-    StreamingGreeterBlockingV2Stub blockingStub = StreamingGreeterGrpc.newBlockingV2Stub(channel);
+    EchoServiceGrpc.EchoServiceBlockingV2Stub blockingStub = EchoServiceGrpc.newBlockingV2Stub(channel);
     List<String> echoInput = names();
     try {
       long start = System.currentTimeMillis();
@@ -98,12 +84,12 @@ public class BidiBlockingClient {
   /**
    *  Create 2 threads, one that writes all values, and one that reads until the stream closes.
    */
-  private static List<String> useTwoThreads(StreamingGreeterBlockingV2Stub blockingStub,
+  private static List<String> useTwoThreads(EchoServiceGrpc.EchoServiceBlockingV2Stub blockingStub,
       List<String> valuesToWrite) throws InterruptedException {
     logMethodStart("Two Threads");
 
     List<String> readValues = new ArrayList<>();
-    final BlockingClientCall<HelloRequest, HelloReply> stream = blockingStub.sayHelloStreaming();
+    final BlockingClientCall<EchoRequest, EchoResponse> stream = blockingStub.bidirectionalStreamingEcho();
 
     Thread reader = new Thread(null,
         new Runnable() {
@@ -136,7 +122,7 @@ public class BidiBlockingClient {
         boolean hadProblem = false;
         try {
           while (iterator.hasNext()) {
-            if (!stream.write(HelloRequest.newBuilder().setName(iterator.next()).setPadding(padding)
+            if (!stream.write(EchoRequest.newBuilder().setName(iterator.next()).setPadding(padding)
                 .build())) {
               logger.warning("Stream closed before writes completed");
               hadProblem = true;

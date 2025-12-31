@@ -1,21 +1,9 @@
-/*
- * Copyright 2017 The gRPC Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+package com.example.grpc.features.manualflowcontrol;
 
-package io.grpc.examples.manualflowcontrol;
 
+import com.example.grpc.echo.EchoRequest;
+import com.example.grpc.echo.EchoResponse;
+import com.example.grpc.echo.EchoServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.ClientCallStreamObserver;
@@ -40,17 +28,17 @@ public class ManualFlowControlClient {
         .forAddress("localhost", 50051)
         .usePlaintext()
         .build();
-    StreamingGreeterGrpc.StreamingGreeterStub stub = StreamingGreeterGrpc.newStub(channel);
+    EchoServiceGrpc.EchoServiceStub stub = EchoServiceGrpc.newStub(channel);
 
     // When using manual flow-control and back-pressure on the client, the ClientResponseObserver handles both
     // request and response streams.
-    ClientResponseObserver<HelloRequest, HelloReply> clientResponseObserver =
-        new ClientResponseObserver<HelloRequest, HelloReply>() {
+    ClientResponseObserver<EchoRequest, EchoResponse> clientResponseObserver =
+        new ClientResponseObserver<EchoRequest, EchoResponse>() {
 
-          ClientCallStreamObserver<HelloRequest> requestStream;
+          ClientCallStreamObserver<EchoRequest> requestStream;
 
           @Override
-          public void beforeStart(final ClientCallStreamObserver<HelloRequest> requestStream) {
+          public void beforeStart(final ClientCallStreamObserver<EchoRequest> requestStream) {
             this.requestStream = requestStream;
             // Set up manual flow control for the response stream. It feels backwards to configure the response
             // stream's flow control using the request stream's observer, but this is the way it is.
@@ -79,7 +67,7 @@ public class ManualFlowControlClient {
                       // Send more messages if there are more messages to send.
                       String name = iterator.next();
                       logger.info("--> " + name);
-                      HelloRequest request = HelloRequest.newBuilder().setName(name).build();
+                      EchoRequest request = EchoRequest.newBuilder().setMessage(name).build();
                       requestStream.onNext(request);
                   } else {
                       // Signal completion if there is nothing left to send.
@@ -91,7 +79,7 @@ public class ManualFlowControlClient {
           }
 
           @Override
-          public void onNext(HelloReply value) {
+          public void onNext(EchoResponse value) {
             logger.info("<-- " + value.getMessage());
             // Signal the sender to send one message.
             requestStream.request(1);
@@ -111,7 +99,7 @@ public class ManualFlowControlClient {
         };
 
     // Note: clientResponseObserver is handling both request and response stream processing.
-    stub.sayHelloStreaming(clientResponseObserver);
+    stub.bidirectionalStreamingEcho(clientResponseObserver);
 
     done.await();
 

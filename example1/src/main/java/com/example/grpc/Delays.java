@@ -8,6 +8,7 @@ public final class Delays {
         try {
             TimeUnit.SECONDS.sleep(seconds);
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
     }

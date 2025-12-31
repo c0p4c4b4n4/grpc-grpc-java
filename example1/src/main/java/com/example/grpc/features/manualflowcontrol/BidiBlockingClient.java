@@ -122,7 +122,7 @@ public class BidiBlockingClient {
         boolean hadProblem = false;
         try {
           while (iterator.hasNext()) {
-            if (!stream.write(EchoRequest.newBuilder().setName(iterator.next()).setPadding(padding)
+            if (!stream.write(EchoRequest.newBuilder().setMessage(iterator.next()).setPadding(padding)
                 .build())) {
               logger.warning("Stream closed before writes completed");
               hadProblem = true;

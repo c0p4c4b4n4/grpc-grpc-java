@@ -3,6 +3,9 @@ package com.example.grpc.feature.header;
 import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoServiceGrpc;
+import io.grpc.Channel;
+import io.grpc.ClientInterceptor;
+import io.grpc.ClientInterceptors;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 
@@ -19,7 +22,8 @@ public class UnaryBlockingClient {
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
 
         try {
-            var blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+            ClientInterceptor interceptor = new HeaderClientInterceptor();
+            var blockingStub = EchoServiceGrpc.newBlockingStub(ClientInterceptors.intercept(channel, interceptor));
             var request = EchoRequest.newBuilder().setMessage("world").build();
             var response = blockingStub.unaryEcho(request);
             logger.info("response: " + response.getMessage());

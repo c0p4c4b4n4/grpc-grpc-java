@@ -21,7 +21,7 @@ public class UnaryServer {
 
         int port = 50051;
         Server server = ServerBuilder.forPort(port)
-            .addService(ServerInterceptors.intercept(new CustomHeaderServer.EchoServiceImpl(), new HeaderServerInterceptor()))
+            .addService(ServerInterceptors.intercept(new EchoServiceImpl(), new HeaderServerInterceptor()))
             .build()
             .start();
 

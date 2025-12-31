@@ -2,6 +2,14 @@
 
 skinparam linetype ortho
 
+'skinparam monochrome true
+'skinparam defaultFontName Source Sans Pro
+'skinparam titleFontSize 15
+'skinparam sequenceMessageAlign left
+'skinparam participantBackgroundColor #white
+'skinparam noteBackgroundColor #white
+'skinparam sequenceGroupBackgroundColor #white
+
 rectangle "Client" as C1
 rectangle "Client stub" as C2
 rectangle "gRPC runtime" as C3

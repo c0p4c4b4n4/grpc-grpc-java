@@ -5,7 +5,6 @@ import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
-import io.grpc.Channel;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
@@ -17,44 +16,11 @@ import io.grpc.health.v1.HealthGrpc;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class UnaryBlockingClient extends Loggable {
 
-    private final EchoServiceGrpc.EchoServiceBlockingStub echoBlockingStub;
-
-    private final HealthGrpc.HealthStub healthStub;
-    private final HealthGrpc.HealthBlockingStub healthBlockingStub;
-
-    private final HealthCheckRequest healthRequest;
-
-    public UnaryBlockingClient(Channel channel) {
-        echoBlockingStub = EchoServiceGrpc.newBlockingStub(channel);
-        healthStub = HealthGrpc.newStub(channel);
-        healthBlockingStub = HealthGrpc.newBlockingStub(channel);
-        healthRequest = HealthCheckRequest.getDefaultInstance();
-    }
-
-    private ServingStatus checkHealth(String prefix) {
-        HealthCheckResponse response = healthBlockingStub.check(healthRequest);
-        logger.info(prefix + ", current health is: " + response.getStatus());
-        return response.getStatus();
-    }
-
-    public void greet(String name) {
-        logger.info("Will try to greet " + name + " ...");
-        EchoRequest request = EchoRequest.newBuilder().setMessage(name).build();
-        EchoResponse response;
-        try {
-            response = echoBlockingStub.unaryEcho(request);
-        } catch (StatusRuntimeException e) {
-            logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
-            return;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
-        logger.info("Greeting: " + response.getMessage());
-    }
+    private static final Logger logger = Logger.getLogger(UnaryBlockingClient.class.getName());
 
     public static void main(String[] args) throws Exception {
         Loggers.init();
@@ -65,25 +31,56 @@ public class UnaryBlockingClient extends Loggable {
         ManagedChannel channel = Grpc.newChannelBuilder(target, InsecureChannelCredentials.create()).build();
 
         try {
-            UnaryBlockingClient client = new UnaryBlockingClient(channel);
-            client.checkHealth("Before call");
-            client.greet(users[0]);
-            client.checkHealth("After user " + users[0]);
+            EchoServiceGrpc.EchoServiceBlockingStub echoBlockingStub;
+
+            HealthGrpc.HealthStub healthStub= HealthGrpc.newStub(channel);
+            HealthGrpc.HealthBlockingStub healthBlockingStub;
+
+            echoBlockingStub = EchoServiceGrpc.newBlockingStub(channel);
+            healthBlockingStub = HealthGrpc.newBlockingStub(channel);
+
+//            UnaryBlockingClient client = new UnaryBlockingClient(channel);
+            checkHealth(healthBlockingStub, "Before call");
+            greet(echoBlockingStub, users[0]);
+            checkHealth(healthBlockingStub, "After user " + users[0]);
 
             for (String user : users) {
-                client.greet(user);
+                greet(echoBlockingStub, user);
                 Thread.sleep(100);
             }
 
-            client.checkHealth("After all users");
+            checkHealth(healthBlockingStub, "After all users");
             Thread.sleep(10000);
-            client.checkHealth("After 10 second wait");
+            checkHealth(healthBlockingStub, "After 10 second wait");
 
-            client.greet("Delta");
+            greet(echoBlockingStub, "Delta");
         } finally {
             channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
         }
-
-
     }
+
+
+    private static ServingStatus checkHealth(HealthGrpc.HealthBlockingStub healthBlockingStub, String prefix) {
+        HealthCheckRequest healthRequest = HealthCheckRequest.getDefaultInstance();
+        HealthCheckResponse response = healthBlockingStub.check(healthRequest);
+        logger.info(prefix + ", current health is: " + response.getStatus());
+        return response.getStatus();
+    }
+
+    public static void greet(EchoServiceGrpc.EchoServiceBlockingStub echoBlockingStub, String name) {
+        logger.info("Will try to greet " + name + " ...");
+        EchoRequest request = EchoRequest.newBuilder().setMessage(name).build();
+        EchoResponse response;
+        try {
+            response = echoBlockingStub.unaryEcho(request);
+        } catch (StatusRuntimeException e) {
+            logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
+            return;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return;
+        }
+        logger.info("Greeting: " + response.getMessage());
+    }
+
 }

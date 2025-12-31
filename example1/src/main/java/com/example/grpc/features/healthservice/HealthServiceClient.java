@@ -1,21 +1,8 @@
-/*
- * Copyright 2023 The gRPC Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+package com.example.grpc.features.healthservice;
 
-package io.grpc.examples.healthservice;
-
+import com.example.grpc.echo.EchoRequest;
+import com.example.grpc.echo.EchoResponse;
+import com.example.grpc.echo.EchoServiceGrpc;
 import io.grpc.Channel;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
@@ -24,9 +11,7 @@ import io.grpc.LoadBalancerRegistry;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
-import io.grpc.examples.helloworld.GreeterGrpc;
-import io.grpc.examples.helloworld.HelloReply;
-import io.grpc.examples.helloworld.HelloRequest;
+
 import io.grpc.health.v1.HealthCheckRequest;
 import io.grpc.health.v1.HealthCheckResponse;
 import io.grpc.health.v1.HealthCheckResponse.ServingStatus;
@@ -38,13 +23,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * A client that requests a greeting from the {@link HelloWorldServer}.
- */
 public class HealthServiceClient {
   private static final Logger logger = Logger.getLogger(HealthServiceClient.class.getName());
 
-  private final GreeterGrpc.GreeterBlockingStub greeterBlockingStub;
+  private final EchoServiceGrpc.EchoServiceBlockingStub echoBlockingStub;
+
   private final HealthGrpc.HealthStub healthStub;
   private final HealthGrpc.HealthBlockingStub healthBlockingStub;
 
@@ -52,18 +35,18 @@ public class HealthServiceClient {
 
   /** Construct client for accessing HelloWorld server using the existing channel. */
   public HealthServiceClient(Channel channel) {
-    greeterBlockingStub = GreeterGrpc.newBlockingStub(channel);
+    echoBlockingStub = EchoServiceGrpc.newBlockingStub(channel);
     healthStub = HealthGrpc.newStub(channel);
     healthBlockingStub = HealthGrpc.newBlockingStub(channel);
     healthRequest = HealthCheckRequest.getDefaultInstance();
-    LoadBalancerProvider roundRobin = LoadBalancerRegistry.getDefaultRegistry()
+    LoadBalancerProvider roundRobin = LoadBalancerRegistry
+        .getDefaultRegistry()
         .getProvider("round_robin");
 
   }
 
   private ServingStatus checkHealth(String prefix) {
-    HealthCheckResponse response =
-        healthBlockingStub.check(healthRequest);
+    HealthCheckResponse response = healthBlockingStub.check(healthRequest);
     logger.info(prefix + ", current health is: " + response.getStatus());
     return response.getStatus();
   }
@@ -71,10 +54,10 @@ public class HealthServiceClient {
   /** Say hello to server. */
   public void greet(String name) {
     logger.info("Will try to greet " + name + " ...");
-    HelloRequest request = HelloRequest.newBuilder().setName(name).build();
-    HelloReply response;
+    EchoRequest request = EchoRequest.newBuilder().setMessage(name).build();
+      EchoResponse response;
     try {
-      response = greeterBlockingStub.sayHello(request);
+      response = echoBlockingStub.unaryEcho(request);
     } catch (StatusRuntimeException e) {
       logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
       return;

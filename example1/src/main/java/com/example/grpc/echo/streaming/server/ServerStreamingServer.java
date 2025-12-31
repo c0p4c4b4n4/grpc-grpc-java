@@ -16,7 +16,7 @@ public class ServerStreamingServer {
         Servers.start(new EchoServiceImpl(), logger);
     }
 
-    static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
         @Override
         public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
             logger.info("request: " + request.getMessage());

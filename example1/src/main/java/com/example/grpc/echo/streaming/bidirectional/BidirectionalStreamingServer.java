@@ -17,7 +17,7 @@ public class BidirectionalStreamingServer {
         Servers.start(new EchoServiceImpl(), logger);
     }
 
-    static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
         @Override
         public StreamObserver<EchoRequest> bidirectionalStreamingEcho(StreamObserver<EchoResponse> responseObserver) {
             return new StreamObserver<>() {

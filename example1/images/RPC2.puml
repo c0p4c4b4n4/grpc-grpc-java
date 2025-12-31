@@ -7,10 +7,10 @@ rectangle "client stub\nResponse echo(Request request) {/*gRPC call*/}" as C2
 rectangle "gRPC runtime" as C3
 
 rectangle "server\nServerBuilder.forPort(port)\n.addService(new EchoServiceImpl())\n.build()\n.start();" as S1
-rectangle "service stub" as S2
+rectangle "service stub\nclass EchoServiceImpl extends EchoServiceStub {\n@Override\npublic void echo(Request request, StreamObserver<Response> responseObserver) {\nresponseObserver.onNext(response);\nresponseObserver.onCompleted();\n}\n}" as S2
 rectangle "gRPC runtime" as S3
 
-file ".proto\nmessage Request {}\nmessage Response {}\nservice EchoService { rpc Echo(Request) returns (Response); }" as P
+file ".proto\nmessage Request {}\nmessage Response {}\nservice EchoService {\nrpc Echo(Request) returns (Response);\n}" as P
 card "HTTP/2" as H
 
 C1 -down- C2

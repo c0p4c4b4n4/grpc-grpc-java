@@ -1,7 +1,5 @@
 package com.example.grpc.features.retrying;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
@@ -11,8 +9,7 @@ import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
-import java.io.InputStreamReader;
-import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
@@ -33,7 +30,7 @@ public class RetryingHelloWorldClient {
     private final AtomicInteger totalRpcs = new AtomicInteger();
     private final AtomicInteger failedRpcs = new AtomicInteger();
 
-    protected Map<String, ?> getRetryingServiceConfig() {
+    private Map<String, ?> getRetryingServiceConfig() {
         return Map.of(
             "methodConfig", List.of(
                 Map.of(
@@ -55,7 +52,7 @@ public class RetryingHelloWorldClient {
         );
     }
 
-    public RetryingHelloWorldClient(String host, int port, boolean enableRetries) {
+    private RetryingHelloWorldClient(String host, int port, boolean enableRetries) {
         ManagedChannelBuilder<?> channelBuilder            = Grpc.newChannelBuilderForAddress(host, port, InsecureChannelCredentials.create());
         if (enableRetries) {
             Map<String, ?> serviceConfig = getRetryingServiceConfig();
@@ -67,13 +64,14 @@ public class RetryingHelloWorldClient {
         this.enableRetries = enableRetries;
     }
 
-    public void shutdown() throws InterruptedException {
+    private void shutdown() throws InterruptedException {
         channel.shutdown().awaitTermination(60, TimeUnit.SECONDS);
     }
 
-    public void greet(String name) {
-        EchoRequest request = EchoRequest.newBuilder().setMessage(name).build();
+    private void unaryEcho(String message) {
+        EchoRequest request = EchoRequest.newBuilder().setMessage(message).build();
         EchoResponse response = null;
+
         StatusRuntimeException statusRuntimeException = null;
         try {
             response = blockingStub.unaryEcho(request);
@@ -85,30 +83,29 @@ public class RetryingHelloWorldClient {
         totalRpcs.incrementAndGet();
 
         if (statusRuntimeException == null) {
-            logger.log(Level.INFO,"Greeting: {0}", new Object[]{response.getMessage()});
+            logger.log(Level.INFO,"response: {0}", response.getMessage());
         } else {
-            logger.log(Level.INFO,"RPC failed: {0}", new Object[]{statusRuntimeException.getStatus()});
+            logger.log(Level.INFO,"error: {0}", statusRuntimeException.getStatus());
         }
     }
 
     private void printSummary() {
         logger.log(
             Level.INFO,
-            "\n\nTotal RPCs sent: {0}. Total RPCs failed: {1}\n",
-            new Object[]{
-                totalRpcs.get(), failedRpcs.get()});
+            "\n\nRetrying: {0}. Total RPCs sent: {1}. Total RPCs failed: {2}\n",
+            new Object[]{  enableRetries ?"enabled" :"disabled",   totalRpcs.get(), failedRpcs.get()});
 
-        if (enableRetries) {
-            logger.log(
-                Level.INFO,
-                "Retrying enabled. To disable retries, run the client with environment variable {0}=true.",
-                ENV_DISABLE_RETRYING);
-        } else {
-            logger.log(
-                Level.INFO,
-                "Retrying disabled. To enable retries, unset environment variable {0} and then run the client.",
-                ENV_DISABLE_RETRYING);
-        }
+//        if (enableRetries) {
+//            logger.log(
+//                Level.INFO,
+//                "Retrying enabled. To disable retries, run the client with environment variable {0}=true.",
+//                ENV_DISABLE_RETRYING);
+//        } else {
+//            logger.log(
+//                Level.INFO,
+//                "Retrying disabled. To enable retries, unset environment variable {0} and then run the client.",
+//                ENV_DISABLE_RETRYING);
+//        }
     }
 
     public static void main(String[] args) throws Exception {
@@ -124,7 +121,7 @@ public class RetryingHelloWorldClient {
                 new Runnable() {
                     @Override
                     public void run() {
-                        client.greet(userId);
+                        client.unaryEcho(userId);
                     }
                 });
         }

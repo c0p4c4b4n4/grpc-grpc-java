@@ -71,6 +71,7 @@ When you are ready to begin processing the next value from the stream call
 `serverCallStreamObserver.request(1)`
 
 ### Related documents
+
 Also see [gRPC Flow Control Users Guide][user guide]
 
- [user guide]: https://grpc.io/docs/guides/flow-control
+[user guide]: https://grpc.io/docs/guides/flow-control

@@ -76,8 +76,7 @@ public class RetryingHelloWorldServer {
             int count = retryCounter.incrementAndGet();
             if (random.nextFloat() < UNAVAILABLE_PERCENTAGE) {
                 logger.info("Returning stubbed UNAVAILABLE error. count: " + count);
-                responseObserver.onError(Status.UNAVAILABLE
-                    .withDescription("Greeter temporarily unavailable...").asRuntimeException());
+                responseObserver.onError(Status.UNAVAILABLE        .withDescription("Greeter temporarily unavailable...").asRuntimeException());
             } else {
                 logger.info("Returning successful Hello response, count: " + count);
                 EchoResponse reply = EchoResponse.newBuilder().setMessage("Hello " + request.getMessage()).build();

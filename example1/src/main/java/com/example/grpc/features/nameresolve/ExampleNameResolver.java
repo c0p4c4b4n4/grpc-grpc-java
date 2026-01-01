@@ -1,6 +1,5 @@
 package com.example.grpc.features.nameresolve;
 
-import com.example.grpc.features.loadbalance.Settings;
 import com.google.common.collect.ImmutableMap;
 import io.grpc.EquivalentAddressGroup;
 import io.grpc.NameResolver;

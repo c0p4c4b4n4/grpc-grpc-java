@@ -13,9 +13,10 @@ import java.util.logging.Logger;
 
 public class NameResolveServer {
 
+    private static final Logger logger = Logger.getLogger(NameResolveServer.class.getName());
+
     static public final int serverCount = 3;
     static public final int startPort = 50051;
-    private static final Logger logger = Logger.getLogger(NameResolveServer.class.getName());
     private Server[] servers;
 
     public static void main(String[] args) throws IOException, InterruptedException {

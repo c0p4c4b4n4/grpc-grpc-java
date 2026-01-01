@@ -18,11 +18,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class RetryingHelloWorldClient {
+public class RetryingUnaryBlockingClient {
 
-    static final String ENV_DISABLE_RETRYING = "DISABLE_RETRYING_IN_RETRYING_EXAMPLE";
-
-    private static final Logger logger = Logger.getLogger(RetryingHelloWorldClient.class.getName());
+    private static final Logger logger = Logger.getLogger(RetryingUnaryBlockingClient.class.getName());
 
     private final boolean enableRetries;
     private final ManagedChannel channel;
@@ -33,8 +31,8 @@ public class RetryingHelloWorldClient {
     public static void main(String[] args) throws Exception {
         Loggers.init();
 
-        boolean enableRetries = !Boolean.parseBoolean(System.getenv(ENV_DISABLE_RETRYING));
-        RetryingHelloWorldClient client = new RetryingHelloWorldClient("localhost", 50051, enableRetries);
+        boolean enableRetries = !Boolean.parseBoolean(System.getenv("EXAMPLE_GRPC_DISABLE_RETRYING"));
+        RetryingUnaryBlockingClient client = new RetryingUnaryBlockingClient("localhost", 50051, enableRetries);
 
         ForkJoinPool executor = new ForkJoinPool();
         for (int i = 0; i < 50; i++) {
@@ -47,18 +45,18 @@ public class RetryingHelloWorldClient {
                     }
                 });
         }
-        executor.awaitQuiescence(100, TimeUnit.SECONDS);
+        executor.awaitQuiescence(120, TimeUnit.SECONDS);
         executor.shutdown();
 
         client.printSummary();
         client.shutdown();
     }
 
-    private RetryingHelloWorldClient(String host, int port, boolean enableRetries) {
-        ManagedChannelBuilder<?> channelBuilder            = Grpc.newChannelBuilderForAddress(host, port, InsecureChannelCredentials.create());
+    private RetryingUnaryBlockingClient(String host, int port, boolean enableRetries) {
+        ManagedChannelBuilder<?> channelBuilder = Grpc.newChannelBuilderForAddress(host, port, InsecureChannelCredentials.create());
         if (enableRetries) {
             Map<String, ?> serviceConfig = getRetryingServiceConfig();
-            logger.info("Client started with retrying configuration: " + serviceConfig);
+            logger.info("client started with service configuration: " + serviceConfig);
             channelBuilder.defaultServiceConfig(serviceConfig).enableRetry();
         }
         channel = channelBuilder.build();
@@ -103,15 +101,15 @@ public class RetryingHelloWorldClient {
         totalRpcs.incrementAndGet();
 
         if (statusRuntimeException == null) {
-            logger.log(Level.INFO,"response: {0}", response.getMessage());
+            logger.log(Level.INFO, "response: {0}", response.getMessage());
         } else {
-            logger.log(Level.INFO,"error: {0}", statusRuntimeException.getStatus());
+            logger.log(Level.INFO, "error: {0}", statusRuntimeException.getStatus());
         }
     }
 
     private void printSummary() {
-        logger.log(            Level.INFO,            "retrying: {0}, calls sent: {1}, calls failed: {2}\n",
-            new Object[]{  enableRetries ?"enabled" :"disabled",   totalRpcs.get(), failedRpcs.get()});
+        logger.log(Level.INFO, "retrying: {0}, calls sent: {1}, calls failed: {2}\n",
+            new Object[]{enableRetries ? "enabled" : "disabled", totalRpcs.get(), failedRpcs.get()});
     }
 
     private void shutdown() throws InterruptedException {

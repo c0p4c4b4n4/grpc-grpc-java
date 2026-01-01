@@ -24,8 +24,7 @@ public class ManualFlowControlServer {
             public StreamObserver<EchoRequest> bidirectionalStreamingEcho(final StreamObserver<EchoResponse> responseObserver) {
                 // Set up manual flow control for the request stream. It feels backwards to configure the request
                 // stream's flow control using the response stream's observer, but this is the way it is.
-                final ServerCallStreamObserver<EchoResponse> serverCallStreamObserver =
-                    (ServerCallStreamObserver<EchoResponse>) responseObserver;
+                final ServerCallStreamObserver<EchoResponse> serverCallStreamObserver =                 (ServerCallStreamObserver<EchoResponse>) responseObserver;
                 serverCallStreamObserver.disableAutoRequest();
 
                 // Set up a back-pressure-aware consumer for the request stream. The onReadyHandler will be invoked
@@ -70,7 +69,7 @@ public class ManualFlowControlServer {
                             logger.info("--> " + name);
 
                             // Simulate server "work"
-                            int sleepMillis = ++cnt % 20 == 0 ? 2000 : 100;
+                            int sleepMillis = ++cnt % 10 == 0 ? 2000 : 100;
                             Thread.sleep(sleepMillis);
 
                             // Send a response.

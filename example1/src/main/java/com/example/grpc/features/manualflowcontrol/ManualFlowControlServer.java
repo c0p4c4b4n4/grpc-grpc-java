@@ -14,12 +14,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class ManualFlowControlServer {
-  private static final Logger logger =
-      Logger.getLogger(ManualFlowControlServer.class.getName());
+
+  private static final Logger logger = Logger.getLogger(ManualFlowControlServer.class.getName());
 
   public static void main(String[] args) throws InterruptedException, IOException {
     // Service class implementation
-    EchoServiceGrpc.EchoServiceImplBase svc = new EchoServiceGrpc.EchoServiceImplBase() {
+    EchoServiceGrpc.EchoServiceImplBase service = new EchoServiceGrpc.EchoServiceImplBase() {
       @Override
       public StreamObserver<EchoRequest> bidirectionalStreamingEcho(final StreamObserver<EchoResponse> responseObserver) {
         // Set up manual flow control for the request stream. It feels backwards to configure the request
@@ -119,7 +119,7 @@ public class ManualFlowControlServer {
 
     final Server server = ServerBuilder
         .forPort(50051)
-        .addService(svc)
+        .addService(service)
         .build()
         .start();
 

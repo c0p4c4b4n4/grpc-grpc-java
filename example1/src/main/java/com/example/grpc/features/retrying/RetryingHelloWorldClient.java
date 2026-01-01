@@ -2,6 +2,7 @@ package com.example.grpc.features.retrying;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
@@ -20,10 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * A client that requests a greeting from the {@link RetryingHelloWorldServer} with a retrying policy.
- */
 public class RetryingHelloWorldClient {
+
     static final String ENV_DISABLE_RETRYING = "DISABLE_RETRYING_IN_RETRYING_EXAMPLE";
 
     private static final Logger logger = Logger.getLogger(RetryingHelloWorldClient.class.getName());
@@ -35,73 +34,29 @@ public class RetryingHelloWorldClient {
     private final AtomicInteger failedRpcs = new AtomicInteger();
 
     protected Map<String, ?> getRetryingServiceConfig() {
-        // 1. Define the "name" entry
-        Map<String, Object> name = new HashMap<>();
-        name.put("service", "example.grpc.echo.EchoService");
-        name.put("method", "UnaryEcho");
-
-        // 2. Define the "retryPolicy"
-        Map<String, Object> retryPolicy = new HashMap<>();
-        retryPolicy.put("maxAttempts", 5.0); // gRPC expects numbers as doubles when using Maps
-        retryPolicy.put("initialBackoff", "0.5s");
-        retryPolicy.put("maxBackoff", "30s");
-        retryPolicy.put("backoffMultiplier", 2.0);
-        retryPolicy.put("retryableStatusCodes", List.of("UNAVAILABLE"));
-
-        // 3. Define the "methodConfig" entry
-        Map<String, Object> methodConfigEntry = new HashMap<>();
-        methodConfigEntry.put("name", List.of(name));
-        methodConfigEntry.put("retryPolicy", retryPolicy);
-
-        // 4. Wrap in the root "methodConfig" list
-        Map<String, Object> serviceConfig = new HashMap<>();
-        serviceConfig.put("methodConfig", List.of(methodConfigEntry));
-
-        return serviceConfig;
-//      return Map.of()
-//    return new Gson()
-//        .fromJson(
-//            new JsonReader(
-//                new InputStreamReader(
-//                    RetryingHelloWorldClient.class.getResourceAsStream(
-//                        "retrying_service_config.json"),
-//                    UTF_8)),
-//            Map.class);
+        return Map.of(
+            "methodConfig", List.of(
+                Map.of(
+                    "name", List.of(
+                        Map.of(
+                            "service", "example.grpc.echo.EchoService",
+                            "method", "UnaryEcho"
+                        )
+                    ),
+                    "retryPolicy", Map.of(
+                        "maxAttempts", 5.0,
+                        "initialBackoff", "0.5s",
+                        "maxBackoff", "30s",
+                        "backoffMultiplier", 2.0,
+                        "retryableStatusCodes", List.of("UNAVAILABLE")
+                    )
+                )
+            )
+        );
     }
 
-/*
-{
-  "methodConfig": [
-    {
-      "name": [
-        {
-          "service": "helloworld.Greeter",
-          "method": "SayHello"
-        }
-      ],
-
-      "retryPolicy": {
-        "maxAttempts": 5,
-        "initialBackoff": "0.5s",
-        "maxBackoff": "30s",
-        "backoffMultiplier": 2,
-        "retryableStatusCodes": [
-          "UNAVAILABLE"
-        ]
-      }
-    }
-  ]
-}
- */
-
-
-    /**
-     * Construct client connecting to HelloWorld server at {@code host:port}.
-     */
     public RetryingHelloWorldClient(String host, int port, boolean enableRetries) {
-
-        ManagedChannelBuilder<?> channelBuilder
-            = Grpc.newChannelBuilderForAddress(host, port, InsecureChannelCredentials.create());
+        ManagedChannelBuilder<?> channelBuilder            = Grpc.newChannelBuilderForAddress(host, port, InsecureChannelCredentials.create());
         if (enableRetries) {
             Map<String, ?> serviceConfig = getRetryingServiceConfig();
             logger.info("Client started with retrying configuration: " + serviceConfig);
@@ -116,9 +71,6 @@ public class RetryingHelloWorldClient {
         channel.shutdown().awaitTermination(60, TimeUnit.SECONDS);
     }
 
-    /**
-     * Say hello to server in a blocking unary call.
-     */
     public void greet(String name) {
         EchoRequest request = EchoRequest.newBuilder().setMessage(name).build();
         EchoResponse response = null;
@@ -160,10 +112,12 @@ public class RetryingHelloWorldClient {
     }
 
     public static void main(String[] args) throws Exception {
-        boolean enableRetries = true;//!Boolean.parseBoolean(System.getenv(ENV_DISABLE_RETRYING));
-        final RetryingHelloWorldClient client = new RetryingHelloWorldClient("localhost", 50051, enableRetries);
-        ForkJoinPool executor = new ForkJoinPool();
+        Loggers.init();
 
+        boolean enableRetries = !Boolean.parseBoolean(System.getenv(ENV_DISABLE_RETRYING));
+        RetryingHelloWorldClient client = new RetryingHelloWorldClient("localhost", 50051, enableRetries);
+
+        ForkJoinPool executor = new ForkJoinPool();
         for (int i = 0; i < 50; i++) {
             final String userId = "user" + i;
             executor.execute(
@@ -176,6 +130,7 @@ public class RetryingHelloWorldClient {
         }
         executor.awaitQuiescence(100, TimeUnit.SECONDS);
         executor.shutdown();
+
         client.printSummary();
         client.shutdown();
     }

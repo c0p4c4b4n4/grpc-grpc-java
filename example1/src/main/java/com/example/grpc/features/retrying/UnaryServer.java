@@ -30,10 +30,10 @@ public class UnaryServer {
         public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
             int count = retryCounter.incrementAndGet();
             if (random.nextFloat() < UNAVAILABLE_PERCENTAGE) {
-                logger.info("Returning stubbed UNAVAILABLE error, count: " + count);
+                logger.info("request: " + request.getMessage() +" Returning stubbed UNAVAILABLE error, count: " + count);
                 responseObserver.onError(Status.UNAVAILABLE.withDescription("Server temporarily unavailable...").asRuntimeException());
             } else {
-                logger.info("Returning successful response, count: " + count);
+                logger.info("request: " + request.getMessage() +" Returning successful response, count: " + count);
                 EchoResponse response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
                 responseObserver.onNext(response);
                 responseObserver.onCompleted();

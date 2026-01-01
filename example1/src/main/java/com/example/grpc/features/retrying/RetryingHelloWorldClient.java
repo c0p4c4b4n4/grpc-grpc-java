@@ -37,8 +37,8 @@ public class RetryingHelloWorldClient {
     protected Map<String, ?> getRetryingServiceConfig() {
         // 1. Define the "name" entry
         Map<String, Object> name = new HashMap<>();
-        name.put("service", "com.example.grpc.echo.EchoService");
-        name.put("method", "unaryEcho");
+        name.put("service", "example.grpc.echo.EchoService");
+        name.put("method", "UnaryEcho");
 
         // 2. Define the "retryPolicy"
         Map<String, Object> retryPolicy = new HashMap<>();
@@ -160,7 +160,7 @@ public class RetryingHelloWorldClient {
     }
 
     public static void main(String[] args) throws Exception {
-        boolean enableRetries = !Boolean.parseBoolean(System.getenv(ENV_DISABLE_RETRYING));
+        boolean enableRetries = true;//!Boolean.parseBoolean(System.getenv(ENV_DISABLE_RETRYING));
         final RetryingHelloWorldClient client = new RetryingHelloWorldClient("localhost", 50051, enableRetries);
         ForkJoinPool executor = new ForkJoinPool();
 

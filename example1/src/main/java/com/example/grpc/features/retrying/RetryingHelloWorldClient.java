@@ -55,12 +55,11 @@ public class RetryingHelloWorldClient {
 
 
     public RetryingHelloWorldClient(String host, int port) {
-
         ManagedChannelBuilder<?> channelBuilder = Grpc.newChannelBuilderForAddress(host, port, InsecureChannelCredentials.create());
 
-            Map<String, ?> serviceConfig = getRetryingServiceConfig();
-            logger.info("Client started with retrying configuration: " + serviceConfig);
-            channelBuilder.defaultServiceConfig(serviceConfig).enableRetry();
+        Map<String, ?> serviceConfig = getRetryingServiceConfig();
+        logger.info("Client started with retrying configuration: " + serviceConfig);
+        channelBuilder.defaultServiceConfig(serviceConfig).enableRetry();
 
         channel = channelBuilder.build();
         blockingStub = EchoServiceGrpc.newBlockingStub(channel);
@@ -99,7 +98,7 @@ public class RetryingHelloWorldClient {
     }
 
     public static void main(String[] args) throws Exception {
-        RetryingHelloWorldClient client = new RetryingHelloWorldClient("localhost", 50051 );
+        RetryingHelloWorldClient client = new RetryingHelloWorldClient("localhost", 50051);
         ForkJoinPool executor = new ForkJoinPool();
 
         for (int i = 0; i < 50; i++) {

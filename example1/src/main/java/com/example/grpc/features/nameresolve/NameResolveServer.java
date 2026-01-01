@@ -1,26 +1,10 @@
-/*
- * Copyright 2022 The gRPC Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+package com.example.grpc.features.nameresolve;
 
-package io.grpc.examples.nameresolve;
-
+import com.example.grpc.echo.EchoRequest;
+import com.example.grpc.echo.EchoResponse;
+import com.example.grpc.echo.EchoServiceGrpc;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
-import io.grpc.examples.helloworld.GreeterGrpc;
-import io.grpc.examples.helloworld.HelloReply;
-import io.grpc.examples.helloworld.HelloRequest;
 import io.grpc.stub.StreamObserver;
 
 import java.io.IOException;
@@ -28,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class NameResolveServer {
+
     static public final int serverCount = 3;
     static public final int startPort = 50051;
     private static final Logger logger = Logger.getLogger(NameResolveServer.class.getName());
@@ -44,9 +29,9 @@ public class NameResolveServer {
         for (int i = 0; i < serverCount; i++) {
             int port = startPort + i;
             servers[i] = ServerBuilder.forPort(port)
-                    .addService(new GreeterImpl(port))
-                    .build()
-                    .start();
+                .addService(new GreeterImpl(port))
+                .build()
+                .start();
             logger.info("Server started, listening on " + port);
         }
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -76,7 +61,7 @@ public class NameResolveServer {
         }
     }
 
-    static class GreeterImpl extends GreeterGrpc.GreeterImplBase {
+    static class GreeterImpl extends EchoServiceGrpc.EchoServiceImplBase {
 
         int port;
 
@@ -85,8 +70,8 @@ public class NameResolveServer {
         }
 
         @Override
-        public void sayHello(HelloRequest req, StreamObserver<HelloReply> responseObserver) {
-            HelloReply reply = HelloReply.newBuilder().setMessage("Hello " + req.getName() + " from server<" + this.port + ">").build();
+        public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
+            EchoResponse reply = EchoResponse.newBuilder().setMessage("Hello " + request.getMessage() + " from server<" + this.port + ">").build();
             responseObserver.onNext(reply);
             responseObserver.onCompleted();
         }

@@ -30,6 +30,42 @@ public class RetryingHelloWorldClient {
     private final AtomicInteger totalRpcs = new AtomicInteger();
     private final AtomicInteger failedRpcs = new AtomicInteger();
 
+    public static void main(String[] args) throws Exception {
+        Loggers.init();
+
+        boolean enableRetries = !Boolean.parseBoolean(System.getenv(ENV_DISABLE_RETRYING));
+        RetryingHelloWorldClient client = new RetryingHelloWorldClient("localhost", 50051, enableRetries);
+
+        ForkJoinPool executor = new ForkJoinPool();
+        for (int i = 0; i < 50; i++) {
+            String userId = "user" + i;
+            executor.execute(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        client.unaryEcho(userId);
+                    }
+                });
+        }
+        executor.awaitQuiescence(100, TimeUnit.SECONDS);
+        executor.shutdown();
+
+        client.printSummary();
+        client.shutdown();
+    }
+
+    private RetryingHelloWorldClient(String host, int port, boolean enableRetries) {
+        ManagedChannelBuilder<?> channelBuilder            = Grpc.newChannelBuilderForAddress(host, port, InsecureChannelCredentials.create());
+        if (enableRetries) {
+            Map<String, ?> serviceConfig = getRetryingServiceConfig();
+            logger.info("Client started with retrying configuration: " + serviceConfig);
+            channelBuilder.defaultServiceConfig(serviceConfig).enableRetry();
+        }
+        channel = channelBuilder.build();
+        blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+        this.enableRetries = enableRetries;
+    }
+
     private Map<String, ?> getRetryingServiceConfig() {
         return Map.of(
             "methodConfig", List.of(
@@ -50,22 +86,6 @@ public class RetryingHelloWorldClient {
                 )
             )
         );
-    }
-
-    private RetryingHelloWorldClient(String host, int port, boolean enableRetries) {
-        ManagedChannelBuilder<?> channelBuilder            = Grpc.newChannelBuilderForAddress(host, port, InsecureChannelCredentials.create());
-        if (enableRetries) {
-            Map<String, ?> serviceConfig = getRetryingServiceConfig();
-            logger.info("Client started with retrying configuration: " + serviceConfig);
-            channelBuilder.defaultServiceConfig(serviceConfig).enableRetry();
-        }
-        channel = channelBuilder.build();
-        blockingStub = EchoServiceGrpc.newBlockingStub(channel);
-        this.enableRetries = enableRetries;
-    }
-
-    private void shutdown() throws InterruptedException {
-        channel.shutdown().awaitTermination(60, TimeUnit.SECONDS);
     }
 
     private void unaryEcho(String message) {
@@ -90,45 +110,11 @@ public class RetryingHelloWorldClient {
     }
 
     private void printSummary() {
-        logger.log(
-            Level.INFO,
-            "\n\nRetrying: {0}. Total RPCs sent: {1}. Total RPCs failed: {2}\n",
+        logger.log(            Level.INFO,            "retrying: {0}, calls sent: {1}, calls failed: {2}\n",
             new Object[]{  enableRetries ?"enabled" :"disabled",   totalRpcs.get(), failedRpcs.get()});
-
-//        if (enableRetries) {
-//            logger.log(
-//                Level.INFO,
-//                "Retrying enabled. To disable retries, run the client with environment variable {0}=true.",
-//                ENV_DISABLE_RETRYING);
-//        } else {
-//            logger.log(
-//                Level.INFO,
-//                "Retrying disabled. To enable retries, unset environment variable {0} and then run the client.",
-//                ENV_DISABLE_RETRYING);
-//        }
     }
 
-    public static void main(String[] args) throws Exception {
-        Loggers.init();
-
-        boolean enableRetries = !Boolean.parseBoolean(System.getenv(ENV_DISABLE_RETRYING));
-        RetryingHelloWorldClient client = new RetryingHelloWorldClient("localhost", 50051, enableRetries);
-
-        ForkJoinPool executor = new ForkJoinPool();
-        for (int i = 0; i < 50; i++) {
-            final String userId = "user" + i;
-            executor.execute(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        client.unaryEcho(userId);
-                    }
-                });
-        }
-        executor.awaitQuiescence(100, TimeUnit.SECONDS);
-        executor.shutdown();
-
-        client.printSummary();
-        client.shutdown();
+    private void shutdown() throws InterruptedException {
+        channel.shutdown().awaitTermination(60, TimeUnit.SECONDS);
     }
 }

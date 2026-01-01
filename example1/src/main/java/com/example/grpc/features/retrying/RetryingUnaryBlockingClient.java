@@ -2,12 +2,10 @@ package com.example.grpc.features.retrying;
 
 import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;
-import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 
 import java.util.List;
@@ -22,38 +20,31 @@ public class RetryingUnaryBlockingClient {
 
     private static final Logger logger = Logger.getLogger(RetryingUnaryBlockingClient.class.getName());
 
-    private final boolean enableRetries;
     private final ManagedChannel channel;
     private final EchoServiceGrpc.EchoServiceBlockingStub blockingStub;
-    private final AtomicInteger totalRpcs = new AtomicInteger();
-    private final AtomicInteger failedRpcs = new AtomicInteger();
+    private final AtomicInteger totalCalls = new AtomicInteger();
+    private final AtomicInteger failedCalls = new AtomicInteger();
 
     public static void main(String[] args) throws Exception {
         Loggers.init();
 
         boolean enableRetries = !Boolean.parseBoolean(System.getenv("EXAMPLE_GRPC_DISABLE_RETRYING"));
-        RetryingUnaryBlockingClient client = new RetryingUnaryBlockingClient("localhost", 50051, enableRetries);
+        var client = new RetryingUnaryBlockingClient("localhost", 50051, enableRetries);
 
-        ForkJoinPool executor = new ForkJoinPool();
+        var executor = new ForkJoinPool();
         for (int i = 0; i < 50; i++) {
             String userId = "user" + i;
-            executor.execute(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        client.unaryEcho(userId);
-                    }
-                });
+            executor.execute(() -> client.unaryEcho(userId));
         }
         executor.awaitQuiescence(120, TimeUnit.SECONDS);
         executor.shutdown();
 
-        client.printSummary();
+        client.printSummary(enableRetries);
         client.shutdown();
     }
 
     private RetryingUnaryBlockingClient(String host, int port, boolean enableRetries) {
-        ManagedChannelBuilder<?> channelBuilder = Grpc.newChannelBuilderForAddress(host, port, InsecureChannelCredentials.create());
+        var channelBuilder = Grpc.newChannelBuilderForAddress(host, port, InsecureChannelCredentials.create());
         if (enableRetries) {
             Map<String, ?> serviceConfig = getRetryingServiceConfig();
             logger.info("client started with service configuration: " + serviceConfig);
@@ -61,7 +52,6 @@ public class RetryingUnaryBlockingClient {
         }
         channel = channelBuilder.build();
         blockingStub = EchoServiceGrpc.newBlockingStub(channel);
-        this.enableRetries = enableRetries;
     }
 
     private Map<String, ?> getRetryingServiceConfig() {
@@ -87,29 +77,21 @@ public class RetryingUnaryBlockingClient {
     }
 
     private void unaryEcho(String message) {
-        EchoRequest request = EchoRequest.newBuilder().setMessage(message).build();
-        EchoResponse response = null;
-
-        StatusRuntimeException statusRuntimeException = null;
         try {
-            response = blockingStub.unaryEcho(request);
-        } catch (StatusRuntimeException e) {
-            failedRpcs.incrementAndGet();
-            statusRuntimeException = e;
-        }
-
-        totalRpcs.incrementAndGet();
-
-        if (statusRuntimeException == null) {
+            var request = EchoRequest.newBuilder().setMessage(message).build();
+            var response = blockingStub.unaryEcho(request);
             logger.log(Level.INFO, "response: {0}", response.getMessage());
-        } else {
-            logger.log(Level.INFO, "error: {0}", statusRuntimeException.getStatus());
+        } catch (StatusRuntimeException e) {
+            failedCalls.incrementAndGet();
+            logger.log(Level.INFO, "error: {0}", e.getStatus());
         }
+
+        totalCalls.incrementAndGet();
     }
 
-    private void printSummary() {
+    private void printSummary(boolean enableRetries) {
         logger.log(Level.INFO, "retrying: {0}, calls sent: {1}, calls failed: {2}\n",
-            new Object[]{enableRetries ? "enabled" : "disabled", totalRpcs.get(), failedRpcs.get()});
+            new Object[]{enableRetries ? "enabled" : "disabled", totalCalls.get(), failedCalls.get()});
     }
 
     private void shutdown() throws InterruptedException {

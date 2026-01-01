@@ -23,16 +23,16 @@ public class RetryingUnaryServer {
 
         private static final float UNAVAILABLE_PERCENTAGE = 0.5F;
         private final Random random = new Random();
-        private final AtomicInteger counter = new AtomicInteger(0);
+        private final AtomicInteger calls = new AtomicInteger(0);
 
         @Override
         public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-            int count = counter.incrementAndGet();
+            calls.incrementAndGet();
             if (random.nextFloat() < UNAVAILABLE_PERCENTAGE) {
-                logger.info("returning UNAVAILABLE error, count: " + count);
+                logger.info("returning UNAVAILABLE error, call: " + calls.get());
                 responseObserver.onError(Status.UNAVAILABLE.withDescription("Server temporarily unavailable...").asRuntimeException());
             } else {
-                logger.info("returning successful response, count: " + count);
+                logger.info("returning successful response, call: " + calls.get());
                 EchoResponse response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
                 responseObserver.onNext(response);
                 responseObserver.onCompleted();

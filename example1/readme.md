@@ -22,6 +22,8 @@ However, with REST architecture, problems arise when implementing client-server 
 
 RPC is based on the technique of calling methods in another process as if they were local methods. RPC frameworks provide code generation tools that create client and server stubs based on a given RPC interface. These stubs handle data serialization and network communication. As a result, when a client calls a remote method with parameters and receives a return value, it appears to be a local call. RPC frameworks aim to hide the complexity of serialization and network communication from developers.
 
+![gRPC architecture](/images/gRPC.png)
+
 However, it is not possible to completely hide the intermediate network communication in RPC, because the network is [unreliable](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing) by its nature:
 
 
@@ -31,7 +33,7 @@ However, it is not possible to completely hide the intermediate network communic
 * The network can fail, so clients may throw a network-related exception.
 * The network can *partially* fail, so clients have to use retries, and servers should be idempotent.
 
-(When studying gRPC, pay attention to how these potential network problems were taken into account during its development.)
+>When studying gRPC, pay attention to how these potential network problems were taken into account during its development.
 
 
 #### The problem
@@ -109,7 +111,7 @@ Based on whether a method handles a single message or a stream of messages on th
 * *Unary*: the client sends a single request, and the server replies with a single response.
 * *Server-side streaming*: the client sends a single request, and the server replies with multiple responses.
 * *Client-side streaming*: the client sends multiple requests, and the server replies with a single response.
-* *Bidirectional streaming*: both the client and server exchange multiple requests and responses simultaneously, providing full-duplex communication.
+* *Bidirectional streaming*: both the client and server exchange multiple requests and responses simultaneously.
 
 
 ```
@@ -183,7 +185,7 @@ service EchoService {
 ```
 
 
-(The *java_package* option defines the package where the generated Java classes are placed. In contrast, the *package* directive defines Protobuf namespace and is part of the cross-platform contract between clients and servers.)
+>The *java_package* option defines the package where the generated Java classes are placed. In contrast, the *package* directive defines the Protobuf namespace and is part of the cross-platform contract between clients and servers.
 
 
 ##### Generating service and client stubs
@@ -200,10 +202,10 @@ For the EchoService, an EchoServiceGrpc class is generated, containing inner cla
 
 * EchoServiceStub: to make asynchronous calls using the StreamObserver interface (it supports all four communication patterns)
 * EchoServiceBlockingStub: to make synchronous calls (it supports unary and server-streaming calls only)
-* EchoServiceBlockingV2Stub: to make synchronous calls (it also supports unary as a stable feature and all 3 streaming communication patterns as experimental features), but throws checked StatusException instead of runtime StatusRuntimeException). <sup>Use this to ensure that potential gRPC errors are not ignored, which may happen when using runtime exceptions.</sup>
+* EchoServiceBlockingV2Stub: to make synchronous calls (it supports unary calls as a stable feature and all 3 streaming calls as experimental features), but can throw checked StatusException instead of runtime StatusRuntimeException. <sup>Use this to ensure that potential gRPC errors are not ignored, which may happen when using runtime exceptions.</sup>
 * EchoServiceFutureStub: to asynchronous calls with the [ListenableFuture](https://javadoc.io/doc/com.google.guava/guava/latest/com/google/common/util/concurrent/ListenableFuture.html) interface (it supports unary calls only)
 
-The [StreamObserver](https://grpc.github.io/grpc-java/javadoc/io/grpc/stub/StreamObserver.html) interface serves as the API for managing streaming between the client and service. It is used by both parties to send and receive messages. For outbound messages, the gRPC library provides an observer instance, and the participant invokes its methods to transmit messages. For inbound messages, the participant implements this interface and passes it to the gRPC library, which then calls the appropriate methods upon message reception.
+The [StreamObserver](https://grpc.github.io/grpc-java/javadoc/io/grpc/stub/StreamObserver.html) interface serves as the API for an observable stream of messages. It is used by both a client and a service to send and receive messages. For outbound messages, the gRPC library provides an observer instance, and the sender invokes its methods to transmit messages. For inbound messages, the receiver implements this interface and passes it to the gRPC library, which then calls the appropriate methods upon message reception:
 
 
 ```
@@ -379,7 +381,7 @@ gRPC is an effective framework for implementing inter-service communication. How
 * Automatic generation of gRPC service and client stubs is available for all required programming languages and platforms.
 * Both the client and server are developed within the same organization, and the application operates in a controlled environment.
 * Your organization has strong development standards that require clearly defined client–server contracts specified in *.proto* files.
-* Developers benefit from built-in gRPC capabilities, such as including requests deadline/retry/cancellation, manual flow control, health checking, and advanced error handling.
+* Developers benefit from built-in gRPC capabilities, such as including request deadline/retries/cancellation, manual flow control, health checking, and advanced error handling.
 
 However, REST is a more appropriate architecture if the application meets most of the following conditions:
 

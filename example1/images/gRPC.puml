@@ -1,5 +1,6 @@
 @startuml
 
+scale 1.1
 skinparam linetype ortho
 
 skinparam rectangle {
@@ -12,21 +13,21 @@ skinparam file {
   BorderColor black
 }
 
-skinparam card {
+skinparam cloud {
   BackgroundColor transparent
   BorderColor black
 }
 
-rectangle "client" as C1
-rectangle "client stub" as C2
+rectangle "Client" as C1
+rectangle "Client stub" as C2
 rectangle "gRPC runtime" as C3
 
-rectangle "server" as S1
-rectangle "service stub" as S2
+rectangle "Server" as S1
+rectangle "Service stub" as S2
 rectangle "gRPC runtime" as S3
 
 file "ProtoBuf" as P
-card "HTTP/2" as H
+cloud "HTTP/2" as H
 
 C1 -down- C2
 C2 -down- C3
@@ -37,7 +38,7 @@ S2 -down- S3
 C2 --[dotted]right-- P
 P --[dotted]right-- S2
 
-C3 -right- H
-H -right- S3
+C3 --right-- H
+H --right-- S3
 
 @enduml

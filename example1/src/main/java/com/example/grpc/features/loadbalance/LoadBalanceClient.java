@@ -29,7 +29,7 @@ public class LoadBalanceClient {
         try {
             response = blockingStub.unaryEcho(request);
         } catch (StatusRuntimeException e) {
-            logger.log(Level.WARNING, "error: {0}", e.getStatus());
+            logger.log(Level.WARNINGING, "error: {0}", e.getStatus());
             return;
         }
         logger.info("response: " + response.getMessage());

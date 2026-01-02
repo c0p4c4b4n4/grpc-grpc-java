@@ -22,7 +22,7 @@ public class ServerStreamingServer {
     private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
         @Override
         public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-            logger.info("request: " + request.getMessage());
+            logger.log(Level.INFO, "request: {0}", request.getMessage());
 
             var serverObserver = (ServerCallStreamObserver<EchoResponse>) responseObserver;
             for (int i = 1; i <= 7; i++) {

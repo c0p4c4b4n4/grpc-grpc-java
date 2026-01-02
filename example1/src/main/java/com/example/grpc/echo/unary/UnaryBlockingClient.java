@@ -24,7 +24,7 @@ public class UnaryBlockingClient {
             var response = blockingStub.unaryEcho(request);
             logger.info("response: " + response.getMessage());
         } catch (StatusRuntimeException e) {
-            logger.warning("error: " + e.getStatus());
+            logger.log(Level.WARNINGING, "error: {0}", e.getStatus());
         } finally {
             channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
         }

@@ -25,7 +25,7 @@ public class ClientStreamingServer {
 
                 @Override
                 public void onNext(EchoRequest request) {
-                    logger.info("request: " + request.getMessage());
+                    logger.log(Level.INFO, "request: {0}", request.getMessage());
                     accumulator.append(request.getMessage()).append(" ");
                 }
 

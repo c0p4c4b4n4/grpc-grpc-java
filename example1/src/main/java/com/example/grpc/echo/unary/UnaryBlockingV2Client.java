@@ -8,6 +8,7 @@ import io.grpc.StatusException;
 import io.grpc.StatusRuntimeException;
 
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class UnaryBlockingV2Client {
@@ -25,7 +26,7 @@ public class UnaryBlockingV2Client {
             var response = blockingStub.unaryEcho(request);
             logger.info("response: " + response.getMessage());
         } catch (StatusException e) {
-            logger.warning("error: " + e.getStatus());
+            logger.log(Level.WARNING, "error: {0}", e.getStatus());
         } finally {
             channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
         }

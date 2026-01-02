@@ -63,7 +63,7 @@ public class UnaryBlockingClient extends Loggable {
             var response = echoBlockingStub.unaryEcho(request);
             logger.info("greeting: " + response.getMessage());
         } catch (StatusRuntimeException e) {
-            logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
+            logger.log(Level.WARNINGING, "RPC failed: {0}", e.getStatus());
             return;
         }
     }

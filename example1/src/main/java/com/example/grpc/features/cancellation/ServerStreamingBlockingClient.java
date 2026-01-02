@@ -42,7 +42,7 @@ public class ServerStreamingBlockingClient {
             }
 
         } catch (StatusRuntimeException e) {
-            logger.warning("error: " + e.getStatus());
+            logger.log(Level.WARNING, "error: {0}", e.getStatus());
         } finally {
             channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
         }

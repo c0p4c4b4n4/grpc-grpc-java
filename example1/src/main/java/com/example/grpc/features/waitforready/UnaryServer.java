@@ -6,6 +6,7 @@ import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
 import io.grpc.stub.StreamObserver;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class UnaryServer {

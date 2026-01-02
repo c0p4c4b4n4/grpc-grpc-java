@@ -27,7 +27,7 @@ public class BidirectionalStreamingServer {
                     logger.log(Level.INFO, "next: {0}", request.getMessage());
                     var response1 = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
                     responseObserver.onNext(response1);
-                    var response2 = EchoResponse.newBuilder().setMessage("hallo " + request.getMessage()).build();
+                    var response2 = EchoResponse.newBuilder().setMessage("guten tag " + request.getMessage()).build();
                     responseObserver.onNext(response2);
                     var response3 = EchoResponse.newBuilder().setMessage("bonjour " + request.getMessage()).build();
                     responseObserver.onNext(response3);

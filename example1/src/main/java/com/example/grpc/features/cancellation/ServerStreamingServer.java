@@ -9,6 +9,7 @@ import io.grpc.Status;
 import io.grpc.stub.ServerCallStreamObserver;
 import io.grpc.stub.StreamObserver;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ServerStreamingServer {

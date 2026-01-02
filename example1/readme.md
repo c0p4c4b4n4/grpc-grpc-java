@@ -81,7 +81,7 @@ message ChatMessage {
 ```
 
 
-*Types* include scalar types — 32/64-bit integers, 32/64-bit floating-point numbers, booleans, UTF-8 strings, bytes, and composite types — enumerations, structures, maps, and arrays. Interestingly, the type system provides 10 integer types that allow developers to select the most space-efficient type. The developer must choose the type for an integer field, based on whether its values are positive, negative, or can include both, and whether they are typically small or evenly distributed across the range:
+*Types* include scalar types — 32/64-bit integers, 32/64-bit floating-point numbers, booleans, UTF-8 strings, bytes, and composite types — enumerations, structures, maps, and arrays. Interestingly, the type system provides 10 integer types that allow developers to select the most space-efficient type. The developer should choose the type for an integer field, based on whether its values are positive, negative, or can include both, and whether they are typically small or evenly distributed across the range:
 
 
 
@@ -233,17 +233,20 @@ To process a client request, the server performs the following steps: for each m
 
 
 ```
-static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
-   @Override
-   public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-       logger.log(Level.INFO, "request: {0}", request.getMessage());
-       for (int i = 1; i <= 3; i++) {
-           String value = "hello " + request.getMessage() + " " + i;
-           EchoResponse response = EchoResponse.newBuilder().setMessage(value).build();
-           responseObserver.onNext(response);
-       }
-       responseObserver.onCompleted();
-   }
+private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    @Override
+    public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
+        logger.log(Level.INFO, "request: {0}", request.getMessage());
+
+        var response1 = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
+        responseObserver.onNext(response1);
+        var response2 = EchoResponse.newBuilder().setMessage("guten tag " + request.getMessage()).build();
+        responseObserver.onNext(response2);
+        var response3 = EchoResponse.newBuilder().setMessage("bonjour " + request.getMessage()).build();
+        responseObserver.onNext(response3);
+
+        responseObserver.onCompleted();
+    }
 }
 ```
 
@@ -264,8 +267,9 @@ logger.log(Level.INFO, "server started, listening on {0}", port);
 Runtime.getRuntime().addShutdownHook(new Thread(() -> {
    System.err.println("server is shutting down");
    try {
-       server.shutdown().awaitTermination(10, TimeUnit.SECONDS);
+       server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
    } catch (InterruptedException e) {
+       System.err.println("server shutdown was interrupted");
        server.shutdownNow();
    }
    System.err.println("server has been shut down");
@@ -305,7 +309,7 @@ try {
 } catch (StatusRuntimeException e) {
     logger.log(Level.WARNING, "error: {0}", e.getStatus());
 } finally {
-   channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
+   channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
 }
 ```
 
@@ -342,7 +346,7 @@ asyncStub.serverStreamingEcho(request, new StreamObserver<EchoResponse>() {
 });
 
 latch.await();
-channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
+channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
 ```
 
 
@@ -351,12 +355,20 @@ In this implementation, the client *does not block* on the serverStreamingEcho m
 
 ##### Running the server and client
 
-To build the application, execute the Gradle task *./gradlew clean shadowJar*. Then start the server first, and then start the client:
+To build the application, execute the Gradle task *shadowJar* to create an über *.jar* file without the main Java class. Then start the server first, and then start the client:
 
 
 ```
-java -cp build/libs/examples-all.jar com.example.grpc.server_streaming.ServerStreamingEchoServer
-java -cp build/libs/examples-all.jar com.example.grpc.server_streaming.ServerStreamingEchoBlockingClient
+./gradlew clean shadowJar
+
+java -cp build/libs/examples-all.jar com.example.grpc.echo.streaming.server.ServerStreamingEchoServer
+server started, listening on 50051
+request: world
+
+java -cp build/libs/examples-all.jar com.example.grpc.echo.streaming.server.ServerStreamingEchoBlockingClient
+response: hello world
+response: guten tag world
+response: bonjour world
 ```
 
 

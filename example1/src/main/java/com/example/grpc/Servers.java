@@ -14,7 +14,8 @@ public final class Servers {
         Loggers.init();
 
         var port = 50051;
-        var server = ServerBuilder.forPort(port)
+        var server = ServerBuilder
+            .forPort(port)
             .addService(bindableService)
             .build()
             .start();

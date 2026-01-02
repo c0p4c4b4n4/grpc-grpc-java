@@ -28,22 +28,22 @@ public class UnaryFutureClient {
         var request = EchoRequest.newBuilder().setMessage("world").build();
         var responseFuture = futureStub.unaryEcho(request);
 
-        var latch = new CountDownLatch(1);
+        var done = new CountDownLatch(1);
         Futures.addCallback(responseFuture, new FutureCallback<>() {
             @Override
             public void onSuccess(EchoResponse response) {
                 logger.info("result: " + response.getMessage());
-                latch.countDown();
+                done.countDown();
             }
 
             @Override
             public void onFailure(Throwable t) {
                 logger.log(Level.WARNING, "error: {0}", Status.fromThrowable(t));
-                latch.countDown();
+                done.countDown();
             }
         }, MoreExecutors.directExecutor());
 
-        latch.await();
+        done.await();
         channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
     }
 }

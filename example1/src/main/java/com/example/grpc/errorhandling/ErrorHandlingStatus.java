@@ -84,7 +84,7 @@ public class ErrorHandlingStatus {
         var stub = EchoServiceGrpc.newFutureStub(channel);
         var response = stub.unaryEcho(EchoRequest.newBuilder().setMessage("Maggie").build());
 
-        var latch = new CountDownLatch(1);
+        var done = new CountDownLatch(1);
         Futures.addCallback(response, new FutureCallback<EchoResponse>() {
                 @Override
                 public void onSuccess(EchoResponse result) {
@@ -94,12 +94,12 @@ public class ErrorHandlingStatus {
                 @Override
                 public void onFailure(Throwable t) {
                     verifyErrorResponse(t);
-                    latch.countDown();
+                    done.countDown();
                 }
             },
             MoreExecutors.directExecutor());
 
-        if (!Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS)) {
+        if (!Uninterruptibles.awaitUninterruptibly(done, 1, TimeUnit.SECONDS)) {
             throw new RuntimeException("timeout!");
         }
     }
@@ -108,7 +108,7 @@ public class ErrorHandlingStatus {
         var stub = EchoServiceGrpc.newStub(channel);
         var request = EchoRequest.newBuilder().setMessage("Homer").build();
 
-        var latch = new CountDownLatch(1);
+        var done = new CountDownLatch(1);
         var responseObserver = new StreamObserver<EchoResponse>() {
             @Override
             public void onNext(EchoResponse value) {
@@ -118,7 +118,7 @@ public class ErrorHandlingStatus {
             @Override
             public void onError(Throwable t) {
                 verifyErrorResponse(t);
-                latch.countDown();
+                done.countDown();
             }
 
             @Override
@@ -128,7 +128,7 @@ public class ErrorHandlingStatus {
         };
         stub.unaryEcho(request, responseObserver);
 
-        if (!Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS)) {
+        if (!Uninterruptibles.awaitUninterruptibly(done, 1, TimeUnit.SECONDS)) {
             throw new RuntimeException("timeout!");
         }
     }

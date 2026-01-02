@@ -1,5 +1,6 @@
 package com.example.grpc.manualflowcontrol;
 
+import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
@@ -11,6 +12,7 @@ import io.grpc.stub.StreamObserver;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ManualFlowControlServer {
@@ -117,26 +119,28 @@ public class ManualFlowControlServer {
             }
         };
 
-        final var server = ServerBuilder
+        Loggers.init();
+
+        var port = 50051;
+        var server = ServerBuilder
             .forPort(50051)
             .addService(service)
             .build()
             .start();
 
-        logger.info("Listening on " + server.getPort());
+        logger.log(Level.INFO, "server started, listening on {0}", port);
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                // Use stderr here since the logger may have been reset by its JVM shutdown hook.
-                System.err.println("Shutting down");
-                try {
-                    server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
-                } catch (InterruptedException e) {
-                    e.printStackTrace(System.err);
-                }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.err.println("server is shutting down");
+            try {
+                server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                System.err.println("server shutdown was interrupted");
+                server.shutdownNow();
             }
-        });
+            System.err.println("server has been shut down");
+        }));
+
         server.awaitTermination();
     }
 }

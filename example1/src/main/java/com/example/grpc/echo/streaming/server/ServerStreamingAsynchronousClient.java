@@ -25,7 +25,7 @@ public class ServerStreamingAsynchronousClient {
         var asyncStub = EchoServiceGrpc.newStub(channel);
         var request = EchoRequest.newBuilder().setMessage("world").build();
 
-        var latch = new CountDownLatch(1);
+        var done = new CountDownLatch(1);
         asyncStub.serverStreamingEcho(request, new StreamObserver<EchoResponse>() {
             @Override
             public void onNext(EchoResponse response) {
@@ -35,17 +35,17 @@ public class ServerStreamingAsynchronousClient {
             @Override
             public void onError(Throwable t) {
                 logger.log(Level.WARNING, "error: {0}", Status.fromThrowable(t));
-                latch.countDown();
+                done.countDown();
             }
 
             @Override
             public void onCompleted() {
                 logger.info("completed");
-                latch.countDown();
+                done.countDown();
             }
         });
 
-        latch.await();
+        done.await();
         channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
     }
 }

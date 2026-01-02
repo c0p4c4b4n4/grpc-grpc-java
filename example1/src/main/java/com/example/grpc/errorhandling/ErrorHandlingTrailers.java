@@ -109,7 +109,7 @@ public class ErrorHandlingTrailers {
         var stub = EchoServiceGrpc.newFutureStub(channel);
         var response = stub.unaryEcho(EchoRequest.newBuilder().build());
 
-        var latch = new CountDownLatch(1);
+        var done = new CountDownLatch(1);
         Futures.addCallback(
             response,
             new FutureCallback<EchoResponse>() {
@@ -121,12 +121,12 @@ public class ErrorHandlingTrailers {
                 @Override
                 public void onFailure(Throwable t) {
                     verifyErrorResponse(t);
-                    latch.countDown();
+                    done.countDown();
                 }
             },
             MoreExecutors.directExecutor());
 
-        if (!Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS)) {
+        if (!Uninterruptibles.awaitUninterruptibly(done, 1, TimeUnit.SECONDS)) {
             throw new RuntimeException("timeout!");
         }
     }
@@ -135,7 +135,7 @@ public class ErrorHandlingTrailers {
         var stub = EchoServiceGrpc.newStub(channel);
         var request = EchoRequest.newBuilder().build();
 
-        var latch = new CountDownLatch(1);
+        var done = new CountDownLatch(1);
         var responseObserver = new StreamObserver<EchoResponse>() {
             @Override
             public void onNext(EchoResponse value) {
@@ -145,7 +145,7 @@ public class ErrorHandlingTrailers {
             @Override
             public void onError(Throwable t) {
                 verifyErrorResponse(t);
-                latch.countDown();
+                done.countDown();
             }
 
             @Override
@@ -155,7 +155,7 @@ public class ErrorHandlingTrailers {
         };
         stub.unaryEcho(request, responseObserver);
 
-        if (!Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS)) {
+        if (!Uninterruptibles.awaitUninterruptibly(done, 1, TimeUnit.SECONDS)) {
             throw new RuntimeException("timeout!");
         }
     }

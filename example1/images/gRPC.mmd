@@ -3,10 +3,9 @@ block-beta
 
     A1["Client"]        space space space        B1["Server"]
     space               space space space        space
-    A2["Client stub"]   space space space        B2["Service stub"]
+    A2["Client stub"]   space P["ProtoBuf"] space        B2["Service stub"]
     space               space space space        space
     A3["gRPC runtime"]  space E["HTTP/2"] space  B3["gRPC runtime"]
-    space               P["ProtoBuf"] space      space
 
     A1 <--> A2
     A2 <--> A3
@@ -17,5 +16,5 @@ block-beta
     A3 <--> E
     B3 <--> E
 
-    A2 -.-> P
+    P -.-> A2
     P -.-> B2

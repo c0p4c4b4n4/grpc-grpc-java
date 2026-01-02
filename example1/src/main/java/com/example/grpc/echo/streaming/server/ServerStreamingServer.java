@@ -20,11 +20,14 @@ public class ServerStreamingServer {
         @Override
         public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
             logger.info("request: " + request.getMessage());
-            for (int i = 1; i <= 7; i++) {
-                var message = "hello " + request.getMessage() + " " + i;
-                var response = EchoResponse.newBuilder().setMessage(message).build();
-                responseObserver.onNext(response);
-            }
+
+            var response1 = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
+            responseObserver.onNext(response1);
+            var response2 = EchoResponse.newBuilder().setMessage("guten tag " + request.getMessage()).build();
+            responseObserver.onNext(response2);
+            var response3 = EchoResponse.newBuilder().setMessage("bonjour " + request.getMessage()).build();
+            responseObserver.onNext(response3);
+
             responseObserver.onCompleted();
         }
     }

@@ -2,6 +2,21 @@
 
 skinparam linetype ortho
 
+skinparam rectangle {
+  BackgroundColor transparent
+  BorderColor black
+}
+
+skinparam file {
+  BackgroundColor transparent
+  BorderColor black
+}
+
+skinparam card {
+  BackgroundColor transparent
+  BorderColor black
+}
+
 rectangle "client" as C1
 rectangle "client stub" as C2
 rectangle "gRPC runtime" as C3
@@ -10,7 +25,7 @@ rectangle "server" as S1
 rectangle "service stub" as S2
 rectangle "gRPC runtime" as S3
 
-file ".proto" as P
+file "ProtoBuf" as P
 card "HTTP/2" as H
 
 C1 -down- C2

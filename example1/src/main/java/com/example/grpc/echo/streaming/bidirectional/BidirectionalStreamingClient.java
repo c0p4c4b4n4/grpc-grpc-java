@@ -9,6 +9,7 @@ import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class BidirectionalStreamingClient {
@@ -24,12 +25,12 @@ public class BidirectionalStreamingClient {
         var requestObserver = asyncStub.bidirectionalStreamingEcho(new StreamObserver<>() {
             @Override
             public void onNext(EchoResponse response) {
-                logger.info("next: " + response.getMessage());
+                logger.log(Level.INFO, "next: {0}", response.getMessage());
             }
 
             @Override
             public void onError(Throwable t) {
-                logger.warning("error: " + Status.fromThrowable(t));
+                logger.log(Level.WARNING, "error: {0}", Status.fromThrowable(t));
             }
 
             @Override
@@ -38,9 +39,9 @@ public class BidirectionalStreamingClient {
             }
         });
 
-        requestObserver.onNext(EchoRequest.newBuilder().setMessage("one").build());
-        requestObserver.onNext(EchoRequest.newBuilder().setMessage("two").build());
-        requestObserver.onNext(EchoRequest.newBuilder().setMessage("three").build());
+        requestObserver.onNext(EchoRequest.newBuilder().setMessage("world").build());
+        requestObserver.onNext(EchoRequest.newBuilder().setMessage("welt").build());
+        requestObserver.onNext(EchoRequest.newBuilder().setMessage("monde").build());
         requestObserver.onCompleted();
 
         channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);

@@ -28,12 +28,12 @@ public class UnaryAsynchronousClient {
         asyncStub.unaryEcho(request, new StreamObserver<>() {
             @Override
             public void onNext(EchoResponse response) {
-                logger.info("next: " + response.getMessage());
+                logger.log(Level.INFO, "next: {0}", response.getMessage());
             }
 
             @Override
             public void onError(Throwable t) {
-                logger.warning("error: " + Status.fromThrowable(t));
+                logger.log(Level.WARNING, "error: {0}", Status.fromThrowable(t));
                 latch.countDown();
             }
 

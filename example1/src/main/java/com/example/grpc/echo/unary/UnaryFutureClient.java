@@ -12,6 +12,7 @@ import io.grpc.Status;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class UnaryFutureClient {
@@ -37,7 +38,7 @@ public class UnaryFutureClient {
 
             @Override
             public void onFailure(Throwable t) {
-                logger.warning("error: " + Status.fromThrowable(t));
+                logger.log(Level.WARNING, "error: {0}", Status.fromThrowable(t));
                 latch.countDown();
             }
         }, MoreExecutors.directExecutor());

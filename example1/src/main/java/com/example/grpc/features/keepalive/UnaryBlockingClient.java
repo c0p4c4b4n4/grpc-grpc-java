@@ -28,7 +28,7 @@ public class UnaryBlockingClient {
             var blockingStub = EchoServiceGrpc.newBlockingStub(channel);
             var request = EchoRequest.newBuilder().setMessage("world").build();
             var response = blockingStub.unaryEcho(request);
-            logger.info("response: " + response.getMessage());
+            logger.log(Level.INFO, "response: {0}", response.getMessage());
 
             Delays.sleep(30);
         } catch (StatusRuntimeException e) {

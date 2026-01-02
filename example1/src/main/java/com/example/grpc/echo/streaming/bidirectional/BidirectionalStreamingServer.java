@@ -7,6 +7,7 @@ import com.example.grpc.echo.EchoServiceGrpc;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class BidirectionalStreamingServer {
@@ -30,7 +31,7 @@ public class BidirectionalStreamingServer {
 
                 @Override
                 public void onError(Throwable t) {
-                    logger.warning("error: " + Status.fromThrowable(t));
+                    logger.log(Level.WARNING, "error: {0}", Status.fromThrowable(t));
                 }
 
                 @Override

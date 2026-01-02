@@ -25,7 +25,7 @@ public class UnaryBlockingClient {
                 .withDeadline(Deadline.after(30, TimeUnit.SECONDS));
             var request = EchoRequest.newBuilder().setMessage("world").build();
             var response = blockingStub.unaryEcho(request);
-            logger.info("response: " + response.getMessage());
+            logger.log(Level.INFO, "response: {0}", response.getMessage());
         } catch (StatusRuntimeException e) {
             logger.log(Level.WARNING, "error: {0}", e.getStatus());
         } finally {

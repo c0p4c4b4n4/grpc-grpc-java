@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class UnaryBlockingClient extends Loggable {
+public class UnaryBlockingClient {
 
     private static final Logger logger = Logger.getLogger(UnaryBlockingClient.class.getName());
 

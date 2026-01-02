@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
-public class UnaryServer extends Loggable {
+public class UnaryServer {
 
     private static final Logger logger = Logger.getLogger(UnaryServer.class.getName());
 

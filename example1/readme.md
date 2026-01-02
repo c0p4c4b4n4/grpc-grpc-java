@@ -33,19 +33,19 @@ However, it is not possible to completely hide the intermediate network communic
 * The network can fail, so clients may throw a network-related exception.
 * The network can *partially* fail, so clients have to use retries, and servers should be idempotent.
 
->When studying gRPC, pay attention to how these potential network problems were taken into account during its development.
+>When studying gRPC, pay attention to how these potential network problems were addressed during its development.
 
 
 #### The problem
 
 When developing an effective RPC framework, developers had to address two primary challenges. First, developers needed to ensure efficient cross-platform serialization. Solutions, based on textual formats (such as XML, JSON, or YAML), are typically an order of magnitude less efficient than binary formats. They require additional computational resources for serialization and additional network resources for transmitting larger messages. Solutions based on binary formats often face significant challenges in ensuring portability across different languages.
 
-Second, there was an absence of an efficient application-layer network protocol specifically designed for modern inter-service communication. The HTTP protocol was originally designed for browsers to retrieve resources within the hypermedia network. It was not designed to support high-speed, bidirectional, simultaneous communication. Various workarounds based on this protocol (short and long polling, streaming, webhooks) were inherently inefficient in their utilization of computational and network resources. Solutions built on the TCP transport-layer protocol were overly complex due to the low-level nature of the protocol.
+Second, there was an absence of an efficient application-layer network protocol specifically designed for modern inter-service communication. The HTTP protocol was originally designed for browsers to retrieve resources within the hypermedia network. It was not designed to support high-speed, bidirectional, simultaneous communication. Various workarounds based on this protocol (short and long polling, streaming, webhooks) were inherently inefficient in their utilization of computational and network resources. Solutions built on the TCP transport-layer protocol were overly complex due to the protocol’s low-level nature.
 
 
 #### The solution
 
-Since 2001, Google has been developing an internal RPC framework called Stubby. It was designed to connect almost all of the internal services both within and across Google data centers. Stubby was a high-performance, cross-platform framework built on Protobuf for serialization.
+Since 2001, Google has been developing an internal RPC framework called Stubby. It was designed to connect almost all internal services, both within and across Google data centers. Stubby was a high-performance, cross-platform framework built on Protobuf for serialization.
 
 Only in 2015, with the emergence of the innovative HTTP/2 protocol, Google decided to leverage its features in a redesigned version of Stubby. References to Google's internal infrastructure were removed from the framework, and the project was redesigned to comply with public open source standards. The framework has also been adapted for use in mobile devices, IoT, and cloud-native applications. This updated version was released as gRPC (which recursively stands for "gRPC Remote Procedure Calls").
 
@@ -91,7 +91,7 @@ message ChatMessage {
 * *fixed32/64* – for non-negative integers only, encoded with fixed-width encoding (optimized for values that are uniformly distributed)
 * *sfixed32/64* – for positive or negative integers, encoded with fixed-width encoding (optimized for values that are uniformly distributed)
 
-> The ZigZag encoding is a variable-length encoding that uses the least significant bit for sign and is optimized for signed integers with small absolute values, especially those close to zero (0 → 0, -1 → 1, 1 → 2, -2 → 3, 2 → 4, etc.)
+> The ZigZag encoding is a variable-length encoding that uses the least significant bit for sign and is optimized for signed integers with small absolute values, especially those close to zero (0 → 0, -1 → 1, 1 → 2, -2 → 3, 2 → 4, etc)
 
 *Names* are intended for developer readability and are not included in the binary message.
 
@@ -152,7 +152,7 @@ To implement this application, complete the following steps:
 
 ##### The contract between the service and the client
 
-A *.proto* file defines the *contract* between a service and a client. This example shows the *.proto* file used by both clients and servers in the application. Beyond the *message* and *service* definitions discussed earlier, the file also includes additional metadata. Specifically, it declares the use of Protobuf language version 3, and defines options specific to Java applications:
+A *.proto* file defines the contract between a service and a client. This example shows the *.proto* file used by both clients and servers in the application. Beyond the *message* and *service* definitions discussed earlier, the file also includes additional metadata. Specifically, it declares the use of Protobuf language version 3, and defines options specific to Java applications:
 
 
 ```
@@ -163,7 +163,7 @@ syntax = "proto3";
 package example.grpc.echo;
 
 // options
-option java_package = "com.example.grpc";
+option java_package = "com.example.grpc.echo";
 option java_multiple_files = true;
 
 // messages
@@ -185,14 +185,14 @@ service EchoService {
 ```
 
 
->The *java_package* option defines the package where the generated Java classes are placed. In contrast, the *package* directive defines the Protobuf namespace and is part of the cross-platform contract between clients and servers.
+>The *java_package* option defines the package where the generated Java classes are placed. In contrast, the *package* directive defines the Protobuf namespace and is part of the cross-platform contract between clients and services.
 
 
 ##### Generating service and client stubs
 
-To use gRPC in your Gradle project, place your *.proto* file in the *src/main/proto* directory, add the required gRPC Gradle dependencies, and configure the Protobuf Gradle plugin.
+To use gRPC in your Gradle project, place your *.proto* file in the *src/main/proto* directory, add the required implementation and runtime gRPC dependencies, and configure the Protobuf Gradle plugin.
 
-Next, execute a Gradle task (*./gradlew generateProto* or *./gradlew compileJava* or just *./gradlew build*), and the generated Java classes will be placed in a designated directory (in our example, *build/generated/source/proto/main/java*). These generated classes fall into two categories: message definition classes and service definition classes.
+Next, execute a Gradle task (*./gradlew generateProto* or *./gradlew compileJava* or *./gradlew build*), and the generated Java classes will be placed in a designated directory (in our example, *build/generated/source/proto/main/java*). These generated classes fall into two categories: message definition classes and service definition classes.
 
 For the EchoRequest message, an immutable EchoRequest class is generated to handle data storage and serialization, along with an inner EchoRequest.Builder class to create the EchoRequest class using the builder pattern. Similar classes are generated for the EchoResponse message.
 
@@ -286,7 +286,7 @@ The next step in the application implementation is to create an echo client. To 
 * Obtain a client stub for the required communication pattern.
 * Invoke the service method using the obtained client stub.
 
-We create a channel using the ManagedChannelBuilder class, specifying the server host and port we want to connect. In the first client example, a blocking stub is used. This stub is obtained from the auto-generated EchoServiceGrpc class by calling the newBlockingStub factory method and passing the channel as an argument. With this approach, the client *blocks* while invoking the serverStreamingEcho method and waits for the server’s response. The call either returns a response from the server or throws a StatusRuntimeException, in which a gRPC error is encoded as a Status.
+We create a channel using the ManagedChannelBuilder class, specifying the server host and port we want to connect to. In the first client example, a blocking stub is used. This stub is obtained from the auto-generated EchoServiceGrpc class by calling the newBlockingStub factory method and passing the channel as an argument. With this approach, the client *blocks* while invoking the serverStreamingEcho method and waits for the server’s response. The call either returns a response from the server or throws a StatusRuntimeException, in which a gRPC error is encoded as a Status.
 
 Because this example demonstrates server-side streaming with a blocking stub, the request is provided as a method parameter, and the response is returned as an iterator. After the call is completed, the channel is shut down to ensure that the underlying resources (threads and TCP connections) are released.
 
@@ -381,7 +381,7 @@ gRPC is an effective framework for implementing inter-service communication. How
 * Automatic generation of gRPC service and client stubs is available for all required programming languages and platforms.
 * Both the client and server are developed within the same organization, and the application operates in a controlled environment.
 * Your organization has strong development standards that require clearly defined client–server contracts specified in *.proto* files.
-* Developers benefit from built-in gRPC capabilities, such as including request deadline/retries/cancellation, manual flow control, health checking, and advanced error handling.
+* Developers benefit from built-in gRPC capabilities, such as request deadline/retries/cancellation, manual flow control, health checking, and advanced error handling.
 
 However, REST is a more appropriate architecture if the application meets most of the following conditions:
 

@@ -5,7 +5,7 @@
 
 gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google and currently governed by the Cloud Native Computing Foundation. gRPC is designed to provide high-performance inter-service communication within and between data centers, as well as for resource-constrained mobile and IoT applications.
 
-gRPC uses Protocol Buffers as a binary serialization format and RPC interface description language, and HTTP/2 as the application-layer protocol. Thanks to these features, gRPC can provide qualitative and quantitative characteristics of inter-service communication that are not available with REST (that most often means transferring textual JSONs over the HTTP/1.1 protocol).
+gRPC uses Protocol Buffers as a binary serialization format and RPC interface description language, and HTTP/2 as the application-layer protocol. Thanks to these features, gRPC can provide qualitative and quantitative characteristics of communication between (micro)services that are not available with REST (that most often means transferring textual JSONs over the HTTP/1.1 protocol).
 
 
 #### Why not REST?
@@ -118,7 +118,7 @@ Based on whether a method handles a single message or a stream of messages on th
 * *Unary*: the client sends a single request, and the server replies with a single response.
 * *Server-side streaming*: the client sends a single request, and the server replies with multiple responses.
 * *Client-side streaming*: the client sends multiple requests, and the server replies with a single response.
-* *Bidirectional streaming*: both the client and server exchange multiple messages simultaneously, enabling full-duplex communication.
+* *Bidirectional streaming*: both the client and server exchange multiple requests and responses simultaneously, providing full-duplex communication.
 
 
 ```
@@ -291,7 +291,7 @@ The next step in the application implementation is to create an echo client. To 
 
 We create a channel using the ManagedChannelBuilder class, specifying the server host and port we want to connect. In the first client example, a blocking stub is used. This stub is obtained from the auto-generated EchoServiceGrpc class by calling the newBlockingStub factory method and passing the channel as an argument. With this approach, the client *blocks* while invoking the serverStreamingEcho method and waits for the server’s response. The call either returns a response from the server or throws a StatusRuntimeException, in which a gRPC error is encoded as a Status.
 
-Because this example demonstrates server-side streaming with a blocking stub, the request is provided as a method parameter, and the response is returned as an iterator. After the call is completed, the channel is shut down to ensure that the underlying network resources are released.
+Because this example demonstrates server-side streaming with a blocking stub, the request is provided as a method parameter, and the response is returned as an iterator. After the call is completed, the channel is shut down to ensure that the underlying resources (threads and TCP connections) are released.
 
 
 ```
@@ -396,4 +396,4 @@ However, REST is a more appropriate architecture if the application meets most o
 * The application exposes a public API designed for consumption by a broad audience of external developers beyond your organization.
 * Your organization can achieve successful backward and forward compatibility and versioning without strict constraints.
 
-As a rule of thumb, you should migrate your RESTful services to gRPC when you need high-performance inter-service communication — such as low-latency or high-throughput with unidirectional or bidirectional streaming — especially in internal microservice applications.
+As a rule of thumb, you should migrate your RESTful services to gRPC when you need low-latency and high-throughput inter-service communication — with unidirectional or bidirectional streaming — especially in internal microservice applications.

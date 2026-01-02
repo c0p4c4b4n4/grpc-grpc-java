@@ -6,14 +6,12 @@ import com.example.grpc.echo.EchoServiceGrpc;
 import com.google.common.base.Verify;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.Uninterruptibles;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.InsecureServerCredentials;
 import io.grpc.ManagedChannel;
-import io.grpc.Server;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 

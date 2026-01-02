@@ -1,14 +1,12 @@
 package com.example.grpc.healthservice;
 
 import com.example.grpc.Delays;
-import com.example.grpc.Loggable;
 import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
 import io.grpc.Grpc;
 import io.grpc.InsecureServerCredentials;
-import io.grpc.Server;
 import io.grpc.Status;
 import io.grpc.health.v1.HealthCheckResponse.ServingStatus;
 import io.grpc.protobuf.services.HealthStatusManager;

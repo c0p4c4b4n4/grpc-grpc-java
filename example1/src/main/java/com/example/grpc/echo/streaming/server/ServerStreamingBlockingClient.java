@@ -24,7 +24,7 @@ public class ServerStreamingBlockingClient {
             var responses = blockingStub.serverStreamingEcho(request);
 
             while (responses.hasNext()) {
-                logger.log(Level.INFO, "response: {0}" , responses.next().getMessage());
+                logger.log(Level.INFO, "response: {0}", responses.next().getMessage());
             }
         } catch (StatusRuntimeException e) {
             logger.log(Level.WARNING, "error: {0}", e.getStatus());

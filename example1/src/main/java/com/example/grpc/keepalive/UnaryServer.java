@@ -6,7 +6,6 @@ import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
 import io.grpc.Grpc;
 import io.grpc.InsecureServerCredentials;
-import io.grpc.Server;
 import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.TimeUnit;

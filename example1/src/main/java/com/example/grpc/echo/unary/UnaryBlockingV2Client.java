@@ -5,7 +5,6 @@ import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoServiceGrpc;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusException;
-import io.grpc.StatusRuntimeException;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;

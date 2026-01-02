@@ -22,7 +22,7 @@ public class ClientStreamingServer {
         @Override
         public StreamObserver<EchoRequest> clientStreamingEcho(StreamObserver<EchoResponse> responseObserver) {
             return new StreamObserver<>() {
-                StringBuilder accumulator = new StringBuilder();
+                final StringBuilder accumulator = new StringBuilder();
 
                 @Override
                 public void onNext(EchoRequest request) {

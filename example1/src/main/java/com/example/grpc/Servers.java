@@ -14,8 +14,8 @@ public final class Servers {
     public static void start(BindableService bindableService, Logger logger) throws IOException, InterruptedException {
         Loggers.init();
 
-        int port = 50051;
-        Server server = ServerBuilder.forPort(port)
+        var port = 50051;
+        var server = ServerBuilder.forPort(port)
             .addService(bindableService)
             .build()
             .start();

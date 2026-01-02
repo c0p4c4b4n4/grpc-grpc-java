@@ -45,7 +45,7 @@ public class ErrorHandlingStatusProto {
                 .addService(new EchoServiceGrpc.EchoServiceImplBase() {
                     @Override
                     public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-                        Status status = Status.newBuilder()
+                        var status = Status.newBuilder()
                             .setCode(Code.INVALID_ARGUMENT.getNumber())
                             .setMessage("Email or password malformed")
                             .addDetails(Any.pack(DEBUG_INFO))
@@ -84,11 +84,11 @@ public class ErrorHandlingStatusProto {
     }
 
     static void verifyErrorResponse(Throwable t) {
-        Status status = StatusProto.fromThrowable(t);
+        var status = StatusProto.fromThrowable(t);
         Verify.verify(status.getCode() == Code.INVALID_ARGUMENT.getNumber());
         Verify.verify(status.getMessage().equals("Email or password malformed"));
         try {
-            DebugInfo unpackedDetail = status.getDetails(0).unpack(DebugInfo.class);
+            var unpackedDetail = status.getDetails(0).unpack(DebugInfo.class);
             Verify.verify(unpackedDetail.equals(DEBUG_INFO));
         } catch (InvalidProtocolBufferException e) {
             Verify.verify(false, "Message was a different type than expected");
@@ -96,7 +96,7 @@ public class ErrorHandlingStatusProto {
     }
 
     static void blockingCall(Channel channel) {
-        EchoServiceGrpc.EchoServiceBlockingStub stub = EchoServiceGrpc.newBlockingStub(channel);
+        var stub = EchoServiceGrpc.newBlockingStub(channel);
         try {
             stub.unaryEcho(EchoRequest.newBuilder().build());
         } catch (Exception e) {
@@ -106,8 +106,8 @@ public class ErrorHandlingStatusProto {
     }
 
     static void futureCallDirect(Channel channel) {
-        EchoServiceGrpc.EchoServiceFutureStub stub = EchoServiceGrpc.newFutureStub(channel);
-        ListenableFuture<EchoResponse> response = stub.unaryEcho(EchoRequest.newBuilder().build());
+        var stub = EchoServiceGrpc.newFutureStub(channel);
+        var response = stub.unaryEcho(EchoRequest.newBuilder().build());
 
         try {
             response.get();
@@ -121,10 +121,10 @@ public class ErrorHandlingStatusProto {
     }
 
     static void futureCallCallback(Channel channel) {
-        EchoServiceGrpc.EchoServiceFutureStub stub = EchoServiceGrpc.newFutureStub(channel);
-        ListenableFuture<EchoResponse> response = stub.unaryEcho(EchoRequest.newBuilder().build());
+        var stub = EchoServiceGrpc.newFutureStub(channel);
+        var response = stub.unaryEcho(EchoRequest.newBuilder().build());
 
-        CountDownLatch latch = new CountDownLatch(1);
+        var latch = new CountDownLatch(1);
         Futures.addCallback(response, new FutureCallback<EchoResponse>() {
                 @Override
                 public void onSuccess(EchoResponse result) {
@@ -146,11 +146,11 @@ public class ErrorHandlingStatusProto {
     }
 
     static void asyncCall(Channel channel) {
-        EchoServiceGrpc.EchoServiceStub stub = EchoServiceGrpc.newStub(channel);
-        EchoRequest request = EchoRequest.newBuilder().build();
+        var stub = EchoServiceGrpc.newStub(channel);
+        var request = EchoRequest.newBuilder().build();
 
-        CountDownLatch latch = new CountDownLatch(1);
-        StreamObserver<EchoResponse> responseObserver = new StreamObserver<EchoResponse>() {
+        var latch = new CountDownLatch(1);
+        var responseObserver = new StreamObserver<EchoResponse>() {
 
             @Override
             public void onNext(EchoResponse value) {

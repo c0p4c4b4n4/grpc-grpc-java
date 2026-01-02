@@ -30,7 +30,7 @@ public class ErrorHandlingStatus {
     private ManagedChannel channel;
 
     void run() throws Exception {
-        Server server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
+        var server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
             .addService(new EchoServiceGrpc.EchoServiceImplBase() {
                 @Override
                 public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
@@ -54,13 +54,13 @@ public class ErrorHandlingStatus {
     }
 
     private void verifyErrorResponse(Throwable t) {
-        Status status = Status.fromThrowable(t);
+        var status = Status.fromThrowable(t);
         Verify.verify(status.getCode() == Status.Code.INTERNAL);
         Verify.verify(status.getDescription().equals("Eggplant"));
     }
 
     void blockingCall() {
-        EchoServiceGrpc.EchoServiceBlockingStub stub = EchoServiceGrpc.newBlockingStub(channel);
+        var stub = EchoServiceGrpc.newBlockingStub(channel);
         try {
             stub.unaryEcho(EchoRequest.newBuilder().setMessage("Bart").build());
         } catch (Exception e) {
@@ -69,8 +69,8 @@ public class ErrorHandlingStatus {
     }
 
     void futureCallDirect() {
-        EchoServiceGrpc.EchoServiceFutureStub stub = EchoServiceGrpc.newFutureStub(channel);
-        ListenableFuture<EchoResponse> response = stub.unaryEcho(EchoRequest.newBuilder().setMessage("Lisa").build());
+        var stub = EchoServiceGrpc.newFutureStub(channel);
+        var response = stub.unaryEcho(EchoRequest.newBuilder().setMessage("Lisa").build());
 
         try {
             response.get();
@@ -83,10 +83,10 @@ public class ErrorHandlingStatus {
     }
 
     void futureCallCallback() {
-        EchoServiceGrpc.EchoServiceFutureStub stub = EchoServiceGrpc.newFutureStub(channel);
-        ListenableFuture<EchoResponse> response = stub.unaryEcho(EchoRequest.newBuilder().setMessage("Maggie").build());
+        var stub = EchoServiceGrpc.newFutureStub(channel);
+        var response = stub.unaryEcho(EchoRequest.newBuilder().setMessage("Maggie").build());
 
-        CountDownLatch latch = new CountDownLatch(1);
+        var latch = new CountDownLatch(1);
         Futures.addCallback(response, new FutureCallback<EchoResponse>() {
                 @Override
                 public void onSuccess(EchoResponse result) {
@@ -107,11 +107,11 @@ public class ErrorHandlingStatus {
     }
 
     void asyncCall() {
-        EchoServiceGrpc.EchoServiceStub stub = EchoServiceGrpc.newStub(channel);
-        EchoRequest request = EchoRequest.newBuilder().setMessage("Homer").build();
+        var stub = EchoServiceGrpc.newStub(channel);
+        var request = EchoRequest.newBuilder().setMessage("Homer").build();
 
-        CountDownLatch latch = new CountDownLatch(1);
-        StreamObserver<EchoResponse> responseObserver = new StreamObserver<EchoResponse>() {
+        var latch = new CountDownLatch(1);
+        var responseObserver = new StreamObserver<EchoResponse>() {
             @Override
             public void onNext(EchoResponse value) {
                 // won't be called

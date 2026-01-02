@@ -23,19 +23,19 @@ public class UnaryBlockingClient {
     public static void main(String[] args) throws Exception {
         Loggers.init();
 
-        ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
+        var channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
 
         try {
-            EchoServiceGrpc.EchoServiceBlockingStub echoBlockingStub = EchoServiceGrpc.newBlockingStub(channel);
-            HealthGrpc.HealthBlockingStub healthBlockingStub = HealthGrpc.newBlockingStub(channel);
+            var echoBlockingStub = EchoServiceGrpc.newBlockingStub(channel);
+            var healthBlockingStub = HealthGrpc.newBlockingStub(channel);
 
-            String[] users = {"Alpha", "Beta", "Gamma"};
+            var users = new String[]{"Alpha", "Beta", "Gamma"};
 
             checkHealth(healthBlockingStub, "before all users");
             greet(echoBlockingStub, users[0]);
             checkHealth(healthBlockingStub, "after user " + users[0]);
 
-            for (String user : users) {
+            for (var user : users) {
                 greet(echoBlockingStub, user);
                 Thread.sleep(100);
             }

@@ -20,8 +20,8 @@ public class UnaryServer {
     public static void main(String[] args) throws Exception {
         Loggers.initWithGrpcLogs();
 
-        int port = 50051;
-        Server server = Grpc.newServerBuilderForPort(port, InsecureServerCredentials.create())
+        var port = 50051;
+        var server = Grpc.newServerBuilderForPort(port, InsecureServerCredentials.create())
             .addService(new EchoServiceImpl())
             .keepAliveTime(5, TimeUnit.SECONDS)
             .keepAliveTimeout(1, TimeUnit.SECONDS)

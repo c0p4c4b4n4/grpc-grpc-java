@@ -46,11 +46,11 @@ public class ErrorHandlingTrailers {
     private ManagedChannel channel;
 
     void run() throws Exception {
-        Server server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
+        var server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
             .addService(new EchoServiceGrpc.EchoServiceImplBase() {
                 @Override
                 public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-                    Metadata trailers = new Metadata();
+                    var trailers = new Metadata();
                     trailers.put(DEBUG_INFO_TRAILER_KEY, DEBUG_INFO);
                     responseObserver.onError(Status.INTERNAL.withDescription(DEBUG_DESC).asRuntimeException(trailers));
                 }
@@ -72,8 +72,8 @@ public class ErrorHandlingTrailers {
     }
 
     void verifyErrorResponse(Throwable t) {
-        Status status = Status.fromThrowable(t);
-        Metadata trailers = Status.trailersFromThrowable(t);
+        var status = Status.fromThrowable(t);
+        var trailers = Status.trailersFromThrowable(t);
         Verify.verify(status.getCode() == Status.Code.INTERNAL);
         Verify.verify(trailers.containsKey(DEBUG_INFO_TRAILER_KEY));
         Verify.verify(status.getDescription().equals(DEBUG_DESC));
@@ -85,7 +85,7 @@ public class ErrorHandlingTrailers {
     }
 
     void blockingCall() {
-        EchoServiceGrpc.EchoServiceBlockingStub stub = EchoServiceGrpc.newBlockingStub(channel);
+        var stub = EchoServiceGrpc.newBlockingStub(channel);
         try {
             stub.unaryEcho(EchoRequest.newBuilder().build());
         } catch (Exception e) {
@@ -94,8 +94,8 @@ public class ErrorHandlingTrailers {
     }
 
     void futureCallDirect() {
-        EchoServiceGrpc.EchoServiceFutureStub stub = EchoServiceGrpc.newFutureStub(channel);
-        ListenableFuture<EchoResponse> response = stub.unaryEcho(EchoRequest.newBuilder().build());
+        var stub = EchoServiceGrpc.newFutureStub(channel);
+        var response = stub.unaryEcho(EchoRequest.newBuilder().build());
 
         try {
             response.get();
@@ -108,10 +108,10 @@ public class ErrorHandlingTrailers {
     }
 
     void futureCallCallback() {
-        EchoServiceGrpc.EchoServiceFutureStub stub = EchoServiceGrpc.newFutureStub(channel);
-        ListenableFuture<EchoResponse> response = stub.unaryEcho(EchoRequest.newBuilder().build());
+        var stub = EchoServiceGrpc.newFutureStub(channel);
+        var response = stub.unaryEcho(EchoRequest.newBuilder().build());
 
-        CountDownLatch latch = new CountDownLatch(1);
+        var latch = new CountDownLatch(1);
         Futures.addCallback(
             response,
             new FutureCallback<EchoResponse>() {
@@ -134,11 +134,11 @@ public class ErrorHandlingTrailers {
     }
 
     void asyncCall() {
-        EchoServiceGrpc.EchoServiceStub stub = EchoServiceGrpc.newStub(channel);
-        EchoRequest request = EchoRequest.newBuilder().build();
+        var stub = EchoServiceGrpc.newStub(channel);
+        var request = EchoRequest.newBuilder().build();
 
-        CountDownLatch latch = new CountDownLatch(1);
-        StreamObserver<EchoResponse> responseObserver = new StreamObserver<EchoResponse>() {
+        var latch = new CountDownLatch(1);
+        var responseObserver = new StreamObserver<EchoResponse>() {
             @Override
             public void onNext(EchoResponse value) {
                 // won't be called

@@ -26,7 +26,7 @@ public class ServerStreamingServer {
             logger.log(Level.INFO, "request: {0}", request.getMessage());
 
             var serverObserver = (ServerCallStreamObserver<EchoResponse>) responseObserver;
-            for (int i = 1; i <= 7; i++) {
+            for (var i = 1; i <= 7; i++) {
                 if (serverObserver.isCancelled()) {
                     logger.info("Server received cancellation");
                     responseObserver.onError(Status.CANCELLED.withDescription("Server confirmed cancellation").asRuntimeException());

@@ -16,11 +16,11 @@ public final class Loggers {
     public static void initWithGrpcLogs() {
         init();
 
-        Logger grpcLogger = Logger.getLogger("io.grpc");
+        var grpcLogger = Logger.getLogger("io.grpc");
         grpcLogger.setLevel(Level.FINE);
 
-        Logger rootLogger = LogManager.getLogManager().getLogger("");
-        for (Handler handler : rootLogger.getHandlers()) {
+        var rootLogger = LogManager.getLogManager().getLogger("");
+        for (var handler : rootLogger.getHandlers()) {
             if (handler instanceof ConsoleHandler) {
                 handler.setLevel(Level.FINE);
             }

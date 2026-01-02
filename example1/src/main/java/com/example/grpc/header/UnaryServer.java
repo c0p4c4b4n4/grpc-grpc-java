@@ -20,8 +20,8 @@ public class UnaryServer {
     public static void main(String[] args) throws Exception {
         Loggers.init();
 
-        int port = 50051;
-        Server server = ServerBuilder.forPort(port)
+        var port = 50051;
+        var server = ServerBuilder.forPort(port)
             .addService(ServerInterceptors.intercept(new EchoServiceImpl(), new HeaderServerInterceptor()))
             .build()
             .start();

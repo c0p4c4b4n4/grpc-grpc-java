@@ -33,7 +33,7 @@ public class RetryingUnaryServer {
                 responseObserver.onError(Status.UNAVAILABLE.withDescription("Server temporarily unavailable...").asRuntimeException());
             } else {
                 logger.info("returning successful response, call: " + calls.get());
-                EchoResponse response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
+                var response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
                 responseObserver.onNext(response);
                 responseObserver.onCompleted();
             }

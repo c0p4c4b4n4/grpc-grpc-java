@@ -22,7 +22,7 @@ public class ServerStreamingServer {
         @Override
         public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
             logger.log(Level.INFO, "request: {0}", request.getMessage());
-            for (int i = 1; i <= 7; i++) {
+            for (var i = 1; i <= 7; i++) {
                 Delays.sleep(i);
 
                 var message = "hello " + request.getMessage() + " " + i;

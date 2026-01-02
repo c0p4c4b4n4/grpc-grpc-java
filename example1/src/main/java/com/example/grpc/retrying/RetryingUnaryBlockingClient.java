@@ -28,12 +28,12 @@ public class RetryingUnaryBlockingClient {
     public static void main(String[] args) throws Exception {
         Loggers.init();
 
-        boolean enableRetries = !Boolean.parseBoolean(System.getenv("EXAMPLE_GRPC_DISABLE_RETRYING"));
+        var enableRetries = !Boolean.parseBoolean(System.getenv("EXAMPLE_GRPC_DISABLE_RETRYING"));
         var client = new RetryingUnaryBlockingClient("localhost", 50051, enableRetries);
 
         var executor = new ForkJoinPool();
-        for (int i = 0; i < 50; i++) {
-            String userId = "user" + i;
+        for (var i = 0; i < 50; i++) {
+            var userId = "user" + i;
             executor.execute(() -> client.unaryEcho(userId));
         }
         executor.awaitQuiescence(120, TimeUnit.SECONDS);
@@ -46,7 +46,7 @@ public class RetryingUnaryBlockingClient {
     private RetryingUnaryBlockingClient(String host, int port, boolean enableRetries) {
         var channelBuilder = Grpc.newChannelBuilderForAddress(host, port, InsecureChannelCredentials.create());
         if (enableRetries) {
-            Map<String, ?> serviceConfig = getRetryingServiceConfig();
+            var serviceConfig = getRetryingServiceConfig();
             logger.info("client started with service configuration: " + serviceConfig);
             channelBuilder.defaultServiceConfig(serviceConfig).enableRetry();
         }

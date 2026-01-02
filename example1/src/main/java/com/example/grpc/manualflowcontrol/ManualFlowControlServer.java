@@ -19,12 +19,12 @@ public class ManualFlowControlServer {
 
     public static void main(String[] args) throws InterruptedException, IOException {
         // Service class implementation
-        EchoServiceGrpc.EchoServiceImplBase service = new EchoServiceGrpc.EchoServiceImplBase() {
+        var service = new EchoServiceGrpc.EchoServiceImplBase() {
             @Override
             public StreamObserver<EchoRequest> bidirectionalStreamingEcho(final StreamObserver<EchoResponse> responseObserver) {
                 // Set up manual flow control for the request stream. It feels backwards to configure the request
                 // stream's flow control using the response stream's observer, but this is the way it is.
-                final ServerCallStreamObserver<EchoResponse> serverCallStreamObserver =                 (ServerCallStreamObserver<EchoResponse>) responseObserver;
+                final var serverCallStreamObserver =                 (ServerCallStreamObserver<EchoResponse>) responseObserver;
                 serverCallStreamObserver.disableAutoRequest();
 
                 // Set up a back-pressure-aware consumer for the request stream. The onReadyHandler will be invoked
@@ -53,7 +53,7 @@ public class ManualFlowControlServer {
                         }
                     }
                 }
-                final OnReadyHandler onReadyHandler = new OnReadyHandler();
+                final var onReadyHandler = new OnReadyHandler();
                 serverCallStreamObserver.setOnReadyHandler(onReadyHandler);
 
                 // Give gRPC a StreamObserver that can observe and process incoming requests.
@@ -65,17 +65,17 @@ public class ManualFlowControlServer {
                         // Process the request and send a response or an error.
                         try {
                             // Accept and enqueue the request.
-                            String name = request.getMessage();
+                            var name = request.getMessage();
                             logger.info("--> " + name);
 
                             // Simulate server "work"
-                            int sleepMillis = ++cnt % 10 == 0 ? 2000 : 100;
+                            var sleepMillis = ++cnt % 10 == 0 ? 2000 : 100;
                             Thread.sleep(sleepMillis);
 
                             // Send a response.
-                            String message = "Hello " + name;
+                            var message = "Hello " + name;
                             logger.info("<-- " + message);
-                            EchoResponse reply = EchoResponse.newBuilder().setMessage(message).build();
+                            var reply = EchoResponse.newBuilder().setMessage(message).build();
                             responseObserver.onNext(reply);
 
                             // Check the provided ServerCallStreamObserver to see if it is still ready to accept more messages.
@@ -117,7 +117,7 @@ public class ManualFlowControlServer {
             }
         };
 
-        final Server server = ServerBuilder
+        final var server = ServerBuilder
             .forPort(50051)
             .addService(service)
             .build()

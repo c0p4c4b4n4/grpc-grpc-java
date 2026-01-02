@@ -21,14 +21,14 @@ public class ManualFlowControlClient {
     private static final Logger logger = Logger.getLogger(ManualFlowControlClient.class.getName());
 
     public static void main(String[] args) throws InterruptedException {
-        final CountDownLatch done = new CountDownLatch(1);
+        final var done = new CountDownLatch(1);
 
-        ManagedChannel channel = ManagedChannelBuilder            .forAddress("localhost", 50051)            .usePlaintext()            .build();
-        EchoServiceGrpc.EchoServiceStub stub = EchoServiceGrpc.newStub(channel);
+        var channel = ManagedChannelBuilder            .forAddress("localhost", 50051)            .usePlaintext()            .build();
+        var stub = EchoServiceGrpc.newStub(channel);
 
         // When using manual flow-control and back-pressure on the client, the ClientResponseObserver handles both
         // request and response streams.
-        ClientResponseObserver<EchoRequest, EchoResponse> clientResponseObserver =
+        var clientResponseObserver =
             new ClientResponseObserver<EchoRequest, EchoResponse>() {
 
                 ClientCallStreamObserver<EchoRequest> requestStream;
@@ -61,9 +61,9 @@ public class ManualFlowControlClient {
                             while (requestStream.isReady()) {
                                 if (iterator.hasNext()) {
                                     // Send more messages if there are more messages to send.
-                                    String name = iterator.next();
+                                    var name = iterator.next();
                                     logger.info("--> " + name);
-                                    EchoRequest request = EchoRequest.newBuilder().setMessage(name).build();
+                                    var request = EchoRequest.newBuilder().setMessage(name).build();
                                     requestStream.onNext(request);
                                 } else {
                                     // Signal completion if there is nothing left to send.

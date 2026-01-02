@@ -26,10 +26,10 @@ public class UnaryServer {
     public static void main(String[] args) throws IOException, InterruptedException {
         Loggers.init();
 
-        int port = 50051;
-        HealthStatusManager health = new HealthStatusManager();
+        var port = 50051;
+        var health = new HealthStatusManager();
 
-        Server server = Grpc.newServerBuilderForPort(port, InsecureServerCredentials.create())
+        var server = Grpc.newServerBuilderForPort(port, InsecureServerCredentials.create())
             .addService(new EchoServiceImpl(health))
             .addService(health.getHealthService())
             .build()
@@ -70,7 +70,7 @@ public class UnaryServer {
             }
 
             if (shouldServe(request)) {
-                EchoResponse response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
+                var response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
                 responseObserver.onNext(response);
                 responseObserver.onCompleted();
             } else {

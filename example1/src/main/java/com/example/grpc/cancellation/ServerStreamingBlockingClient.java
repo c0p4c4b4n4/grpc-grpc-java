@@ -23,13 +23,13 @@ public class ServerStreamingBlockingClient {
             var blockingStub = EchoServiceGrpc.newBlockingStub(channel);
             var request = EchoRequest.newBuilder().setMessage("world").build();
 
-            Context.CancellableContext cancellableContext = Context.current().withCancellation();
+            var cancellableContext = Context.current().withCancellation();
 
             try {
                 cancellableContext.run(() -> {
                     var responses = blockingStub.serverStreamingEcho(request);
 
-                    int i = 0;
+                    var i = 0;
                     while (responses.hasNext()) {
                         logger.info("response: " + responses.next().getMessage());
 

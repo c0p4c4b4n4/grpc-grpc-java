@@ -1,4 +1,4 @@
-package com.example.grpc.features.deadline;
+package com.example.grpc.deadline;
 
 import com.example.grpc.Delays;
 import com.example.grpc.Servers;

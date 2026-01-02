@@ -1,12 +1,12 @@
-package com.example.grpc.features.header;
+package com.example.grpc.keepalive;
 
 import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
+import io.grpc.Grpc;
+import io.grpc.InsecureServerCredentials;
 import io.grpc.Server;
-import io.grpc.ServerBuilder;
-import io.grpc.ServerInterceptors;
 import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.TimeUnit;
@@ -18,11 +18,18 @@ public class UnaryServer {
     private static final Logger logger = Logger.getLogger(UnaryServer.class.getName());
 
     public static void main(String[] args) throws Exception {
-        Loggers.init();
+        Loggers.initWithGrpcLogs();
 
         int port = 50051;
-        Server server = ServerBuilder.forPort(port)
-            .addService(ServerInterceptors.intercept(new EchoServiceImpl(), new HeaderServerInterceptor()))
+        Server server = Grpc.newServerBuilderForPort(port, InsecureServerCredentials.create())
+            .addService(new EchoServiceImpl())
+            .keepAliveTime(5, TimeUnit.SECONDS)
+            .keepAliveTimeout(1, TimeUnit.SECONDS)
+            .permitKeepAliveTime(5, TimeUnit.SECONDS)
+            .permitKeepAliveWithoutCalls(true)
+            .maxConnectionIdle(15, TimeUnit.SECONDS)
+            .maxConnectionAge(30, TimeUnit.SECONDS)
+            .maxConnectionAgeGrace(5, TimeUnit.SECONDS)
             .build()
             .start();
 

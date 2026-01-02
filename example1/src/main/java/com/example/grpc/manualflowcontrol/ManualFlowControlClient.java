@@ -1,4 +1,4 @@
-package com.example.grpc.features.manualflowcontrol;
+package com.example.grpc.manualflowcontrol;
 
 
 import com.example.grpc.echo.EchoRequest;

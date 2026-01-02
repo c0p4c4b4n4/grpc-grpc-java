@@ -1,4 +1,4 @@
-package com.example.grpc.features.errorhandling;
+package com.example.grpc.errorhandling;
 
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;

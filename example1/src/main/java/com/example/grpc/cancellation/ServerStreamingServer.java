@@ -1,4 +1,4 @@
-package com.example.grpc.features.cancellation;
+package com.example.grpc.cancellation;
 
 import com.example.grpc.Delays;
 import com.example.grpc.Servers;

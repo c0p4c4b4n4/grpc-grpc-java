@@ -1,4 +1,4 @@
-package com.example.grpc.features.healthservice;
+package com.example.grpc.healthservice;
 
 import com.example.grpc.Delays;
 import com.example.grpc.Loggable;

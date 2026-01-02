@@ -1,4 +1,4 @@
-package com.example.grpc.features.retrying;
+package com.example.grpc.retrying;
 
 import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;

@@ -1,4 +1,4 @@
-package com.example.grpc.features.header;
+package com.example.grpc.header;
 
 import io.grpc.CallOptions;
 import io.grpc.Channel;

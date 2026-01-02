@@ -5,6 +5,7 @@ import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.Status;
 import io.grpc.stub.ClientCallStreamObserver;
 import io.grpc.stub.ClientResponseObserver;
 
@@ -13,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ManualFlowControlClient {
@@ -82,13 +84,13 @@ public class ManualFlowControlClient {
 
             @Override
             public void onError(Throwable t) {
-                t.printStackTrace();
+                logger.log(Level.WARNING, "error: {0}", Status.fromThrowable(t));
                 done.countDown();
             }
 
             @Override
             public void onCompleted() {
-                logger.info("All Done");
+                logger.info("completed");
                 done.countDown();
             }
         };

@@ -4,7 +4,6 @@ import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
-import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.Status;
 import io.grpc.stub.ServerCallStreamObserver;
@@ -26,7 +25,7 @@ public class ManualFlowControlServer {
             public StreamObserver<EchoRequest> bidirectionalStreamingEcho(final StreamObserver<EchoResponse> responseObserver) {
                 // Set up manual flow control for the request stream. It feels backwards to configure the request
                 // stream's flow control using the response stream's observer, but this is the way it is.
-                final var serverCallStreamObserver =                 (ServerCallStreamObserver<EchoResponse>) responseObserver;
+                final var serverCallStreamObserver = (ServerCallStreamObserver<EchoResponse>) responseObserver;
                 serverCallStreamObserver.disableAutoRequest();
 
                 // Set up a back-pressure-aware consumer for the request stream. The onReadyHandler will be invoked
@@ -97,22 +96,21 @@ public class ManualFlowControlServer {
                             }
                         } catch (Throwable throwable) {
                             throwable.printStackTrace();
-                            responseObserver.onError(
-                                Status.UNKNOWN.withDescription("Error handling request").withCause(throwable).asException());
+                            responseObserver.onError(Status.UNKNOWN.withDescription("Error handling request").withCause(throwable).asException());
                         }
                     }
 
                     @Override
                     public void onError(Throwable t) {
                         // End the response stream if the client presents an error.
-                        t.printStackTrace();
+                        logger.log(Level.WARNING, "error: {0}", Status.fromThrowable(t));
                         responseObserver.onCompleted();
                     }
 
                     @Override
                     public void onCompleted() {
                         // Signal the end of work when the client ends the request stream.
-                        logger.info("COMPLETED");
+                        logger.info("completed");
                         responseObserver.onCompleted();
                     }
                 };

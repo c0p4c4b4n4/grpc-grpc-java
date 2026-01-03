@@ -26,7 +26,7 @@ public class ManualFlowControlClient {
         var stub = EchoServiceGrpc.newStub(channel);
 
         var done = new CountDownLatch(1);
-        var clientResponseObserver = new ClientResponseObserver<EchoRequest, EchoResponse>() {
+        stub.bidirectionalStreamingEcho(new ClientResponseObserver<EchoRequest, EchoResponse>() {
 
             ClientCallStreamObserver<EchoRequest> requestStream;
 
@@ -35,28 +35,7 @@ public class ManualFlowControlClient {
                 this.requestStream = requestStream;
                 requestStream.disableAutoRequestWithInitial(1);
 
-                Runnable onReadyHandler = new Runnable() {
-                    // An iterator is used so we can pause and resume iteration of the request data.
-                    Iterator<String> iterator = names().iterator();
-
-                    @Override
-                    public void run() {
-                        // Start generating values from where we left off on a non-gRPC thread.
-                        while (requestStream.isReady()) {
-                            if (iterator.hasNext()) {
-                                // Send more messages if there are more messages to send.
-                                var name = iterator.next();
-                                logger.info("--> " + name);
-                                var request = EchoRequest.newBuilder().setMessage(name).build();
-                                requestStream.onNext(request);
-                            } else {
-                                // Signal completion if there is nothing left to send.
-                                requestStream.onCompleted();
-                            }
-                        }
-                    }
-                };
-
+                Runnable onReadyHandler = new OnReadyHandler(requestStream);
                 requestStream.setOnReadyHandler(onReadyHandler);
             }
 
@@ -78,10 +57,8 @@ public class ManualFlowControlClient {
                 logger.info("completed");
                 done.countDown();
             }
-        };
-
-        // Note: clientResponseObserver is handling both request and response stream processing.
-        stub.bidirectionalStreamingEcho(clientResponseObserver);
+        }
+        );
 
         done.await();
 
@@ -89,6 +66,34 @@ public class ManualFlowControlClient {
         channel.awaitTermination(1, TimeUnit.SECONDS);
     }
 
+    private static class OnReadyHandler implements  Runnable {
+
+        private final ClientCallStreamObserver<EchoRequest> requestStream;
+
+        // An iterator is used so we can pause and resume iteration of the request data.
+        Iterator<String> iterator = names().iterator();
+
+        private OnReadyHandler(ClientCallStreamObserver<EchoRequest> requestStream) {
+            this.requestStream = requestStream;
+        }
+
+        @Override
+        public void run() {
+            // Start generating values from where we left off on a non-gRPC thread.
+            while (requestStream.isReady()) {
+                if (iterator.hasNext()) {
+                    // Send more messages if there are more messages to send.
+                    var name = iterator.next();
+                    logger.info("--> " + name);
+                    var request = EchoRequest.newBuilder().setMessage(name).build();
+                    requestStream.onNext(request);
+                } else {
+                    // Signal completion if there is nothing left to send.
+                    requestStream.onCompleted();
+                }
+            }
+        }
+    };
     private static List<String> names() {
         return Arrays.asList(
             "Alpha",

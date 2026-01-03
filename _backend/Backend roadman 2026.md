@@ -184,3 +184,34 @@ Backend
       * Active Record
       * Data Mapper
   * DDD
+* SQL
+  * order by, limit, like
+  * join
+    * INNER
+    * OUTER
+      * LEFT
+      * RIGHT
+      * FULL
+    * CROSS
+  * индексы
+    * B-tree
+    * Hash
+      * primary key
+    * Bitmap
+    * Gin/Gist
+  * оконные функции (OVER)
+  * Common Table Expressions (WITH AS)
+  * вложенные запросы (EXISTS)
+  * GROUP BY & HAVING
+  * транзакции
+    * уровни изолированности
+    * ACID
+  * план запросов
+    * explain
+    * explain analyze
+    * параметры
+      * scan
+        * seq (без индексов)
+        * index
+      * rows
+      * cost

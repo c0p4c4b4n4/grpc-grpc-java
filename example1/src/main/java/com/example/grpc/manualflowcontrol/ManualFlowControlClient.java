@@ -26,9 +26,6 @@ public class ManualFlowControlClient {
         var stub = EchoServiceGrpc.newStub(channel);
 
         var done = new CountDownLatch(1);
-
-        // When using manual flow-control and back-pressure on the client, the ClientResponseObserver handles both
-        // request and response streams.
         var clientResponseObserver = new ClientResponseObserver<EchoRequest, EchoResponse>() {
 
             ClientCallStreamObserver<EchoRequest> requestStream;
@@ -36,22 +33,9 @@ public class ManualFlowControlClient {
             @Override
             public void beforeStart(ClientCallStreamObserver<EchoRequest> requestStream) {
                 this.requestStream = requestStream;
-                // Set up manual flow control for the response stream. It feels backwards to configure the response
-                // stream's flow control using the request stream's observer, but this is the way it is.
                 requestStream.disableAutoRequestWithInitial(1);
 
-                // Set up a back-pressure-aware producer for the request stream. The onReadyHandler will be invoked
-                // when the consuming side has enough buffer space to receive more messages.
-                //
-                // Messages are serialized into a transport-specific transmit buffer. Depending on the size of this buffer,
-                // MANY messages may be buffered, however, they haven't yet been sent to the server. The server must call
-                // request() to pull a buffered message from the client.
-                //
-                // Note: the onReadyHandler's invocation is serialized on the same thread pool as the incoming
-                // StreamObserver's onNext(), onError(), and onComplete() handlers. Blocking the onReadyHandler will prevent
-                // additional messages from being processed by the incoming StreamObserver. The onReadyHandler must return
-                // in a timely manner or else message processing throughput will suffer.
-                requestStream.setOnReadyHandler(new Runnable() {
+                Runnable onReadyHandler = new Runnable() {
                     // An iterator is used so we can pause and resume iteration of the request data.
                     Iterator<String> iterator = names().iterator();
 
@@ -71,7 +55,9 @@ public class ManualFlowControlClient {
                             }
                         }
                     }
-                });
+                };
+
+                requestStream.setOnReadyHandler(onReadyHandler);
             }
 
             @Override

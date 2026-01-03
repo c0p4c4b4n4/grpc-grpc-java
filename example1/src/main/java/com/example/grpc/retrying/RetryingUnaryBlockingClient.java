@@ -25,6 +25,17 @@ public class RetryingUnaryBlockingClient {
     private final AtomicInteger totalCalls = new AtomicInteger();
     private final AtomicInteger failedCalls = new AtomicInteger();
 
+    private RetryingUnaryBlockingClient(String host, int port, boolean enableRetries) {
+        var channelBuilder = Grpc.newChannelBuilderForAddress(host, port, InsecureChannelCredentials.create());
+        if (enableRetries) {
+            var serviceConfig = getRetryingServiceConfig();
+            logger.info("client started with service configuration: " + serviceConfig);
+            channelBuilder.defaultServiceConfig(serviceConfig).enableRetry();
+        }
+        channel = channelBuilder.build();
+        blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+    }
+
     public static void main(String[] args) throws Exception {
         Loggers.init();
 
@@ -41,17 +52,6 @@ public class RetryingUnaryBlockingClient {
 
         client.printSummary(enableRetries);
         client.shutdown();
-    }
-
-    private RetryingUnaryBlockingClient(String host, int port, boolean enableRetries) {
-        var channelBuilder = Grpc.newChannelBuilderForAddress(host, port, InsecureChannelCredentials.create());
-        if (enableRetries) {
-            var serviceConfig = getRetryingServiceConfig();
-            logger.info("client started with service configuration: " + serviceConfig);
-            channelBuilder.defaultServiceConfig(serviceConfig).enableRetry();
-        }
-        channel = channelBuilder.build();
-        blockingStub = EchoServiceGrpc.newBlockingStub(channel);
     }
 
     private Map<String, ?> getRetryingServiceConfig() {

@@ -1,5 +1,6 @@
 package com.example.grpc.manualflowcontrol;
 
+import com.example.grpc.Delays;
 import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
@@ -29,7 +30,7 @@ public class ManualFlowControlServer {
             .build()
             .start();
 
-        logger.log(Level.INFO, "server started, listening on {0}", port);
+        logger.log(Level.INFO, "server started, listening on {0,number,#}", port);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.err.println("server is shutting down");
@@ -63,7 +64,7 @@ public class ManualFlowControlServer {
                     try {
                         logger.log(Level.INFO, "request: {0}", request.getMessage());
 
-                        Thread.sleep(++counter % 10 == 0 ? 5000 : 100);
+                        Delays.sleep(++counter % 10 == 0 ? 5 : 0);
 
                         var response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
                         responseObserver.onNext(response);

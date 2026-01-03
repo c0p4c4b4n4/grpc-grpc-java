@@ -21,11 +21,11 @@ import java.util.concurrent.TimeUnit;
 
 public class ErrorHandlingStatus {
 
+    private ManagedChannel channel;
+
     public static void main(String[] args) throws Exception {
         new ErrorHandlingStatus().run();
     }
-
-    private ManagedChannel channel;
 
     void run() throws Exception {
         var server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())

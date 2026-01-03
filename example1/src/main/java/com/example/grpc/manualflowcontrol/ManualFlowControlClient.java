@@ -60,38 +60,7 @@ public class ManualFlowControlClient {
         });
 
         done.await();
-
-//        channel.shutdown();
-//        channel.awaitTermination(1, TimeUnit.SECONDS);
-
         channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
-    }
-
-    private static class OnReadyHandler implements Runnable {
-
-        private final ClientCallStreamObserver<EchoRequest> requestStream;
-        private final Iterator<String> iterator;
-
-        private OnReadyHandler(ClientCallStreamObserver<EchoRequest> requestStream, Iterator<String> iterator) {
-            this.requestStream = requestStream;
-            this.iterator = iterator;
-        }
-
-        @Override
-        public void run() {
-            while (requestStream.isReady()) {
-                if (iterator.hasNext()) {
-                    var name = iterator.next();
-                    logger.log(Level.INFO, "request: {0}", name);
-
-                    var request = EchoRequest.newBuilder().setMessage(name).build();
-                    requestStream.onNext(request);
-                } else {
-                    logger.info("requests completed");
-                    requestStream.onCompleted();
-                }
-            }
-        }
     }
 
     private static List<String> getNames() {
@@ -123,5 +92,32 @@ public class ManualFlowControlClient {
             "Yankee",
             "Zulu"
         );
+    }
+
+    private static class OnReadyHandler implements Runnable {
+
+        private final ClientCallStreamObserver<EchoRequest> requestStream;
+        private final Iterator<String> iterator;
+
+        private OnReadyHandler(ClientCallStreamObserver<EchoRequest> requestStream, Iterator<String> iterator) {
+            this.requestStream = requestStream;
+            this.iterator = iterator;
+        }
+
+        @Override
+        public void run() {
+            while (requestStream.isReady()) {
+                if (iterator.hasNext()) {
+                    var name = iterator.next();
+                    logger.log(Level.INFO, "request: {0}", name);
+
+                    var request = EchoRequest.newBuilder().setMessage(name).build();
+                    requestStream.onNext(request);
+                } else {
+                    logger.info("requests completed");
+                    requestStream.onCompleted();
+                }
+            }
+        }
     }
 }

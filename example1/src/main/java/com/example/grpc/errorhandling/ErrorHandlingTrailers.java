@@ -36,12 +36,11 @@ public class ErrorHandlingTrailers {
             .setDetail("detailed error info.").build();
 
     private static final String DEBUG_DESC = "detailed error description";
+    private ManagedChannel channel;
 
     public static void main(String[] args) throws Exception {
         new ErrorHandlingTrailers().run();
     }
-
-    private ManagedChannel channel;
 
     void run() throws Exception {
         var server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())

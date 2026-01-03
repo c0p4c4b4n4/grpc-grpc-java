@@ -29,30 +29,30 @@ Backend
       * селекты
       * гороутины
     * Общая помять (shared memory and locks) 
-  * TCP/IP
-    * HTTP
-      * REST
-        * Swagger docs
-        * OpenAPI codegen
-    * WebSockets
-    * GraphQL
-    * RPC
-      * gRPC
-      * SOAP
-  * Безопасность
-    * Формат токенов
-      * JWT
-        * claims
-        * roles
-        * scopes
-    * Авторизация
-      * RBAC (на ролях)
-      * ABAC (на аттрибутах)
-      * ACL (на пользователях)
-      * policy-based access (на правилах)
-    * Аутентификация
-      * Keycloak
-      * OAuth 2.0 + OpenID Connect
-        * реализует SSO
-      * basic auth
-      * SAML/Kerberos
+* TCP/IP
+  * HTTP
+    * REST
+      * Swagger docs
+      * OpenAPI codegen
+  * WebSockets
+  * GraphQL
+  * RPC
+    * gRPC
+    * SOAP
+* Безопасность
+  * Формат токенов
+    * JWT
+      * claims
+      * roles
+      * scopes
+  * Авторизация
+    * RBAC (на ролях)
+    * ABAC (на аттрибутах)
+    * ACL (на пользователях)
+    * policy-based access (на правилах)
+  * Аутентификация
+    * Keycloak
+    * OAuth 2.0 + OpenID Connect
+      * реализует SSO
+    * basic auth
+    * SAML/Kerberos

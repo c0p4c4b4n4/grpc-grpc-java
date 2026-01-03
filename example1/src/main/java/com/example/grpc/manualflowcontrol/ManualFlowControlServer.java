@@ -55,7 +55,7 @@ public class ManualFlowControlServer {
             var onReadyHandler = new OnReadyHandler(serverCallStreamObserver);
             serverCallStreamObserver.setOnReadyHandler(onReadyHandler);
 
-            return new StreamObserver<EchoRequest>() {
+            return new StreamObserver<>() {
                 int counter = 0;
 
                 @Override
@@ -106,7 +106,7 @@ public class ManualFlowControlServer {
             @Override
             public void run() {
                 if (serverCallStreamObserver.isReady() && !wasReady.get()) {
-                    wasReady.set( true);
+                    wasReady.set(true);
 
                     logger.info("ready");
                     serverCallStreamObserver.request(1);

@@ -30,14 +30,14 @@ public class ManualFlowControlClient {
         var done = new CountDownLatch(1);
         stub.bidirectionalStreamingEcho(new ClientResponseObserver<EchoRequest, EchoResponse>() {
 
-            ClientCallStreamObserver<EchoRequest> requestStream;
+            private ClientCallStreamObserver<EchoRequest> requestStream;
 
             @Override
             public void beforeStart(ClientCallStreamObserver<EchoRequest> requestStream) {
                 this.requestStream = requestStream;
 
                 requestStream.disableAutoRequestWithInitial(1);
-                requestStream.setOnReadyHandler(new OnReadyHandler(requestStream));
+                requestStream.setOnReadyHandler(new OnReadyHandler(requestStream, getNames().iterator()));
             }
 
             @Override
@@ -54,27 +54,27 @@ public class ManualFlowControlClient {
 
             @Override
             public void onCompleted() {
-                logger.info("completed");
+                logger.info("responses completed");
                 done.countDown();
             }
         });
 
         done.await();
 
-        channel.shutdown();
-        channel.awaitTermination(1, TimeUnit.SECONDS);
+//        channel.shutdown();
+//        channel.awaitTermination(1, TimeUnit.SECONDS);
 
-//        channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+        channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
     }
 
     private static class OnReadyHandler implements Runnable {
 
         private final ClientCallStreamObserver<EchoRequest> requestStream;
+        private final Iterator<String> iterator;
 
-        Iterator<String> iterator = names().iterator();
-
-        private OnReadyHandler(ClientCallStreamObserver<EchoRequest> requestStream) {
+        private OnReadyHandler(ClientCallStreamObserver<EchoRequest> requestStream, Iterator<String> iterator) {
             this.requestStream = requestStream;
+            this.iterator = iterator;
         }
 
         @Override
@@ -87,14 +87,14 @@ public class ManualFlowControlClient {
                     var request = EchoRequest.newBuilder().setMessage(name).build();
                     requestStream.onNext(request);
                 } else {
-                    logger.info("complete");
+                    logger.info("requests completed");
                     requestStream.onCompleted();
                 }
             }
         }
     }
 
-    private static List<String> names() {
+    private static List<String> getNames() {
         return Arrays.asList(
             "Alpha",
             "Bravo",

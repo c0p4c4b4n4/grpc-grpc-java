@@ -5,7 +5,7 @@
 
 gRPC is a multi-language remote procedure call (RPC) framework initially developed by Google. gRPC is developed for high-performance inter-service communication within or between data centers, as well as for resource-constrained mobile and IoT applications.
 
-gRPC uses Protocol Buffers as a binary serialization format and RPC interface description language, and HTTP/2 as the *transport*-layer protocol. Thanks to these features, gRPC can provide qualitative and quantitative characteristics of communication between (micro)services that are not available for RESTful applications (that most often means transferring textual JSONs over the HTTP/1.1 protocol).
+gRPC uses Protocol Buffers as a binary serialization format and RPC interface description language, and HTTP/2 as the transport protocol. Thanks to these features, gRPC can provide qualitative and quantitative characteristics of communication between (micro)services that are not available for RESTful applications (that most often means transferring textual JSONs over the HTTP/1.1 protocol).
 
 
 #### Why not REST?
@@ -67,21 +67,36 @@ The gRPC framework includes three main components:
 
 Protocol Buffers (Protobuf) is a multi-language serialization framework (also being developed by Google) designed to encode structured data into a compact binary format. The resulting binary messages are efficient not only for network transmission but also for persistent storage. Each message is composed of fields that define a required *type*, *name*, and *identifier*, along with optional *attributes*. Messages are defined in *.proto* files, which are processed by the Protobuf compiler (*protoc*) to generate strongly typed domain objects in the target programming language. Protobuf also provides runtime libraries for each supported language that manage serialization between in-memory objects and the binary format.
 
+Below is an example of a message definition using most Protobuf types:
+
 
 ```
-message ChatMessage {
+message Person {
   int32 id = 1;
-  string sender = 2;
-  bytes payload = 3;
-  bool is_edited = 4;
+  string login = 2;
+  bytes photo = 3;
+  bool is_active = 4;
+
+  enum Status {
+    ACTIVE = 1;
+    INACTIVE = 2;
+  }
   Status status = 5;
-  map<string, string> metadata = 6;
-  repeated string attachments = 7;
+
+  message Name {
+    string given_name = 1;
+    string middle_name = 2;
+    string family_name = 3;
+  }
+  Name name = 6;
+
+  map<string, string> social_networks = 7;
+  repeated string email_addresses = 8;
 }
 ```
 
 
-*Types* include data types that are common in any object-oriented programming language. They include scalar types — 32/64-bit integers, 32/64-bit floating-point numbers, booleans, UTF-8 strings, bytes, and composite types — enumerations, structures, maps, and arrays. Interestingly, the type system provides 10 integer types, allowing developers to select the most space-efficient type. The developer should choose the type for an integer field based on whether its values are positive, negative, or can include both, and whether they are typically small or evenly distributed across the range:
+*Types* include data types that are common in any object-oriented programming language. They include scalar types — 32/64-bit integers, 32/64-bit floating-point numbers, booleans, UTF-8 strings, bytes, and composite types — enumerations, structures, maps, and arrays. It is worth noting that the type system provides 10 integer types, allowing developers to select the most space-efficient type. A developer can choose the most appropriate integer type based on its maximum absolute value (32 or 64 bits), sign (non-negative or can have any sign), and typical value distribution (whether values are usually small or spread evenly across the range):
 
 
 
@@ -113,13 +128,15 @@ Based on whether a method handles a single message or a stream of messages on th
 * *Client-side streaming*: the client sends multiple requests, and the server replies with a single response.
 * *Bidirectional streaming*: both the client and server exchange multiple requests and responses simultaneously.
 
+Below is an example of a service definition using all communication patterns:
+
 
 ```
-service ChatService {
-  rpc SendMessage(ChatMessage) returns (MessageResponse);
-  rpc JoinRoom(RoomRequest) returns (stream RoomResponse);
-  rpc UploadHistory(stream ChatMessage) returns (HistoryResponse);
-  rpc Chat(stream ChatMessage) returns (stream ChatMessage);
+service EchoService {
+  rpc UnaryEcho(EchoRequest) returns (EchoResponse);
+  rpc ServerStreamingEcho(EchoRequest) returns (stream EchoResponse);
+  rpc ClientStreamingEcho(stream EchoRequest) returns (EchoResponse);
+  rpc BidirectionalStreamingEcho(stream EchoRequest) returns (stream EchoResponse);
 }
 ```
 
@@ -152,7 +169,7 @@ To implement this application, complete the following steps:
 
 ##### The contract between the service and the client
 
-A *.proto* file defines the contract between a service and a client. This example shows the *.proto* file used by both clients and servers in the application. Beyond the *message* and *service* definitions discussed earlier, the file also includes additional metadata. Specifically, it declares the use of Protobuf language version 3, and defines options specific to Java applications:
+A *.proto* file defines the contract between a service and a client. This example shows the *.proto* file used by both clients and servers in the application. Beyond the message and service definitions discussed earlier, the file also includes additional metadata. Specifically, it declares the use of Protobuf language version 3, and defines options specific to Java applications:
 
 
 ```
@@ -302,6 +319,7 @@ try {
     var blockingStub = EchoServiceGrpc.newBlockingStub(channel)
        .withWaitForReady()
        .withDeadline(Deadline.after(30, TimeUnit.SECONDS));
+
    var request = EchoRequest.newBuilder().setMessage("world").build();
    var responses = blockingStub.serverStreamingEcho(request);
 
@@ -322,12 +340,12 @@ The onNext method is called each time the client receives a single response from
 
 
 ```
-ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
+var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
 
-EchoServiceGrpc.EchoServiceStub asyncStub = EchoServiceGrpc.newStub(channel);
-EchoRequest request = EchoRequest.newBuilder().setMessage("world").build();
+var asyncStub = EchoServiceGrpc.newStub(channel);
+var request = EchoRequest.newBuilder().setMessage("world").build();
 
-CountDownLatch latch = new CountDownLatch(1);
+var done = new CountDownLatch(1);
 asyncStub.serverStreamingEcho(request, new StreamObserver<EchoResponse>() {
    @Override
    public void onNext(EchoResponse response) {
@@ -337,17 +355,17 @@ asyncStub.serverStreamingEcho(request, new StreamObserver<EchoResponse>() {
    @Override
    public void onError(Throwable t) {
        logger.log(Level.WARNING, "error: {0}", Status.fromThrowable(t));
-       latch.countDown();
+       done.countDown();
    }
 
    @Override
    public void onCompleted() {
        logger.info("completed");
-       latch.countDown();
+       done.countDown();
    }
 });
 
-latch.await();
+done.await();
 channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
 ```
 
@@ -395,7 +413,7 @@ gRPC is an effective framework for implementing inter-service communication. How
 * Automatic generation of gRPC service and client stubs is available for all required programming languages and platforms.
 * Both the client and server are developed within the same organization, and the application operates in a controlled environment.
 * Your organization has strong development standards that require clearly defined client-server contracts specified in *.proto* files.
-* Developers benefit from built-in gRPC capabilities, such as request deadline/retries/cancellation, manual flow control, health checking, error handling, and many others.
+* Developers benefit from built-in gRPC capabilities, such as request deadline/retries/cancellation, manual flow control, health checking, error handling, etc.
 
 However, REST is a more appropriate architecture if the application meets most of the following conditions:
 

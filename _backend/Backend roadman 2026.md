@@ -56,3 +56,101 @@ Backend
       * реализует SSO
     * basic auth
     * SAML/Kerberos
+* Микросервисы
+  * плюсы и минусы
+  * микросервисы vs монолиты
+  * паттерны микросервисов
+    * обмен данными
+      * CQRS
+      * Saga
+      * Event sourcing
+      * database per service
+      * transactional outbox
+      * transactional inbox
+      * eventual consistency
+        * теорема CAP 
+    * коммуникация
+      * API gateway
+      * backend for frontend
+      * Service Mesh
+      * Request/response vs Event-driven
+    * мониторинг
+      * health check
+      * centralized logging
+      * distributed tracing
+    * отказоустойчивость
+      * retry
+      * circuit breaker
+      * bulkhead
+    * обнаружение
+      * на стороне клиента
+      * на стороне сервера
+      * sidecar pattern
+    * развертывание
+      * канарейки
+      * feature toggle
+      * rolling update
+      * blue-greed deployment
+  * взаимодействие
+    * синхронное
+      * REST
+      * WebSocket
+      * gRPC
+      * graphQL
+    * асинхронное
+      * Kafka
+      * Rabbit
+      * Nats
+      * Nats JetStream
+      * Redis Streams
+      * Redis Pub/Sub
+* Деплой и мониторинг
+  * мониторинг
+    * Grafana
+      * это UI
+    * Zabbix
+    * Prometheus
+    * VictoriaMetrics
+  * логирование
+    * ELK-стек
+      * Elstic
+      * LogStash
+      * Kibana
+  * развертывание
+    * Docker
+    * Gitlab CI/CD
+    * Kubernetes
+      * kubectl
+      * ktx
+    * Ansible
+    * Jenkins
+  * тестирование
+    * unit
+      * снапшот
+    * интеграционное
+    * e2e
+  * бэкапы
+    * S3
+    * PITR
+    * DB snapshots
+  * трассировка
+    * Jaeger
+    * OpenTelemetry
+    * Zipkin
+  * балансировка
+    * Nginx
+    * Envoy
+  * облака
+    * AWS
+      * S3
+      * SQS
+    * GCP
+    * Azure
+* Архитектура
+  * Паттерны проектирования
+    * порождающие
+    * структурные
+    * поведенческие
+    * многопоточного программирования
+    * баз данных
+  * DDD

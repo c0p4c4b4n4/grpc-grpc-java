@@ -1,5 +1,6 @@
 package com.example.grpc.manualflowcontrol;
 
+import com.example.grpc.Loggers;
 import com.example.grpc.echo.EchoRequest;
 import com.example.grpc.echo.EchoResponse;
 import com.example.grpc.echo.EchoServiceGrpc;
@@ -21,6 +22,7 @@ public class ManualFlowControlClient {
     private static final Logger logger = Logger.getLogger(ManualFlowControlClient.class.getName());
 
     public static void main(String[] args) throws InterruptedException {
+        Loggers.init();
 
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         var stub = EchoServiceGrpc.newStub(channel);
@@ -33,10 +35,9 @@ public class ManualFlowControlClient {
             @Override
             public void beforeStart(ClientCallStreamObserver<EchoRequest> requestStream) {
                 this.requestStream = requestStream;
-                requestStream.disableAutoRequestWithInitial(1);
 
-                Runnable onReadyHandler = new OnReadyHandler(requestStream);
-                requestStream.setOnReadyHandler(onReadyHandler);
+                requestStream.disableAutoRequestWithInitial(1);
+                requestStream.setOnReadyHandler(new OnReadyHandler(requestStream));
             }
 
             @Override
@@ -86,6 +87,7 @@ public class ManualFlowControlClient {
                     var request = EchoRequest.newBuilder().setMessage(name).build();
                     requestStream.onNext(request);
                 } else {
+                    logger.info("complete");
                     requestStream.onCompleted();
                 }
             }

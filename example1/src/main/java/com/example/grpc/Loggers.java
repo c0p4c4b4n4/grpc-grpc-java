@@ -9,7 +9,7 @@ public final class Loggers {
 
     public static void init() {
         System.setProperty("java.util.logging.SimpleFormatter.format",
-            "%1$tH:%1$tM:%1$tS %4$s %2$s: %5$s%6$s%n");
+            "%1$tH:%1$tM:%1$tS.%1$tL %4$s %2$s: %5$s%6$s%n");
     }
 
     public static void initWithGrpcLogs() {

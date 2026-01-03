@@ -11,6 +11,7 @@ import io.grpc.stub.StreamObserver;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -70,7 +71,7 @@ public class ManualFlowControlServer {
                         if (serverCallStreamObserver.isReady()) {
                             serverCallStreamObserver.request(1);
                         } else {
-                            onReadyHandler.wasReady = false;
+                            onReadyHandler.wasReady.set(false);
                         }
                     } catch (Throwable t) {
                         logger.log(Level.SEVERE, "failure: {0}", t.getMessage());
@@ -95,17 +96,17 @@ public class ManualFlowControlServer {
         private static class OnReadyHandler implements Runnable {
 
             private final ServerCallStreamObserver<EchoResponse> serverCallStreamObserver;
-            private volatile boolean wasReady;
+            private final AtomicBoolean wasReady;
 
             OnReadyHandler(ServerCallStreamObserver<EchoResponse> serverCallStreamObserver) {
                 this.serverCallStreamObserver = serverCallStreamObserver;
-                this.wasReady = false;
+                this.wasReady = new AtomicBoolean(false);
             }
 
             @Override
             public void run() {
-                if (serverCallStreamObserver.isReady() && !wasReady) {
-                    wasReady = true;
+                if (serverCallStreamObserver.isReady() && !wasReady.get()) {
+                    wasReady.set( true);
 
                     logger.info("ready");
                     serverCallStreamObserver.request(1);

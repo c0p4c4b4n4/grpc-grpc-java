@@ -35,26 +35,7 @@ public class ManualFlowControlServer {
                 // onNext(), onError(), and onComplete() handlers. Blocking the onReadyHandler will prevent additional messages
                 // from being processed by the incoming StreamObserver. The onReadyHandler must return in a timely manner or
                 // else message processing throughput will suffer.
-                class OnReadyHandler implements Runnable {
-                    // Guard against spurious onReady() calls caused by a race between onNext() and onReady(). If the transport
-                    // toggles isReady() from false to true while onNext() is executing, but before onNext() checks isReady(),
-                    // request(1) would be called twice - once by onNext() and once by the onReady() scheduled during onNext()'s
-                    // execution.
-                    private boolean wasReady = false;
-
-                    @Override
-                    public void run() {
-                        if (serverCallStreamObserver.isReady() && !wasReady) {
-                            wasReady = true;
-                            logger.info("READY");
-                            // Signal the request sender to send one message. This happens when isReady() turns true, signaling that
-                            // the receive buffer has enough free space to receive more messages. Calling request() serves to prime
-                            // the message pump.
-                            serverCallStreamObserver.request(1);
-                        }
-                    }
-                }
-                final var onReadyHandler = new OnReadyHandler();
+                final var onReadyHandler = new OnReadyHandler(serverCallStreamObserver);
                 serverCallStreamObserver.setOnReadyHandler(onReadyHandler);
 
                 // Give gRPC a StreamObserver that can observe and process incoming requests.
@@ -140,5 +121,30 @@ public class ManualFlowControlServer {
         }));
 
         server.awaitTermination();
+    }
+
+    private static class OnReadyHandler implements Runnable {
+        private final ServerCallStreamObserver<EchoResponse> serverCallStreamObserver;// Guard against spurious onReady() calls caused by a race between onNext() and onReady(). If the transport
+        // toggles isReady() from false to true while onNext() is executing, but before onNext() checks isReady(),
+        // request(1) would be called twice - once by onNext() and once by the onReady() scheduled during onNext()'s
+        // execution.
+        private boolean wasReady;
+
+        OnReadyHandler(ServerCallStreamObserver<EchoResponse> serverCallStreamObserver) {
+            this.serverCallStreamObserver = serverCallStreamObserver;
+            wasReady = false;
+        }
+
+        @Override
+        public void run() {
+            if (serverCallStreamObserver.isReady() && !wasReady) {
+                wasReady = true;
+                logger.info("READY");
+                // Signal the request sender to send one message. This happens when isReady() turns true, signaling that
+                // the receive buffer has enough free space to receive more messages. Calling request() serves to prime
+                // the message pump.
+                serverCallStreamObserver.request(1);
+            }
+        }
     }
 }

@@ -33,7 +33,7 @@ public class UnaryServer {
             .build()
             .start();
 
-        logger.info("server started, listening on " + port);
+        logger.log(Level.INFO, "server started, listening on {0,number,#}", port);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.err.println("server is shutting down");

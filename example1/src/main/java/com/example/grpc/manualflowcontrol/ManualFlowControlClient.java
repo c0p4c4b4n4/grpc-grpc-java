@@ -40,9 +40,8 @@ public class ManualFlowControlClient {
             }
 
             @Override
-            public void onNext(EchoResponse value) {
-                logger.info("<-- " + value.getMessage());
-                // Signal the sender to send one message.
+            public void onNext(EchoResponse response) {
+                logger.log(Level.INFO, "response: {0}", response.getMessage());
                 requestStream.request(1);
             }
 
@@ -57,20 +56,20 @@ public class ManualFlowControlClient {
                 logger.info("completed");
                 done.countDown();
             }
-        }
-        );
+        });
 
         done.await();
 
         channel.shutdown();
         channel.awaitTermination(1, TimeUnit.SECONDS);
+
+//        channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
     }
 
-    private static class OnReadyHandler implements  Runnable {
+    private static class OnReadyHandler implements Runnable {
 
         private final ClientCallStreamObserver<EchoRequest> requestStream;
 
-        // An iterator is used so we can pause and resume iteration of the request data.
         Iterator<String> iterator = names().iterator();
 
         private OnReadyHandler(ClientCallStreamObserver<EchoRequest> requestStream) {
@@ -79,21 +78,20 @@ public class ManualFlowControlClient {
 
         @Override
         public void run() {
-            // Start generating values from where we left off on a non-gRPC thread.
             while (requestStream.isReady()) {
                 if (iterator.hasNext()) {
-                    // Send more messages if there are more messages to send.
                     var name = iterator.next();
-                    logger.info("--> " + name);
+                    logger.log(Level.INFO, "request: {0}", name);
+
                     var request = EchoRequest.newBuilder().setMessage(name).build();
                     requestStream.onNext(request);
                 } else {
-                    // Signal completion if there is nothing left to send.
                     requestStream.onCompleted();
                 }
             }
         }
-    };
+    }
+
     private static List<String> names() {
         return Arrays.asList(
             "Alpha",

@@ -60,7 +60,7 @@ public class ManualFlowControlServer {
                 @Override
                 public void onNext(EchoRequest request) {
                     try {
-                        logger.log(Level.INFO, "next: {0}", request.getMessage());
+                        logger.log(Level.INFO, "request: {0}", request.getMessage());
 
                         Thread.sleep(++counter % 10 == 0 ? 5000 : 100);
 

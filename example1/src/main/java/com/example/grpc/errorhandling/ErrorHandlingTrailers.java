@@ -111,7 +111,7 @@ public class ErrorHandlingTrailers {
         var done = new CountDownLatch(1);
         Futures.addCallback(
             response,
-            new FutureCallback<EchoResponse>() {
+            new FutureCallback<>() {
                 @Override
                 public void onSuccess(EchoResponse result) {
                     // won't be called

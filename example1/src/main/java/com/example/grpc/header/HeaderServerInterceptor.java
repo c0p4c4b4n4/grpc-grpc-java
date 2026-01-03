@@ -20,7 +20,7 @@ public class HeaderServerInterceptor implements ServerInterceptor {
         Metadata requestHeaders,
         ServerCallHandler<ReqT, RespT> next) {
         logger.info("header received from client: " + requestHeaders);
-        return next.startCall(new SimpleForwardingServerCall<ReqT, RespT>(call) {
+        return next.startCall(new SimpleForwardingServerCall<>(call) {
 
             @Override
             public void sendHeaders(Metadata responseHeaders) {

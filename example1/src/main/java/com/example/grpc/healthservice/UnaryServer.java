@@ -77,15 +77,12 @@ public class UnaryServer {
 
                 isServing.set(false);
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Delays.sleep(10);
-                        isServing.set(true);
+                new Thread(() -> {
+                    Delays.sleep(10);
+                    isServing.set(true);
 
-                        logger.info("continue to serve");
-                        health.setStatus("", ServingStatus.SERVING);
-                    }
+                    logger.info("continue to serve");
+                    health.setStatus("", ServingStatus.SERVING);
                 }).start();
 
                 responseObserver.onError(Status.INVALID_ARGUMENT.withDescription("paused by short message").asRuntimeException());

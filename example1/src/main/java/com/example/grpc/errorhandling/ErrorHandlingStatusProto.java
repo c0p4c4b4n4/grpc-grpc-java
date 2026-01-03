@@ -124,7 +124,7 @@ public class ErrorHandlingStatusProto {
         var response = stub.unaryEcho(EchoRequest.newBuilder().build());
 
         var done = new CountDownLatch(1);
-        Futures.addCallback(response, new FutureCallback<EchoResponse>() {
+        Futures.addCallback(response, new FutureCallback<>() {
                 @Override
                 public void onSuccess(EchoResponse result) {
                     // won't be called

@@ -26,7 +26,7 @@ public class ServerStreamingAsynchronousClient {
         var request = EchoRequest.newBuilder().setMessage("world").build();
 
         var done = new CountDownLatch(1);
-        asyncStub.serverStreamingEcho(request, new StreamObserver<EchoResponse>() {
+        asyncStub.serverStreamingEcho(request, new StreamObserver<>() {
             @Override
             public void onNext(EchoResponse response) {
                 logger.log(Level.INFO, "next: {0}", response.getMessage());

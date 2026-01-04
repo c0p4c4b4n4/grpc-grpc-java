@@ -1,4 +1,3 @@
-[Music]
 hey everyone I'm Arvin and this is iswar
 we both are software Engineers on the
 grpc team at Google we work on building
@@ -354,7 +353,4 @@ each of our language repositories in
 GitHub which go over these features be
 sure to check them out
 we'll be back with more videos and
-always thanks for
-[Music]
-watching
-
+always thanks for watching

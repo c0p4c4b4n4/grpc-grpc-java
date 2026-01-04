@@ -1,845 +1,423 @@
 good afternoon how's everybody doing
-
 hopefully lunch was good and we're not
-
 still lethargic I know the coffee and
-
 ice cream out there is a dangerous combo
-
 you take the coffee to the coffe uh you
-
 take the ice cream to the coffee stand
-
 pour some espresso on it you've got
-
 yourself an apagado I've been having
-
 some fun out there so this session is um
-
 kind of special to me and to a lot of
-
 people here um I realized when we
-
 started planning for grpc comp that oh
-
 my gosh how did we miss it we're about
-
 to come up on the 10year anniversary of
-
 grpc right so we are going to take some
-
 time to look back at the past decade
-
 reflect on it and then think about maybe
-
 where we're going in the future so I'm
-
 Richard I am uh a maintainer on the grpc
-
 project specifically TL for python but
-
 also work on a bunch of other stuff um
-
 hello everyone my name is Jun I'm a JPC
-
 mantener and I'm excited to talk about
-
 10 years of JPC all right let's jump
-
 into
-
 it so believe it or not it has been 10
-
 years since GPC was created and when I
-
 first heard that the anniversary was
-
 coming up I I really just had to double
-
 check because it did not feel like it
-
 had been that long you know birthdays
-
 aren't quite as clearcut for software as
-
 they are for humans but it is very clear
-
 that the first commit was made internal
-
 to Google in December 2013 and the
-
 project was released publicly on GitHub
-
 in February 2015 15 so we are right
-
 around that time right now no matter how
-
 you cut it we are a decade from when the
-
 grpc project began so as you might know
-
 grpc started out as an open-source
-
 version of stubby Google's original
-
 remote procedure call system but over
-
 the past 10 years grpc has swept the
-
 cloud native mobile and machine learning
-
 ecosystems it'd be difficult to imagine
-
 a large system nowadays that didn't have
-
 grpc inside of it in one form or another
-
 so join us in taking the opportunity now
-
 to look back at the past 10 years and to
-
 look forward at the years to
-
 come okay so let's take a look at the
-
 history of GPC from a very high level as
-
 I mentioned it all started way back in
-
 2013 Google had been doing RPC with
-
 protocol buffers for years and years but
-
 since Google was starting out its own
-
 cloud there was a greater need than ever
-
 to expose apis for public consumption so
-
 they started the 10-year project of
-
 building
-
 grpc the first few years were a team
-
 effort to design a viable cross language
-
 protocol and API across a staggering
-
 nine different languages 2 and a half
-
 years after the first commit the 1.o
-
 release was made on GitHub with a
-
 familiar set of basic client and server
-
 features that we've come to depend
-
 on right moving into 2017 grpc was
-
 donated to the cncf starting a new era
-
 in grpc the community grew larger and
-
 grpc picked up more hours in production
-
 we figured out more advanced features
-
 that users needed like interceptors and
-
 flat buffer support and in 2019 grpc
-
 started working on the world's first
-
 service mesh without proxies with its
-
 implementation of XDS support adding all
-
 of this varied and Rich functionality
-
 right into the client and server
-
 libraries enabled users to get the
-
 benefits of service mesh without paying
-
 all of the
-
 costs we kept on building out more and
-
 more service mesh features in the grpc
-
 library until we got to where we are
-
 today with no more burning user requests
-
 for service mesh functionality near
-
 feature parody with traditional service
-
 meshes during this period we also built
-
 observability capabilities deep into the
-
 grpc implementation to ensure users are
-
 B able to better understand what's
-
 happening in their systems and more
-
 recently we've been engaging in
-
 integrating with other hotly growing
-
 communities such as kubernetes and the
-
 Russ programming language
-
 so let's Zoom back in on the birth of
-
 grpc as Google Cloud was beginning and
-
 apis exposed to the public were more
-
 important than ever the stubby team was
-
 faced with an interesting problem how do
-
 you open- Source stubby and make it
-
 successful one problem was that stubby
-
 was very C++ Centric but the world
-
 outside Google had much less of an
-
 emphasis on C++ it was clear that this
-
 needed to be a framework with support
-
 for a wide variety of languages and
-
 stubby was also hopelessly tied to
-
 Google internal infrastructure for name
-
 resolution and load
-
 balancing and the libraries it was built
-
 on would be a nightmare to open source
-
 along with stubby so the choice was made
-
 to build a new project completely from
-
 scratch with a code name
-
 grpc the very first code was written by
-
 Louis Ryan in December 2013 he went on
-
 to be a leader in the iso community and
-
 is now CTO of
-
 soloio back then ht2 wasn't an ietf
-
 standard and it was still just called
-
 Speedy the protocol itself wasn't stable
-
 yet either so as the grpc team was
-
 writing code it was eagerly awaiting new
-
 drafts of the http2 spec and changing up
-
 the grpc implementation in response
-
 across nine languages three operating
-
 systems and multiple instructions set
-
 architectures the grpc team worked
-
 diligently to build the first stable
-
 release along the way the team debated
-
 about what to call the project some
-
 strong contenders were brought forward
-
 such as protocol like calling a Proto AR
-
 wire and X krp c d a combination of RPC
-
 and XKCD and in the end the team chose
-
 AR wire but just before the first public
-
 release someone in leadership shot down
-
 the name archwire and the team continued
-
 on with the code name grpc the one we
-
 all know and love but we could very
-
 easily be at AR wirec 2024 today if
-
 things had played out just a little bit
-
 differently so finally in 2016 it was
-
 the big day the team had worked out all
-
 the bugs settled all the thorny design
-
 questions and declared grpc stable and
-
 generally available we have sever
-
 several video game industry veterans on
-
 the team so of course there was a golden
-
 copy created this is the grpc 1.0
-
 release written onto 10 separate floppy
-
 discs this is right around when I first
-
 heard of grpc it was making a lot of
-
 noise on the internet and in the
-
 software industry in general someone did
-
 a tech talk specifically cat around grpc
-
 python at my previous company in
-
 2016 the team formed a tight-knit
-
 community and an identity around the
-
 framework we had brought into the world
-
 we built an 8ft tall wall of sticky
-
 notes forming the original grpc logo
-
 that was at MP3 just across the lawn
-
 from this building from there the team
-
 went hard to work responding to user
-
 feedback and improving the ecosystem
-
 meanwhile the industry started to react
-
 so I'll ask Gina to describe that for us
-
 thank you Richard so since the first
-
 public release of JPC in 2015 JPC has
-
 experienced rapid adoption across
-
 various various Industries and
-
 applications its high performance
-
 capabilities and language agnostics
-
 nature have made it the goto solution
-
 for building efficient and scalable
-
 communication systems in the modern
-
 distributed
-
 environment Cisco integrated with J PC
-
 from
-
 2016 Netflix start using Dr PC for their
-
 backend communication and contributing
-
 to JPC from 2018 Spotify adopts JPC in
-
 2019 red redit linan also moved to JPC
-
 later on it's incredibly rewarding to
-
 see how our solution is being embraced
-
 by developers and making a positive
-
 impact across various Industries
-
 applications JPC has proven to be an
-
 exceptional feed for cloud native
-
 archite architectures it designed to
-
 enable efficient communication between
-
 Services by using Port buff to reduce
-
 the message size and http2 to increase
-
 the network efficiency and enables
-
 realtime communication making it ideal
-
 for com micro services that has a need
-
 to exchange large amounts of data it's
-
 language agnostic Nature Made it easy to
-
 be deployed on various platforms and
-
 infrastructure it also allow developer
-
 to build your services
-
 in your preferred
-
 languages the portability is crucial in
-
 the cloud native environments where it
-
 is quite common to build build your
-
 microservices in several languages and
-
 last but not least grpc provides
-
 features like low balancing and retries
-
 to improve the to improve the fault
-
 tolerance ensure the reliability in the
-
 distributed systems SD container D
-
 kubernetes Google Cloud platform have
-
 been using JPC for their internal
-
 communication and JPC has become a
-
 popular choice for building modern
-
 scalable and efficient applications and
-
 the cloud native
-
 environments as the tech lead for grpc
-
 python I have gotten a front row seat to
-
 the massive adoption grpc has had in the
-
 machine Learning Community as it has
-
 grown with distributed learning and
-
 remote inference both important use
-
 cases grpc is a core part of many
-
 different machine learning systems
-
 one of my earliest memories on the grpc
-
 team was fixing a deadlock intenser flow
-
 that was originally thought to be caused
-
 by grpc and with the increasing growth
-
 in machine learning gpc's presence here
-
 shows no signs of slowing down you can
-
 expect a strong presence here in the
-
 coming
-
 years JPC has emerged to be a powerful
-
 tool for mobile app development and
-
 mobile developers can Leverage PC to
-
 build robust and scalable mobile apps
-
 that can access data from various
-
 backend systems including your iot
-
 devices the cloud-based microservices
-
 and the mobile apps additionally JPC
-
 support of by directional streaming
-
 allows for a real-time data exchange
-
 making it well suited for features like
-
 live updates cheat or or collaborative
-
 tools with its ability to optimize the
-
 network usage and improve the overall
-
 performance drpc has becoming a popular
-
 choice to build your mobile
-
 apps natic the company who developed a
-
 popular mobile argm called Kon go uses
-
 drw PC for their cross component
-
 Communications within their systems Uber
-
 optimized their poal locations platform
-
 by leverage drps by directional
-
 streaming and it has been rolled out
-
 globally across all the Uber apps like
-
 Uber driver Uber Rider and Uber Ys on
-
 both Android and
-
 iOS as richer mentioned earlier drpc
-
 support a number of languages when 1.0
-
 was released in 2016 and more language
-
 support comes along the way given
-
 JavaScript widespread popularity we
-
 decided to embrace node.js and develop
-
 the native
-
 implementation similar story for cop a
-
 native cop implementation was launched
-
 with the name of jrpc dnet
-
 Dart Swift Colin support are also
-
 available for JC developers
-
 nowadays over the past few years we are
-
 committed to making Cloud native
-
 adoption easy and enabling you to scale
-
 your services
-
 seamlessly procus draw PC service match
-
 streamlines the development process by
-
 eliminating the operational overhead
-
 associated with managing and maintaining
-
 the cych process
-
 this approach not only reduce the
-
 complexity but also improve the resource
-
 efficiency making it particular
-
 appealing for large scale and Cloud
-
 native
-
 environments also processess draw PC
-
 comes with many features which allows
-
 you to bring service match capabilities
-
 to your drop PC applications
-
 easily drop PC supports various
-
 authenication and authorization
-
 mechanisms such as all alls dra toen it
-
 can be integrated with low balancing
-
 systems to distribute the traffic across
-
 multiple server
-
 instances it also provides a reflection
-
 service that allows the clients to
-
 techically discover the methods and the
-
 messages supported by a server JPC comes
-
 with the building retry and timeout
-
 mechanisms to improve the fault
-
 tolerance and
-
 reliability it allows developer to
-
 intercept the calls and modify the
-
 request and response before or after it
-
 processed last but not least drpc
-
 supports pluging that can be used to
-
 extend its
-
 functionalities we are excited to share
-
 that JPC route resource in the
-
 kubernetes Gateway API is g a couple
-
 months ago and you can use it to easily
-
 Define the routing rules for your TR for
-
 your drop PC traffic if you interested
-
 in learn more details about the procus
-
 drop PC and the drop PC route resource I
-
 have another talk earlier CLE today and
-
 you can watch a recording when they're
-
 available online or check out the
-
 documentation at a short link
-
 below so that was a look back at the
-
 past 10 years clearly some great
-
 successes with adoption but why study
-
 history without trying to draw some
-
 lessons from it one thing that we've
-
 noticed repeatedly is that people tend
-
 to prefer implementations written
-
 natively in the target language instead
-
 of built to C extensions with a rapper
-
 in the target language we found
-
 repeatedly that packaging and
-
 distribution was not mature enough for
-
 it so in three cases we saw a transition
-
 to a pure target language implementation
-
 with node Swift andn net time and again
-
 when talking to users we hear that
-
 protuff is a pivotable part of their
-
 success with grpc starting with a
-
 strongly typed contract spanning Network
-
 boundaries language boundaries and
-
 operating systems is incredibly powerful
-
 and it speeds up people's development in
-
 ways that are difficult to describe
-
 unless you've experienced it yourself
-
 and as an added bonus it even results in
-
 better performance and
-
 efficiency we've had a very strong focus
-
 on backwards compatibility our interrupt
-
 tests go all the way back to 1.0 so a
-
 client using our latest release will
-
 work against a server written with 1.0
-
 and vice versa and over the years we've
-
 built a lot of Rich functionality into
-
 grpc you saw that on our timeline and
-
 with that comes complexity but we feel
-
 that we've done a pretty good job of
-
 making sure that you only pay the cost
-
 of that complexity if you are using the
-
 particular feature and you're getting
-
 the benefit of that
-
 feature the past 10 years has been an
-
 incredible journey fill with remarkable
-
 achievements the rapid growth in
-
 adoption inspires us to continue
-
 innovating and push the boundaries of
-
 what's possible now we are thrilled to
-
 share our vision of the exciting future
-
 ahead abish schol Maro this morning
-
 highlighted the exciting expansion of
-
 JPC language support to rust and our
-
 close collaboration with the tonic team
-
 to achieve the feature priority in the
-
 native
-
 implementation dog JPC maintainer Lucio
-
 the tonic REO owner had a talk earlier
-
 today about JPC rust if you're
-
 interested check out recordings whenever
-
 it's available
-
 online while expanding the language
-
 support we are also looking ahead to the
-
 future of AI assisted development tools
-
 Eric and Yen had an AI demo earlier
-
 today and we are committed to further
-
 expansion further explore the
-
 possibility in this exciting
-
 space another area that we would like to
-
 invest further is protol management
-
 which Richard and Terry presented
-
 earlier today and be sure to catch
-
 recordings of their talk if you're
-
 interested in improving your developer
-
 workflow with protool and
-
 JPC last but not least we want to
-
 empower every JPC developer to reach
-
 your full potential potential we will
-
 continue to create more documentation
-
 example code and tutorial videos to help
-
 you succeed we would love to hear your
-
 things your insights and experiences at
-
 our inperson and virtual JPC meetups and
-
 considering join us as a JPC maintainer
-
 to help us shape the future of these
-
 amazing
-
 Technologies thank you for joining us
-
 the future of J PC looks incredibly
-
 bright and we are thrilled to be on this
-
 journey with you don't forget to visit
-
 drop.io for more documentation and
-
 example code subscribe to our YouTube
-
 channel to get notifications when there
-
 are new videos available and join our
-
 regular meetups and mailing list to get
-
 the latest update of JPC and with that
-
 I'm handing over to Kevin to talk about
-
 the next sessions of birds of feather
-
 thank you thank you everyone
-
 

@@ -1,0 +1,1648 @@
+1
+00:00:04,000 --> 00:00:09,679
+hello everyone uh my name is Ivy I am a
+
+2
+00:00:06,759 --> 00:00:11,799
+grpc Java maintainer so today uh my
+
+3
+00:00:09,679 --> 00:00:14,480
+overview talk will walk you through the
+
+4
+00:00:11,799 --> 00:00:15,240
+Core Concepts and a request life cycle
+
+5
+00:00:14,480 --> 00:00:17,760
+in
+
+6
+00:00:15,240 --> 00:00:20,920
+grpc so I know many of you have already
+
+7
+00:00:17,760 --> 00:00:24,160
+been us using grpc which is awesome but
+
+8
+00:00:20,920 --> 00:00:26,640
+whether you are a grpc expert or just
+
+9
+00:00:24,160 --> 00:00:28,920
+recently started GPC this talk I believe
+
+10
+00:00:26,640 --> 00:00:31,840
+will probably have something for you and
+
+11
+00:00:28,920 --> 00:00:33,800
+if you are just a started we have the
+
+12
+00:00:31,840 --> 00:00:36,360
+Cod Labs throughout the day uh in
+
+13
+00:00:33,800 --> 00:00:38,640
+breakout rooms those are perfect for to
+
+14
+00:00:36,360 --> 00:00:41,440
+gain some practical experience on
+
+15
+00:00:38,640 --> 00:00:43,239
+grpc so let's get started by the end of
+
+16
+00:00:41,440 --> 00:00:45,360
+the session you'll be all set for a
+
+17
+00:00:43,239 --> 00:00:48,600
+whole day of reach topics and advanced
+
+18
+00:00:45,360 --> 00:00:48,600
+use cases around
+
+19
+00:00:49,680 --> 00:00:55,600
+grpc first of all grpc is a Cutting Edge
+
+20
+00:00:53,160 --> 00:00:57,399
+Open sauce and high performance remote
+
+21
+00:00:55,600 --> 00:01:00,199
+procedure call
+
+22
+00:00:57,399 --> 00:01:04,080
+framework um it is the go-to standard in
+
+23
+00:01:00,199 --> 00:01:07,200
+the industry but part A simpler uh term
+
+24
+00:01:04,080 --> 00:01:09,520
+it think of it as a super uh fast fight
+
+25
+00:01:07,200 --> 00:01:12,840
+service for your data it Zing your
+
+26
+00:01:09,520 --> 00:01:12,840
+business bi across
+
+27
+00:01:13,200 --> 00:01:18,960
+internet JP use cases everywhere it
+
+28
+00:01:16,840 --> 00:01:21,600
+enables communication between a wide
+
+29
+00:01:18,960 --> 00:01:24,960
+range of devices from the mobile phone
+
+30
+00:01:21,600 --> 00:01:26,720
+to web browser to Des desktops and to
+
+31
+00:01:24,960 --> 00:01:29,400
+various backend
+
+32
+00:01:26,720 --> 00:01:31,799
+platforms this versatility makes it
+
+33
+00:01:29,400 --> 00:01:34,600
+perfect to building microservices and
+
+34
+00:01:31,799 --> 00:01:39,000
+distributed applications whether in on
+
+35
+00:01:34,600 --> 00:01:39,000
+premise in the cloud or in the
+
+36
+00:01:41,159 --> 00:01:47,200
+containers JPC is popular because it is
+
+37
+00:01:44,320 --> 00:01:49,320
+suitable for many needs in addition to
+
+38
+00:01:47,200 --> 00:01:51,880
+being available in a wider range of
+
+39
+00:01:49,320 --> 00:01:55,119
+platforms and language the performance
+
+40
+00:01:51,880 --> 00:01:57,759
+is industry leading it is blazing fast
+
+41
+00:01:55,119 --> 00:01:59,479
+incredibly efficient that connects your
+
+42
+00:01:57,759 --> 00:02:02,240
+application and services at very
+
+43
+00:01:59,479 --> 00:02:05,439
+reliable and a smooth
+
+44
+00:02:02,240 --> 00:02:07,520
+way many components in grpc are designed
+
+45
+00:02:05,439 --> 00:02:09,599
+to be plugable like there are different
+
+46
+00:02:07,520 --> 00:02:11,920
+transport suitable for different devices
+
+47
+00:02:09,599 --> 00:02:14,239
+and environments like you can specify
+
+48
+00:02:11,920 --> 00:02:17,760
+civilization wire format or you can
+
+49
+00:02:14,239 --> 00:02:20,080
+specify interceptors Etc this all makes
+
+50
+00:02:17,760 --> 00:02:22,920
+integrating with your development stack
+
+51
+00:02:20,080 --> 00:02:25,800
+very efficient and
+
+52
+00:02:22,920 --> 00:02:28,200
+flexible JPC has Rich features around
+
+53
+00:02:25,800 --> 00:02:31,200
+the um core traffic management or
+
+54
+00:02:28,200 --> 00:02:34,959
+security and the tailored ones for PIV
+
+55
+00:02:31,200 --> 00:02:38,720
+uh for service match just to name a few
+
+56
+00:02:34,959 --> 00:02:41,480
+let's expand more on all of these
+
+57
+00:02:38,720 --> 00:02:43,800
+Dimensions gp's popular popularity
+
+58
+00:02:41,480 --> 00:02:46,280
+stands on a few key fundamental design
+
+59
+00:02:43,800 --> 00:02:48,959
+decisions that brings in Cutting Edge
+
+60
+00:02:46,280 --> 00:02:52,959
+Technologies on top of it one is that
+
+61
+00:02:48,959 --> 00:02:55,959
+JPC is using protuff for data calization
+
+62
+00:02:52,959 --> 00:02:55,959
+and generating
+
+63
+00:02:56,560 --> 00:03:02,040
+interfaces protuff is an open source
+
+64
+00:02:59,040 --> 00:03:03,760
+language agnos framework uh all of the
+
+65
+00:03:02,040 --> 00:03:06,640
+grpc Implement uh language
+
+66
+00:03:03,760 --> 00:03:09,200
+implementations use protuff plugin to
+
+67
+00:03:06,640 --> 00:03:11,959
+generate interfaces therefore these
+
+68
+00:03:09,200 --> 00:03:16,319
+language uh these JPC language can talk
+
+69
+00:03:11,959 --> 00:03:19,920
+with each other over various devices and
+
+70
+00:03:16,319 --> 00:03:22,519
+platforms Pabu uses binary encoding it
+
+71
+00:03:19,920 --> 00:03:26,319
+is very efficient in parsing and reduces
+
+72
+00:03:22,519 --> 00:03:28,360
+message sizes all of which make GPC high
+
+73
+00:03:26,319 --> 00:03:31,760
+performance and high flexibility
+
+74
+00:03:28,360 --> 00:03:31,760
+compared with other RPC
+
+75
+00:03:32,319 --> 00:03:38,080
+Frameworks GPC boasts an extensive
+
+76
+00:03:35,680 --> 00:03:40,599
+support of languages and platforms as
+
+77
+00:03:38,080 --> 00:03:44,080
+evidenced from this
+
+78
+00:03:40,599 --> 00:03:47,040
+list um the exciting news as Kevin abek
+
+79
+00:03:44,080 --> 00:03:48,760
+mentioned that Russ JP R is coming soon
+
+80
+00:03:47,040 --> 00:03:51,760
+so uh don't miss out today's session if
+
+81
+00:03:48,760 --> 00:03:51,760
+you want to learn more about
+
+82
+00:03:52,760 --> 00:03:58,360
+it another key design decision is that
+
+83
+00:03:55,280 --> 00:04:00,640
+your PC is built on top of http2 that
+
+84
+00:03:58,360 --> 00:04:02,799
+make it compatible with with a variety
+
+85
+00:04:00,640 --> 00:04:04,360
+of low balancers and practice over the
+
+86
+00:04:02,799 --> 00:04:08,159
+wild
+
+87
+00:04:04,360 --> 00:04:10,920
+internet hp2 reduces TCP connection is
+
+88
+00:04:08,159 --> 00:04:13,519
+binary and use header compression all of
+
+89
+00:04:10,920 --> 00:04:18,120
+which makes grpc high performance reduce
+
+90
+00:04:13,519 --> 00:04:18,120
+latency and make better use of
+
+91
+00:04:18,919 --> 00:04:25,240
+resources okay Core Concepts so gpc's
+
+92
+00:04:22,120 --> 00:04:27,880
+core concept starts with channel channel
+
+93
+00:04:25,240 --> 00:04:31,320
+is an abstract of the end point that you
+
+94
+00:04:27,880 --> 00:04:33,120
+can send or receive messages
+
+95
+00:04:31,320 --> 00:04:36,199
+it is the first object that you will
+
+96
+00:04:33,120 --> 00:04:38,720
+create when you are using JPC to create
+
+97
+00:04:36,199 --> 00:04:41,320
+a channel you will provide the talk UI
+
+98
+00:04:38,720 --> 00:04:43,479
+string to specify the remote Hoster name
+
+99
+00:04:41,320 --> 00:04:45,880
+and then Channel credentials for
+
+100
+00:04:43,479 --> 00:04:48,600
+authorization again I highly recommend
+
+101
+00:04:45,880 --> 00:04:51,560
+to attend those collabs to gain more
+
+102
+00:04:48,600 --> 00:04:51,560
+practical experiences
+
+103
+00:04:52,280 --> 00:04:56,840
+quickly so as a channel is like a
+
+104
+00:04:54,759 --> 00:04:58,600
+waterpipe placeholder the sub channels
+
+105
+00:04:56,840 --> 00:05:02,280
+are the real connections towards the
+
+106
+00:04:58,600 --> 00:05:04,960
+back end um Services JPC during it life
+
+107
+00:05:02,280 --> 00:05:07,360
+cycle will create those sub channels
+
+108
+00:05:04,960 --> 00:05:10,400
+dynamically select sub channels to
+
+109
+00:05:07,360 --> 00:05:12,800
+multipli rpcs over the channel and it
+
+110
+00:05:10,400 --> 00:05:16,759
+will report Channel status and finally
+
+111
+00:05:12,800 --> 00:05:16,759
+tear down the sub channels to return
+
+112
+00:05:17,800 --> 00:05:23,680
+resources JPC is very simple to use the
+
+113
+00:05:21,319 --> 00:05:25,880
+application only need to send a request
+
+114
+00:05:23,680 --> 00:05:28,800
+of the stop that is Created from the
+
+115
+00:05:25,880 --> 00:05:30,919
+channel and stop is at the protuff
+
+116
+00:05:28,800 --> 00:05:32,240
+generated layer which is also the first
+
+117
+00:05:30,919 --> 00:05:33,479
+layer that you will see when you're
+
+118
+00:05:32,240 --> 00:05:36,720
+using
+
+119
+00:05:33,479 --> 00:05:39,400
+JPC the stop qu call towards the JPC run
+
+120
+00:05:36,720 --> 00:05:43,800
+time and then further creates stream on
+
+121
+00:05:39,400 --> 00:05:45,840
+the transport so in JPC an RPC a core or
+
+122
+00:05:43,800 --> 00:05:48,720
+stream are fundamentally the same
+
+123
+00:05:45,840 --> 00:05:53,600
+concept just refer to by different names
+
+124
+00:05:48,720 --> 00:05:53,600
+at various um stages in their life
+
+125
+00:05:55,160 --> 00:06:00,160
+cycle because the chance part speakers
+
+126
+00:05:57,520 --> 00:06:01,960
+IP address while you specify or Target
+
+127
+00:06:00,160 --> 00:06:04,400
+UI screen when you are creating the
+
+128
+00:06:01,960 --> 00:06:07,000
+channel so the first thing JPC will do
+
+129
+00:06:04,400 --> 00:06:09,000
+is to do this uh translation before it
+
+130
+00:06:07,000 --> 00:06:11,199
+contacts the
+
+131
+00:06:09,000 --> 00:06:13,720
+internet name resolution is often
+
+132
+00:06:11,199 --> 00:06:16,160
+thought to be the same as DNS but in
+
+133
+00:06:13,720 --> 00:06:18,639
+practice however uh name resolution is
+
+134
+00:06:16,160 --> 00:06:21,400
+often augmented with extensions or
+
+135
+00:06:18,639 --> 00:06:24,080
+completely replaced to do name
+
+136
+00:06:21,400 --> 00:06:26,520
+resolution fundamentally name resolution
+
+137
+00:06:24,080 --> 00:06:29,000
+is a service Discovery and it's
+
+138
+00:06:26,520 --> 00:06:32,440
+pluggable you can bring in the custom
+
+139
+00:06:29,000 --> 00:06:35,080
+name solver by specifying a schema and
+
+140
+00:06:32,440 --> 00:06:37,240
+then you will put the schema as a syntax
+
+141
+00:06:35,080 --> 00:06:39,919
+in the Target your string grpc will do
+
+142
+00:06:37,240 --> 00:06:39,919
+this mapping for
+
+143
+00:06:40,919 --> 00:06:46,039
+you name resolver returns service config
+
+144
+00:06:44,160 --> 00:06:49,080
+to the next component which is low
+
+145
+00:06:46,039 --> 00:06:51,120
+balancer low balancer manages sub
+
+146
+00:06:49,080 --> 00:06:53,160
+channels create connections and
+
+147
+00:06:51,120 --> 00:06:55,039
+distribute request among the backend
+
+148
+00:06:53,160 --> 00:06:57,720
+multiple backhand
+
+149
+00:06:55,039 --> 00:07:00,199
+Services by taking this service config
+
+150
+00:06:57,720 --> 00:07:02,400
+low balancer can understand where and
+
+151
+00:07:00,199 --> 00:07:04,520
+how to route the traffic like which kind
+
+152
+00:07:02,400 --> 00:07:06,280
+of load Bal type to use their
+
+153
+00:07:04,520 --> 00:07:07,919
+configurations whether to do health
+
+154
+00:07:06,280 --> 00:07:11,720
+check
+
+155
+00:07:07,919 --> 00:07:13,400
+Etc low balancer is a plugable component
+
+156
+00:07:11,720 --> 00:07:15,599
+the built-in low balancer types are
+
+157
+00:07:13,400 --> 00:07:18,319
+picked first which is the default and
+
+158
+00:07:15,599 --> 00:07:20,800
+the r robbing wait R robbing list
+
+159
+00:07:18,319 --> 00:07:20,800
+request
+
+160
+00:07:21,479 --> 00:07:27,520
+Etc so for the first time the system
+
+161
+00:07:24,599 --> 00:07:29,800
+establishes low balancer will um create
+
+162
+00:07:27,520 --> 00:07:31,560
+connection towards the backend service
+
+163
+00:07:29,800 --> 00:07:34,400
+um that is listening on the certain
+
+164
+00:07:31,560 --> 00:07:36,720
+ports when the system is running low
+
+165
+00:07:34,400 --> 00:07:38,919
+balancer will monitor the connections on
+
+166
+00:07:36,720 --> 00:07:41,120
+those sub channels and if necessary it
+
+167
+00:07:38,919 --> 00:07:43,159
+will tear down some sub channels and
+
+168
+00:07:41,120 --> 00:07:45,599
+replace with new
+
+169
+00:07:43,159 --> 00:07:46,560
+ones like for example the back end
+
+170
+00:07:45,599 --> 00:07:49,000
+becomes
+
+171
+00:07:46,560 --> 00:07:51,560
+unhealthy uh L balancer essentially
+
+172
+00:07:49,000 --> 00:07:55,080
+divides GP system into control plane and
+
+173
+00:07:51,560 --> 00:07:57,759
+data plane it maintains a cach cach the
+
+174
+00:07:55,080 --> 00:08:00,800
+Picker that dynamically selects a sub
+
+175
+00:07:57,759 --> 00:08:02,560
+channel on the per RPC based routing and
+
+176
+00:08:00,800 --> 00:08:04,759
+this is on the data plane path while on
+
+177
+00:08:02,560 --> 00:08:07,199
+the control plane path the low balancer
+
+178
+00:08:04,759 --> 00:08:10,039
+will swap the cash in flight this
+
+179
+00:08:07,199 --> 00:08:13,159
+essentially ensures that grpc is
+
+180
+00:08:10,039 --> 00:08:15,479
+scalable effectively and high
+
+181
+00:08:13,159 --> 00:08:18,000
+performance lb is one of the most
+
+182
+00:08:15,479 --> 00:08:19,400
+critical component in GPC so if you're
+
+183
+00:08:18,000 --> 00:08:22,879
+interested in learning more you can
+
+184
+00:08:19,400 --> 00:08:22,879
+check out eswa session
+
+185
+00:08:23,919 --> 00:08:29,960
+today upon the connection establishment
+
+186
+00:08:26,840 --> 00:08:32,719
+GPC will send a request over the Y
+
+187
+00:08:29,960 --> 00:08:36,919
+it is using the protuff calization and
+
+188
+00:08:32,719 --> 00:08:36,919
+the data is framed using htb2
+
+189
+00:08:37,360 --> 00:08:42,919
+protocol the server side is a mirror of
+
+190
+00:08:40,159 --> 00:08:46,000
+the client s the server Transportation
+
+191
+00:08:42,919 --> 00:08:48,200
+once receed the request um will pass up
+
+192
+00:08:46,000 --> 00:08:50,279
+the messages to the JFC run time toward
+
+193
+00:08:48,200 --> 00:08:52,399
+the Stop and notifies the
+
+194
+00:08:50,279 --> 00:08:55,320
+application the application sends a
+
+195
+00:08:52,399 --> 00:08:55,320
+response back on the
+
+196
+00:08:55,680 --> 00:09:02,040
+stop JPC communic back to the client and
+
+197
+00:09:00,000 --> 00:09:04,720
+depending on how many those kind of
+
+198
+00:09:02,040 --> 00:09:07,200
+round trips in each RPC GP supports four
+
+199
+00:09:04,720 --> 00:09:09,959
+types of them unit call is that you only
+
+200
+00:09:07,200 --> 00:09:12,120
+have one request and response um within
+
+201
+00:09:09,959 --> 00:09:14,800
+single RPC while by streaming is that
+
+202
+00:09:12,120 --> 00:09:17,560
+you have multiple on both directions and
+
+203
+00:09:14,800 --> 00:09:20,000
+similarly for count streaming and server
+
+204
+00:09:17,560 --> 00:09:22,200
+streaming in principle J is always
+
+205
+00:09:20,000 --> 00:09:24,720
+asynchronous um but some of apis are
+
+206
+00:09:22,200 --> 00:09:26,760
+blocking these are just special cases of
+
+207
+00:09:24,720 --> 00:09:29,160
+the asynchronous
+
+208
+00:09:26,760 --> 00:09:31,480
+cost you can choose one for your
+
+209
+00:09:29,160 --> 00:09:35,560
+business bus
+
+210
+00:09:31,480 --> 00:09:39,160
+logic a few more bonus um tips for the
+
+211
+00:09:35,560 --> 00:09:43,040
+core comp Concepts in the J life
+
+212
+00:09:39,160 --> 00:09:46,079
+cycle so at the channel and server layer
+
+213
+00:09:43,040 --> 00:09:48,440
+interceptors are useful tools to add a
+
+214
+00:09:46,079 --> 00:09:52,640
+task tasks that are independent of the
+
+215
+00:09:48,440 --> 00:09:55,160
+methods but apply to all or most of the
+
+216
+00:09:52,640 --> 00:09:58,440
+rpcs interceptors are very powerful
+
+217
+00:09:55,160 --> 00:10:02,839
+midle Weare tools to add a tasks to um
+
+218
+00:09:58,440 --> 00:10:04,360
+modify or replace your your your cost um
+
+219
+00:10:02,839 --> 00:10:06,399
+before and after they reach their
+
+220
+00:10:04,360 --> 00:10:08,160
+destination at both the client and the
+
+221
+00:10:06,399 --> 00:10:12,160
+server
+
+222
+00:10:08,160 --> 00:10:15,800
+side this provides a very clean way to
+
+223
+00:10:12,160 --> 00:10:18,480
+um address uh Cutting Edge concerns like
+
+224
+00:10:15,800 --> 00:10:20,880
+logging authenication authorization like
+
+225
+00:10:18,480 --> 00:10:23,839
+ever handling monitoring Etc without
+
+226
+00:10:20,880 --> 00:10:26,680
+cluttering your main application
+
+227
+00:10:23,839 --> 00:10:28,279
+logic you can provide multiple um client
+
+228
+00:10:26,680 --> 00:10:30,240
+server interceptors and their order
+
+229
+00:10:28,279 --> 00:10:32,399
+matters for them example if you are
+
+230
+00:10:30,240 --> 00:10:34,399
+installing two client interceptors the
+
+231
+00:10:32,399 --> 00:10:37,360
+caching and loging Interceptor and if
+
+232
+00:10:34,399 --> 00:10:39,079
+you put log uh caching Interceptor front
+
+233
+00:10:37,360 --> 00:10:41,040
+then that means you are focusing more on
+
+234
+00:10:39,079 --> 00:10:44,079
+the communication because the loging
+
+235
+00:10:41,040 --> 00:10:46,880
+part will be just skipped if you have a
+
+236
+00:10:44,079 --> 00:10:48,920
+cash hit but if you flipped other to put
+
+237
+00:10:46,880 --> 00:10:50,839
+the login first then you are observing
+
+238
+00:10:48,920 --> 00:10:53,240
+more on the client Behavior because all
+
+239
+00:10:50,839 --> 00:10:56,079
+the requests will be
+
+240
+00:10:53,240 --> 00:10:58,480
+logged you might find that many of your
+
+241
+00:10:56,079 --> 00:11:02,800
+functionality is already available as an
+
+242
+00:10:58,480 --> 00:11:02,800
+Interceptor in in The Wider GPC
+
+243
+00:11:04,800 --> 00:11:10,600
+ecosystem deadline and time out they are
+
+244
+00:11:08,360 --> 00:11:13,000
+um when the client is unwilling to wait
+
+245
+00:11:10,600 --> 00:11:15,399
+for response from a server the client
+
+246
+00:11:13,000 --> 00:11:17,320
+will receive a deadline exceeded status
+
+247
+00:11:15,399 --> 00:11:20,120
+code from
+
+248
+00:11:17,320 --> 00:11:22,480
+grpc this safeguards against RPC from
+
+249
+00:11:20,120 --> 00:11:26,200
+taking infinite amount of time when it
+
+250
+00:11:22,480 --> 00:11:27,720
+is doing um the request especially um in
+
+251
+00:11:26,200 --> 00:11:31,880
+distributed systems where Network
+
+252
+00:11:27,720 --> 00:11:35,000
+latency or the servers can cost
+
+253
+00:11:31,880 --> 00:11:37,279
+L that line can be set from the client
+
+254
+00:11:35,000 --> 00:11:40,440
+side when it starts an RPC like in this
+
+255
+00:11:37,279 --> 00:11:43,920
+step um some languages have the concept
+
+256
+00:11:40,440 --> 00:11:46,440
+of deadline others use idea of time out
+
+257
+00:11:43,920 --> 00:11:49,560
+well deadline is that is a specific time
+
+258
+00:11:46,440 --> 00:11:51,959
+point where your RPC cannot go pass by
+
+259
+00:11:49,560 --> 00:11:55,160
+but the uh time out is the max duration
+
+260
+00:11:51,959 --> 00:11:58,240
+of the time to compete a RPC these two
+
+261
+00:11:55,160 --> 00:12:00,800
+concepts are interchangeable with each
+
+262
+00:11:58,240 --> 00:12:02,720
+other while deadline ex seeded is very
+
+263
+00:12:00,800 --> 00:12:05,079
+common when the request never leaves the
+
+264
+00:12:02,720 --> 00:12:07,200
+client for example uh in a typical
+
+265
+00:12:05,079 --> 00:12:10,360
+scenario that the TCP connection cannot
+
+266
+00:12:07,200 --> 00:12:13,320
+be established from the lb but when it
+
+267
+00:12:10,360 --> 00:12:15,959
+leaves the client it will carry this um
+
+268
+00:12:13,320 --> 00:12:18,000
+deadline information to the server it is
+
+269
+00:12:15,959 --> 00:12:20,000
+possible that when server first receive
+
+270
+00:12:18,000 --> 00:12:21,760
+the request it already has earn
+
+271
+00:12:20,000 --> 00:12:24,399
+realistically small amount of time to
+
+272
+00:12:21,760 --> 00:12:26,079
+finish at this time it will just cancel
+
+273
+00:12:24,399 --> 00:12:30,199
+the call and propagate that line
+
+274
+00:12:26,079 --> 00:12:32,440
+exceeded the status code to the client
+
+275
+00:12:30,199 --> 00:12:34,079
+while in a distributed application uh it
+
+276
+00:12:32,440 --> 00:12:37,279
+is typical it's very possible that the
+
+277
+00:12:34,079 --> 00:12:40,160
+server is also a client towards the
+
+278
+00:12:37,279 --> 00:12:43,800
+downstream service in this scenario the
+
+279
+00:12:40,160 --> 00:12:47,040
+um propagating deadline from in incoming
+
+280
+00:12:43,800 --> 00:12:48,360
+RPC to an ongoing outgoing one is uh is
+
+281
+00:12:47,040 --> 00:12:51,680
+supported by
+
+282
+00:12:48,360 --> 00:12:53,720
+JPC there many benefits of set setting
+
+283
+00:12:51,680 --> 00:12:56,720
+that line for example you optimize your
+
+284
+00:12:53,720 --> 00:12:59,320
+resource usage improve latency and abort
+
+285
+00:12:56,720 --> 00:13:00,600
+long um running operations that are
+
+286
+00:12:59,320 --> 00:13:03,160
+unlikely to
+
+287
+00:13:00,600 --> 00:13:05,800
+succeed and it is the best practice to
+
+288
+00:13:03,160 --> 00:13:05,800
+always set a
+
+289
+00:13:06,240 --> 00:13:11,079
+deadline while deadline check is
+
+290
+00:13:08,240 --> 00:13:14,959
+cancellation and user can also actively
+
+291
+00:13:11,079 --> 00:13:17,680
+termin own outgoing on PC RPC actively
+
+292
+00:13:14,959 --> 00:13:20,320
+and this is done by do cancel on the
+
+293
+00:13:17,680 --> 00:13:22,160
+client call object and sometimes on the
+
+294
+00:13:20,320 --> 00:13:24,440
+context in some
+
+295
+00:13:22,160 --> 00:13:26,519
+languages like in this code snipp it it
+
+296
+00:13:24,440 --> 00:13:29,560
+cancel on the future
+
+297
+00:13:26,519 --> 00:13:32,720
+step the cancellation signal is uh
+
+298
+00:13:29,560 --> 00:13:34,720
+propagated to the server and normally um
+
+299
+00:13:32,720 --> 00:13:35,959
+GPC does not have mechanism to interrupt
+
+300
+00:13:34,720 --> 00:13:38,160
+the server application of this
+
+301
+00:13:35,959 --> 00:13:40,560
+cancellation but that is not problem the
+
+302
+00:13:38,160 --> 00:13:43,639
+server can check the cancellation status
+
+303
+00:13:40,560 --> 00:13:46,639
+on the call and actually to optimize
+
+304
+00:13:43,639 --> 00:13:48,720
+resource utilization if RPC is long
+
+305
+00:13:46,639 --> 00:13:51,600
+lived the server Handler should
+
+306
+00:13:48,720 --> 00:13:54,000
+periodically um check the status of the
+
+307
+00:13:51,600 --> 00:13:57,360
+call to see whether it is canceled and
+
+308
+00:13:54,000 --> 00:14:00,959
+cease operation if it does and propagate
+
+309
+00:13:57,360 --> 00:14:00,959
+the operation downstreams
+
+310
+00:14:03,440 --> 00:14:08,320
+um by reattempting the failed operations
+
+311
+00:14:06,199 --> 00:14:10,320
+applications can overcome various
+
+312
+00:14:08,320 --> 00:14:11,519
+problems temporary issues like Network
+
+313
+00:14:10,320 --> 00:14:14,120
+or server
+
+314
+00:14:11,519 --> 00:14:16,880
+glitches your TR component stands in the
+
+315
+00:14:14,120 --> 00:14:18,920
+core above transport layer and when a TR
+
+316
+00:14:16,880 --> 00:14:20,519
+happens it will duplicate a stream on
+
+317
+00:14:18,920 --> 00:14:23,079
+the
+
+318
+00:14:20,519 --> 00:14:26,199
+transport users uh does not immediately
+
+319
+00:14:23,079 --> 00:14:28,680
+notice your exists except for increased
+
+320
+00:14:26,199 --> 00:14:30,639
+latency but with growing the growing
+
+321
+00:14:28,680 --> 00:14:33,000
+support for observability you can see
+
+322
+00:14:30,639 --> 00:14:36,320
+more information on retry which is
+
+323
+00:14:33,000 --> 00:14:38,519
+awesome and let's dive more into the
+
+324
+00:14:36,320 --> 00:14:41,680
+retry
+
+325
+00:14:38,519 --> 00:14:44,120
+Logics so grps built in ret logic will
+
+326
+00:14:41,680 --> 00:14:46,680
+save the call history and then if needed
+
+327
+00:14:44,120 --> 00:14:49,600
+it will replay the call on uh when
+
+328
+00:14:46,680 --> 00:14:52,600
+potential retry happens to opt in the
+
+329
+00:14:49,600 --> 00:14:55,839
+user will specify retry policy in the
+
+330
+00:14:52,600 --> 00:14:58,399
+service configure so ret policy um
+
+331
+00:14:55,839 --> 00:15:02,639
+includes say the maximum attempts the
+
+332
+00:14:58,399 --> 00:15:06,759
+back of policy and retriable status code
+
+333
+00:15:02,639 --> 00:15:10,079
+list JPC will monitor an um rpc's event
+
+334
+00:15:06,759 --> 00:15:13,120
+status and if certain criterias are met
+
+335
+00:15:10,079 --> 00:15:15,480
+for example the retry is with the RPC is
+
+336
+00:15:13,120 --> 00:15:18,320
+within the maximum attempt and it's
+
+337
+00:15:15,480 --> 00:15:20,560
+within the retriable status code it will
+
+338
+00:15:18,320 --> 00:15:23,880
+duplicate a retriable stream on the
+
+339
+00:15:20,560 --> 00:15:26,079
+transport upon the back off exponential
+
+340
+00:15:23,880 --> 00:15:28,800
+exponential back of
+
+341
+00:15:26,079 --> 00:15:29,800
+delays once the response header has been
+
+342
+00:15:28,800 --> 00:15:31,360
+received
+
+343
+00:15:29,800 --> 00:15:35,120
+the RPC will hand over to the
+
+344
+00:15:31,360 --> 00:15:37,560
+application and there will no be no more
+
+345
+00:15:35,120 --> 00:15:40,399
+tries even without explicit
+
+346
+00:15:37,560 --> 00:15:43,399
+configuration retry can also happen as a
+
+347
+00:15:40,399 --> 00:15:45,639
+transparent try it can be multiple
+
+348
+00:15:43,399 --> 00:15:47,560
+unlimited time of transparent try if the
+
+349
+00:15:45,639 --> 00:15:49,519
+request never leaves the client or a
+
+350
+00:15:47,560 --> 00:15:51,959
+single one if it leaves the client but
+
+351
+00:15:49,519 --> 00:15:55,040
+never seen by the server
+
+352
+00:15:51,959 --> 00:15:57,440
+application if we config observability
+
+353
+00:15:55,040 --> 00:15:59,600
+um say open Telemetry then you can see
+
+354
+00:15:57,440 --> 00:16:03,279
+the ret information for example ret
+
+355
+00:15:59,600 --> 00:16:06,480
+attempts and the ret latencies on as
+
+356
+00:16:03,279 --> 00:16:06,480
+open Telemetry Matrix and
+
+357
+00:16:08,680 --> 00:16:13,000
+chasing when the server receives the
+
+358
+00:16:10,880 --> 00:16:15,519
+response successfully it can complete
+
+359
+00:16:13,000 --> 00:16:17,839
+successfully um but there it also
+
+360
+00:16:15,519 --> 00:16:21,120
+possible that it will um be ended up in
+
+361
+00:16:17,839 --> 00:16:23,319
+error this is um due to like silver
+
+362
+00:16:21,120 --> 00:16:26,120
+errors clent cancellation as we talked
+
+363
+00:16:23,319 --> 00:16:28,680
+or the network errors normally Cent
+
+364
+00:16:26,120 --> 00:16:30,759
+server will agree on the status of RPC
+
+365
+00:16:28,680 --> 00:16:33,120
+but it's also possible that for example
+
+366
+00:16:30,759 --> 00:16:35,519
+the server uh will see the client the
+
+367
+00:16:33,120 --> 00:16:37,120
+request being successful while due to
+
+368
+00:16:35,519 --> 00:16:40,639
+communication reasons the client will
+
+369
+00:16:37,120 --> 00:16:43,360
+see the error status in the client but
+
+370
+00:16:40,639 --> 00:16:45,680
+this is fine it is important to shut
+
+371
+00:16:43,360 --> 00:16:47,880
+down server and channel to recollect
+
+372
+00:16:45,680 --> 00:16:50,480
+resources you will call shutdown on the
+
+373
+00:16:47,880 --> 00:16:52,880
+channel object that will cancel the new
+
+374
+00:16:50,480 --> 00:16:55,040
+cost immediately but will let um the
+
+375
+00:16:52,880 --> 00:16:57,600
+pre-existing cost to continue or you can
+
+376
+00:16:55,040 --> 00:16:59,800
+also do a forceful shutdown that will
+
+377
+00:16:57,600 --> 00:17:01,959
+cancel the new and both new and the
+
+378
+00:16:59,800 --> 00:17:04,600
+pre-existing calls
+
+379
+00:17:01,959 --> 00:17:08,439
+immediately shutdown is asynchronous you
+
+380
+00:17:04,600 --> 00:17:10,480
+can call um await domination to wait for
+
+381
+00:17:08,439 --> 00:17:12,760
+all the resource to be connected and
+
+382
+00:17:10,480 --> 00:17:14,880
+then it will give up if certain time out
+
+383
+00:17:12,760 --> 00:17:14,880
+is
+
+384
+00:17:15,839 --> 00:17:21,720
+reached to summarize today we talked
+
+385
+00:17:18,640 --> 00:17:23,720
+about grpc Library structure components
+
+386
+00:17:21,720 --> 00:17:26,400
+we touch a bit on the name resolver and
+
+387
+00:17:23,720 --> 00:17:29,360
+load balancer and we walked through the
+
+388
+00:17:26,400 --> 00:17:31,400
+RPC left cycle we talked that uh
+
+389
+00:17:29,360 --> 00:17:35,240
+application will send messages on the
+
+390
+00:17:31,400 --> 00:17:37,440
+Stop and the pro on the pro gener layer
+
+391
+00:17:35,240 --> 00:17:40,960
+and then asynchronously name resolution
+
+392
+00:17:37,440 --> 00:17:42,600
+will do um uh will do it work and then
+
+393
+00:17:40,960 --> 00:17:45,799
+the low balancer will establish
+
+394
+00:17:42,600 --> 00:17:48,440
+connection and pick sub channel for the
+
+395
+00:17:45,799 --> 00:17:50,280
+request well the initially the RPC will
+
+396
+00:17:48,440 --> 00:17:52,120
+buffer for a while but the next one it
+
+397
+00:17:50,280 --> 00:17:54,720
+will be much
+
+398
+00:17:52,120 --> 00:17:57,440
+faster RPC turned into R tribal stream
+
+399
+00:17:54,720 --> 00:17:59,159
+at the transport and it might um be
+
+400
+00:17:57,440 --> 00:18:01,720
+cancelled at any time if that line
+
+401
+00:17:59,159 --> 00:18:03,919
+exceeded or if there is an explicit
+
+402
+00:18:01,720 --> 00:18:06,720
+cancellation and finally hopefully the
+
+403
+00:18:03,919 --> 00:18:09,960
+RPC and all the channel and servers will
+
+404
+00:18:06,720 --> 00:18:09,960
+be terminated
+
+405
+00:18:10,400 --> 00:18:15,240
+properly JPC use cases are every
+
+406
+00:18:13,039 --> 00:18:18,559
+everywhere it is especially powerful in
+
+407
+00:18:15,240 --> 00:18:22,039
+building microservices thanks to the XDS
+
+408
+00:18:18,559 --> 00:18:24,919
+offerings in the proxy L service MH
+
+409
+00:18:22,039 --> 00:18:26,440
+solution that wraps up my presentation
+
+410
+00:18:24,919 --> 00:18:27,750
+thank you all for your time and
+
+411
+00:18:26,440 --> 00:18:33,559
+attention
+
+412
+00:18:27,750 --> 00:18:33,559
+[Applause]
+

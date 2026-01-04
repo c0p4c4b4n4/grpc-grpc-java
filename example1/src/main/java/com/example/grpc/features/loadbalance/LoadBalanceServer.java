@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-public class LoadBalanceServer {
+public class /*TODO*/ LoadBalanceServer {
 
     private static final Logger logger = Logger.getLogger(LoadBalanceServer.class.getName());
 
@@ -59,7 +59,7 @@ public class LoadBalanceServer {
         server.blockUntilShutdown();
     }
 
-    static class GreeterImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    static class /*TODO*/ GreeterImpl extends EchoServiceGrpc.EchoServiceImplBase {
 
         int port;
 

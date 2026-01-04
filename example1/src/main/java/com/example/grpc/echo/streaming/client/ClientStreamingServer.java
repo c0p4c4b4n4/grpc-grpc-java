@@ -10,7 +10,7 @@ import io.grpc.stub.StreamObserver;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ClientStreamingServer {
+public class /*TODO*/ ClientStreamingServer {
 
     private static final Logger logger = Logger.getLogger(ClientStreamingServer.class.getName());
 
@@ -18,7 +18,7 @@ public class ClientStreamingServer {
         Servers.start(new EchoServiceImpl(), logger);
     }
 
-    private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    private static class /*TODO*/ EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
         @Override
         public StreamObserver<EchoRequest> clientStreamingEcho(StreamObserver<EchoResponse> responseObserver) {
             return new StreamObserver<>() {

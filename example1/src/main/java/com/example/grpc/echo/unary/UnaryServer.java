@@ -9,7 +9,7 @@ import io.grpc.stub.StreamObserver;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class UnaryServer {
+public class /*TODO*/ UnaryServer {
 
     private static final Logger logger = Logger.getLogger(UnaryServer.class.getName());
 
@@ -17,7 +17,7 @@ public class UnaryServer {
         Servers.start(new EchoServiceImpl(), logger);
     }
 
-    private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    private static class /*TODO*/ EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
         @Override
         public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
             logger.log(Level.INFO, "request: {0}", request.getMessage());

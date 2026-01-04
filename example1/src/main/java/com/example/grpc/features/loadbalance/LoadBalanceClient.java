@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class LoadBalanceClient {
+public class /*TODO*/ LoadBalanceClient {
 
     private static final Logger logger = Logger.getLogger(LoadBalanceClient.class.getName());
 

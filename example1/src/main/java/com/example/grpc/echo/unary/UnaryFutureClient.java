@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class UnaryFutureClient {
+public class /*TODO*/ UnaryFutureClient {
 
     private static final Logger logger = Logger.getLogger(UnaryFutureClient.class.getName());
 

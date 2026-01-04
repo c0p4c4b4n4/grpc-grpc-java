@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-public class NameResolveServer {
+public class /*TODO*/ NameResolveServer {
 
     private static final Logger logger = Logger.getLogger(NameResolveServer.class.getName());
 
@@ -62,7 +62,7 @@ public class NameResolveServer {
         }
     }
 
-    static class GreeterImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    static class /*TODO*/ GreeterImpl extends EchoServiceGrpc.EchoServiceImplBase {
 
         int port;
 

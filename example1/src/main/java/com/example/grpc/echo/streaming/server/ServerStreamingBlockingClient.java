@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ServerStreamingBlockingClient {
+public class /*TODO*/ ServerStreamingBlockingClient {
 
     private static final Logger logger = Logger.getLogger(ServerStreamingBlockingClient.class.getName());
 

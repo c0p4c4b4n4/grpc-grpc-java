@@ -23,7 +23,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class ErrorHandlingTrailers {
+public class /*TODO*/ ErrorHandlingTrailers {
 
     private static final Metadata.Key<DebugInfo> DEBUG_INFO_TRAILER_KEY =
         ProtoUtils.keyForProto(DebugInfo.getDefaultInstance());

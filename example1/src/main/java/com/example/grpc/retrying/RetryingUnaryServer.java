@@ -11,7 +11,7 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
-public class RetryingUnaryServer {
+public class /*TODO*/ RetryingUnaryServer {
 
     private static final Logger logger = Logger.getLogger(RetryingUnaryServer.class.getName());
 
@@ -19,7 +19,7 @@ public class RetryingUnaryServer {
         Servers.start(new EchoServiceImpl(), logger);
     }
 
-    private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    private static class /*TODO*/ EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
 
         private static final float UNAVAILABLE_PERCENTAGE = 0.5F;
         private final Random random = new Random();

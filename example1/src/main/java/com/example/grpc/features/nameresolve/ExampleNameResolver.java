@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ExampleNameResolver extends NameResolver {
+public class /*TODO*/ ExampleNameResolver extends NameResolver {
 
     private final URI uri;
     private final Map<String, List<InetSocketAddress>> addrStore;

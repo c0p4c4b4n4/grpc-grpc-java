@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class NameResolveClient {
+public class /*TODO*/ NameResolveClient {
 
     public static final String channelTarget = "example:///lb.example.grpc.io";
     private static final Logger logger = Logger.getLogger(NameResolveClient.class.getName());

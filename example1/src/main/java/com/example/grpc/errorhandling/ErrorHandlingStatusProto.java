@@ -26,7 +26,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class ErrorHandlingStatusProto {
+public class /*TODO*/ ErrorHandlingStatusProto {
 
     private static final DebugInfo DEBUG_INFO =
         DebugInfo.newBuilder()

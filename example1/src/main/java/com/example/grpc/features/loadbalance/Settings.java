@@ -1,6 +1,6 @@
 package com.example.grpc.features.loadbalance;
 
-public final class Settings {
+public final class /*TODO*/ Settings {
 
     public static final String SCHEME = "example";
     public static final String SERVICE_NAME = "lb.example.grpc.io";

@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ClientStreamingClient {
+public class /*TODO*/ ClientStreamingClient {
 
     private static final Logger logger = Logger.getLogger(ClientStreamingClient.class.getName());
 

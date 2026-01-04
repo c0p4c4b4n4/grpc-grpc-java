@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class RetryingUnaryBlockingClient {
+public class /*TODO*/ RetryingUnaryBlockingClient {
 
     private static final Logger logger = Logger.getLogger(RetryingUnaryBlockingClient.class.getName());
 

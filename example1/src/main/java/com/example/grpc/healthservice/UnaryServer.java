@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class UnaryServer {
+public class /*TODO*/ UnaryServer {
 
     private static final Logger logger = Logger.getLogger(UnaryServer.class.getName());
 
@@ -52,7 +52,7 @@ public class UnaryServer {
         server.awaitTermination();
     }
 
-    private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    private static class /*TODO*/ EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
 
         private final HealthStatusManager health;
         private final AtomicBoolean isServing = new AtomicBoolean(true);

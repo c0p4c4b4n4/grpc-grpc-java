@@ -10,7 +10,7 @@ import io.grpc.stub.StreamObserver;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class BidirectionalStreamingServer {
+public class /*TODO*/ BidirectionalStreamingServer {
 
     private static final Logger logger = Logger.getLogger(BidirectionalStreamingServer.class.getName());
 
@@ -18,7 +18,7 @@ public class BidirectionalStreamingServer {
         Servers.start(new EchoServiceImpl(), logger);
     }
 
-    private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    private static class /*TODO*/ EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
         @Override
         public StreamObserver<EchoRequest> bidirectionalStreamingEcho(StreamObserver<EchoResponse> responseObserver) {
             return new StreamObserver<>() {

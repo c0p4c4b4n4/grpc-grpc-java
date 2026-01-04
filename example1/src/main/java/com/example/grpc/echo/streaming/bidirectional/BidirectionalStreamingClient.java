@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class BidirectionalStreamingClient {
+public class /*TODO*/ BidirectionalStreamingClient {
 
     private static final Logger logger = Logger.getLogger(BidirectionalStreamingClient.class.getName());
 

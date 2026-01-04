@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class UnaryBlockingV2Client {
+public class /*TODO*/ UnaryBlockingV2Client {
 
     private static final Logger logger = Logger.getLogger(UnaryBlockingV2Client.class.getName());
 

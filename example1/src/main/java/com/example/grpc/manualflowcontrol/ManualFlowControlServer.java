@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ManualFlowControlServer {
+public class /*TODO*/ ManualFlowControlServer {
 
     private static final Logger logger = Logger.getLogger(ManualFlowControlServer.class.getName());
 
@@ -46,7 +46,7 @@ public class ManualFlowControlServer {
         server.awaitTermination();
     }
 
-    private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    private static class /*TODO*/ EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
 
         @Override
         public StreamObserver<EchoRequest> bidirectionalStreamingEcho(final StreamObserver<EchoResponse> responseObserver) {
@@ -94,7 +94,7 @@ public class ManualFlowControlServer {
             };
         }
 
-        private static class OnReadyHandler implements Runnable {
+        private static class /*TODO*/ OnReadyHandler implements Runnable {
 
             private final ServerCallStreamObserver<EchoResponse> serverCallStreamObserver;
             private final AtomicBoolean wasReady;

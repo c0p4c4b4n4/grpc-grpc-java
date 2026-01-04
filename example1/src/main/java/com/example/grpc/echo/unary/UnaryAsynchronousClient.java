@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class UnaryAsynchronousClient {
+public class /*TODO*/ UnaryAsynchronousClient {
 
     private static final Logger logger = Logger.getLogger(UnaryAsynchronousClient.class.getName());
 

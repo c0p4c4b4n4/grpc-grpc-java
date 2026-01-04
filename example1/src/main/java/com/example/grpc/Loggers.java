@@ -5,7 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-public final class Loggers {
+public final class /*TODO*/ Loggers {
 
     public static void init() {
         System.setProperty("java.util.logging.SimpleFormatter.format",

@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ManualFlowControlClient {
+public class /*TODO*/ ManualFlowControlClient {
 
     private static final Logger logger = Logger.getLogger(ManualFlowControlClient.class.getName());
 
@@ -94,7 +94,7 @@ public class ManualFlowControlClient {
         );
     }
 
-    private static class OnReadyHandler implements Runnable {
+    private static class /*TODO*/ OnReadyHandler implements Runnable {
 
         private final ClientCallStreamObserver<EchoRequest> requestStream;
         private final Iterator<String> iterator;

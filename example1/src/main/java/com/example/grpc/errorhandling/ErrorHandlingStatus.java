@@ -19,7 +19,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class ErrorHandlingStatus {
+public class /*TODO*/ ErrorHandlingStatus {
 
     private ManagedChannel channel;
 

@@ -2,8 +2,8 @@ package com.example.grpc.keepalive;
 
 import com.example.grpc.Delays;
 import com.example.grpc.Loggers;
-import com.example.grpc.echo.EchoRequest;
-import com.example.grpc.echo.EchoServiceGrpc;
+import com.example.grpc.EchoRequest;
+import com.example.grpc.EchoServiceGrpc;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.StatusRuntimeException;

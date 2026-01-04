@@ -1,8 +1,8 @@
 package com.example.grpc.errorhandling;
 
-import com.example.grpc.echo.EchoRequest;
-import com.example.grpc.echo.EchoResponse;
-import com.example.grpc.echo.EchoServiceGrpc;
+import com.example.grpc.EchoRequest;
+import com.example.grpc.EchoResponse;
+import com.example.grpc.EchoServiceGrpc;
 import com.google.common.base.Verify;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;

@@ -1,8 +1,8 @@
 package com.example.grpc.header;
 
 import com.example.grpc.Loggers;
-import com.example.grpc.echo.EchoRequest;
-import com.example.grpc.echo.EchoServiceGrpc;
+import com.example.grpc.EchoRequest;
+import com.example.grpc.EchoServiceGrpc;
 import io.grpc.ClientInterceptor;
 import io.grpc.ClientInterceptors;
 import io.grpc.ManagedChannelBuilder;

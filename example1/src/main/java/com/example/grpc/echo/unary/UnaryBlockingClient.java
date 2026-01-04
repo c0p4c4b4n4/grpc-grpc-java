@@ -25,7 +25,7 @@ public class /*TODO*/ UnaryBlockingClient {
             var response = blockingStub.unaryEcho(request);
             logger.log(Level.INFO, "response: {0}", response.getMessage());
         } catch (StatusRuntimeException e) {
-            logger.log(Level.WARNING, "error: {0}", e.getStatus());
+            logger.log(Level.WARNING, "RPC error: {0}", e.getStatus());
         } finally {
             channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
         }

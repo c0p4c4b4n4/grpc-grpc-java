@@ -43,7 +43,7 @@ public class /*TODO*/ ServerStreamingBlockingClient {
             }
 
         } catch (StatusRuntimeException e) {
-            logger.log(Level.WARNING, "error: {0}", e.getStatus());
+            logger.log(Level.WARNING, "RPC error: {0}", e.getStatus());
         } finally {
             channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
         }

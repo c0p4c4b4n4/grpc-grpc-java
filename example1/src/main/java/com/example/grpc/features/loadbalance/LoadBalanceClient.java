@@ -29,7 +29,7 @@ public class /*TODO*/ LoadBalanceClient {
         try {
             response = blockingStub.unaryEcho(request);
         } catch (StatusRuntimeException e) {
-            logger.log(Level.WARNING, "error: {0}", e.getStatus());
+            logger.log(Level.WARNING, "RPC error: {0}", e.getStatus());
             return;
         }
         logger.log(Level.INFO, "response: {0}", response.getMessage());

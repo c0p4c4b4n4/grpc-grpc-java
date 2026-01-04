@@ -64,7 +64,7 @@ public class /*TODO*/ NameResolveClient {
         try {
             response = blockingStub.unaryEcho(request);
         } catch (StatusRuntimeException e) {
-            logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
+            logger.log(Level.WARNING, "RPC error: {0}", e.getStatus());
             return;
         }
         logger.info("Greeting: " + response.getMessage());

@@ -18,7 +18,6 @@ package com.example.grpc.echo.unary
 
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
-import io.grpc.examples.helloworld.GreeterGrpcKt.GreeterCoroutineStub
 import java.io.Closeable
 import java.util.concurrent.TimeUnit
 

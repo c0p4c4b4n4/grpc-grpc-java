@@ -5,12 +5,12 @@ if (startParameter.taskRequests.find { it.args.contains("assemble") } == null) {
   include(
     "protos",
     "stub",
-    "stub-lite",
+//    "stub-lite",
     "client",
-    "native-client",
+//    "native-client",
     "server",
-    "stub-android",
-    "android"
+//    "stub-android",
+//    "android"
   )
 } else {
   include("protos", "stub", "server")

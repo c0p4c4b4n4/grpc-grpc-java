@@ -8,12 +8,18 @@ if (startParameter.taskRequests.find { it.args.contains("assemble") } == null) {
 //    "stub-lite",
     "client",
 //    "native-client",
+"full",
     "server",
 //    "stub-android",
 //    "android"
   )
 } else {
-  include("protos", "stub", "server")
+  include(
+"protos",
+ "stub", 
+"full",
+"server"
+)
 }
 
 pluginManagement {

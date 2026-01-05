@@ -1,33 +1,30 @@
-package com.example.grpc.echo.unary;
+package com.example.grpc.echo.unary
 
-import com.example.grpc.Loggers;
-import com.example.grpc.EchoRequest;
-import com.example.grpc.EchoServiceGrpc;
-import io.grpc.ManagedChannelBuilder;
-import io.grpc.StatusRuntimeException;
+import com.example.grpc.EchoRequest
 
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+object  /*TODO*/ UnaryBlockingClient {
+    private val logger: java.util.logging.Logger =
+        java.util.logging.Logger.getLogger(UnaryBlockingClient::class.java.getName())
 
-public class /*TODO*/ UnaryBlockingClient {
+    @kotlin.Throws(java.lang.Exception::class)
+    @kotlin.jvm.JvmStatic
+    fun main(args: kotlin.Array<kotlin.String>) {
+        Loggers.init()
 
-    private static final Logger logger = Logger.getLogger(UnaryBlockingClient.class.getName());
-
-    public static void main(String[] args) throws Exception {
-        Loggers.init();
-
-        var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
+        val channel: ManagedChannel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build()
 
         try {
-            var blockingStub = EchoServiceGrpc.newBlockingStub(channel);
-            var request = EchoRequest.newBuilder().setMessage("world").build();
-            var response = blockingStub.unaryEcho(request);
-            logger.log(Level.INFO, "response: {0}", response.getMessage());
-        } catch (StatusRuntimeException e) {
-            logger.log(Level.WARNING, "RPC error: {0}", e.getStatus());
+            val blockingStub: Unit /* TODO: class org.jetbrains.kotlin.nj2k.types.JKJavaNullPrimitiveType */? =
+                EchoServiceGrpc.newBlockingStub(channel)
+            val request: Unit /* TODO: class org.jetbrains.kotlin.nj2k.types.JKJavaNullPrimitiveType */? =
+                EchoRequest.newBuilder().setMessage("world").build()
+            val response: Unit /* TODO: class org.jetbrains.kotlin.nj2k.types.JKJavaNullPrimitiveType */? =
+                blockingStub.unaryEcho(request)
+            UnaryBlockingClient.logger.log(java.util.logging.Level.INFO, "response: {0}", response.getMessage())
+        } catch (e: StatusRuntimeException) {
+            UnaryBlockingClient.logger.log(java.util.logging.Level.WARNING, "RPC error: {0}", e.getStatus())
         } finally {
-            channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+            channel.shutdown().awaitTermination(30, TimeUnit.SECONDS)
         }
     }
 }

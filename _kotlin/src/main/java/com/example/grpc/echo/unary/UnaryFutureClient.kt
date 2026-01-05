@@ -1,50 +1,44 @@
-package com.example.grpc.echo.unary;
+package com.example.grpc.echo.unary
 
-import com.example.grpc.Loggers;
-import com.example.grpc.EchoRequest;
-import com.example.grpc.EchoResponse;
-import com.example.grpc.EchoServiceGrpc;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.MoreExecutors;
-import io.grpc.ManagedChannelBuilder;
-import io.grpc.Status;
+import com.example.grpc.EchoRequest
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+object  /*TODO*/ UnaryFutureClient {
+    private val logger: java.util.logging.Logger =
+        java.util.logging.Logger.getLogger(UnaryFutureClient::class.java.getName())
 
-public class /*TODO*/ UnaryFutureClient {
+    @kotlin.Throws(java.lang.Exception::class)
+    @kotlin.jvm.JvmStatic
+    fun main(args: kotlin.Array<kotlin.String>) {
+        Loggers.init()
 
-    private static final Logger logger = Logger.getLogger(UnaryFutureClient.class.getName());
+        val channel: ManagedChannel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build()
 
-    public static void main(String[] args) throws Exception {
-        Loggers.init();
+        val futureStub: Unit /* TODO: class org.jetbrains.kotlin.nj2k.types.JKJavaNullPrimitiveType */? =
+            EchoServiceGrpc.newFutureStub(channel)
+        val request: Unit /* TODO: class org.jetbrains.kotlin.nj2k.types.JKJavaNullPrimitiveType */? =
+            EchoRequest.newBuilder().setMessage("world").build()
+        val responseFuture: Unit /* TODO: class org.jetbrains.kotlin.nj2k.types.JKJavaNullPrimitiveType */? =
+            futureStub.unaryEcho(request)
 
-        var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
-
-        var futureStub = EchoServiceGrpc.newFutureStub(channel);
-        var request = EchoRequest.newBuilder().setMessage("world").build();
-        var responseFuture = futureStub.unaryEcho(request);
-
-        var done = new CountDownLatch(1);
-        Futures.addCallback(responseFuture, new FutureCallback<>() {
-            @Override
-            public void onSuccess(EchoResponse response) {
-                logger.info("result: " + response.getMessage());
-                done.countDown();
+        val done: CountDownLatch = CountDownLatch(1)
+        Futures.addCallback<kotlin.Any?>(responseFuture, object : FutureCallback<kotlin.Any?> {
+            public override fun onSuccess(response: EchoResponse) {
+                UnaryFutureClient.logger.info("result: " + response.getMessage())
+                done.countDown()
             }
 
-            @Override
-            public void onFailure(Throwable t) {
-                logger.log(Level.WARNING, "error: {0}", Status.fromThrowable(t));
-                done.countDown();
+            override fun onFailure(t: Throwable) {
+                UnaryFutureClient.logger.log(
+                    java.util.logging.Level.WARNING,
+                    "error: {0}",
+                    io.grpc.Status.fromThrowable(t)
+                )
+                done.countDown()
             }
-        }, MoreExecutors.directExecutor());
+        }, MoreExecutors.directExecutor())
 
-        done.await();
-        channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+        done.await()
+        channel.shutdown().awaitTermination(30, TimeUnit.SECONDS)
     }
 }
 

@@ -1,15 +1,14 @@
-package com.example.grpc;
+package com.example.grpc
 
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit
 
-public final class /*TODO*/ Delays {
-
-    public static void sleep(int seconds) {
+object  /*TODO*/ Delays {
+    fun sleep(seconds: Int) {
         try {
-            TimeUnit.SECONDS.sleep(seconds);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
+            TimeUnit.SECONDS.sleep(seconds.toLong())
+        } catch (e: InterruptedException) {
+            Thread.currentThread().interrupt()
+            throw RuntimeException(e)
         }
     }
 }

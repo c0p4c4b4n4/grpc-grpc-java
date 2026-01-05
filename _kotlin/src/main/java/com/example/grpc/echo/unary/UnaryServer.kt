@@ -1,29 +1,23 @@
-package com.example.grpc.echo.unary;
+package com.example.grpc.echo.unary
 
-import com.example.grpc.Servers;
-import com.example.grpc.EchoRequest;
-import com.example.grpc.EchoResponse;
-import com.example.grpc.EchoServiceGrpc;
-import io.grpc.stub.StreamObserver;
+import com.example.grpc.EchoRequest
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+object  /*TODO*/ UnaryServer {
+    private val logger: java.util.logging.Logger = java.util.logging.Logger.getLogger(UnaryServer::class.java.getName())
 
-public class /*TODO*/ UnaryServer {
-
-    private static final Logger logger = Logger.getLogger(UnaryServer.class.getName());
-
-    public static void main(String[] args) throws Exception {
-        Servers.start(new EchoServiceImpl(), logger);
+    @kotlin.Throws(java.lang.Exception::class)
+    @kotlin.jvm.JvmStatic
+    fun main(args: kotlin.Array<kotlin.String>) {
+        Servers.start(EchoServiceImpl(), UnaryServer.logger)
     }
 
-    private static class /*TODO*/ EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
-        @Override
-        public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-            logger.log(Level.INFO, "request: {0}", request.getMessage());
-            var response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
-            responseObserver.onNext(response);
-            responseObserver.onCompleted();
+    private class  /*TODO*/ EchoServiceImpl : EchoServiceGrpc.EchoServiceImplBase() {
+        public override fun unaryEcho(request: EchoRequest, responseObserver: StreamObserver<EchoResponse?>) {
+            UnaryServer.logger.log(java.util.logging.Level.INFO, "request: {0}", request.getMessage())
+            val response: Unit /* TODO: class org.jetbrains.kotlin.nj2k.types.JKJavaNullPrimitiveType */? =
+                EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build()
+            responseObserver.onNext(response)
+            responseObserver.onCompleted()
         }
     }
 }

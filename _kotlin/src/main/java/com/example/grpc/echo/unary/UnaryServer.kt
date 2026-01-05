@@ -1,6 +1,9 @@
 package com.example.grpc.echo.unary
 
 import com.example.grpc.EchoRequest
+import com.example.grpc.EchoResponse
+import com.example.grpc.EchoServiceGrpc
+import io.grpc.stub.StreamObserver
 
 object  /*TODO*/ UnaryServer {
     private val logger: java.util.logging.Logger = java.util.logging.Logger.getLogger(UnaryServer::class.java.getName())

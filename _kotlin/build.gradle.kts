@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.9.22"
+    kotlin("jvm") version "2.2.0"
     id("com.google.protobuf") version protobufPluginVersion
     id("com.gradleup.shadow") version shadowPluginVersion
     application
@@ -8,11 +8,6 @@ plugins {
 repositories {
     mavenCentral()
     mavenLocal()
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
 }
 
 kotlin {

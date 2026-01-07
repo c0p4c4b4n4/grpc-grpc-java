@@ -17,7 +17,7 @@ public class KeepAliveUnaryBlockingClient {
 
     public static void main(String[] args) throws Exception {
         Loggers.init();
-        Loggers.initGrpcLogs();
+        Loggers.initIoGrpc();
 
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext()
             .keepAliveTime(10, TimeUnit.SECONDS)

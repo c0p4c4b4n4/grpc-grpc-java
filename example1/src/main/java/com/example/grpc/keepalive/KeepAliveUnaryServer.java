@@ -1,9 +1,10 @@
 package com.example.grpc.keepalive;
 
-import com.example.grpc.Loggers;
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
+import com.example.grpc.Loggers;
+import com.example.grpc.Servers;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 
@@ -16,12 +17,10 @@ public class KeepAliveUnaryServer {
     private static final Logger logger = Logger.getLogger(KeepAliveUnaryServer.class.getName());
 
     public static void main(String[] args) throws Exception {
-        Loggers.init();
-        Loggers.initGrpcLogs();
+        Loggers.initIoGrpc();
 
-        /*TODO*/
         var port = 50051;
-        var server = ServerBuilder
+        var serverBuilder = ServerBuilder
             .forPort(port)
             .addService(new EchoServiceImpl())
             .keepAliveTime(5, TimeUnit.SECONDS)
@@ -30,24 +29,9 @@ public class KeepAliveUnaryServer {
             .permitKeepAliveWithoutCalls(true)
             .maxConnectionIdle(15, TimeUnit.SECONDS)
             .maxConnectionAge(30, TimeUnit.SECONDS)
-            .maxConnectionAgeGrace(5, TimeUnit.SECONDS)
-            .build()
-            .start();
+            .maxConnectionAgeGrace(5, TimeUnit.SECONDS);
 
-        logger.log(Level.INFO, "server started, listening on {0,number,#}", port);
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.err.println("server is shutting down");
-            try {
-                server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                System.err.println("server shutdown was interrupted");
-                server.shutdownNow();
-            }
-            System.err.println("server has been shut down");
-        }));
-
-        server.awaitTermination();
+        Servers.start(port, serverBuilder);
     }
 
     private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {

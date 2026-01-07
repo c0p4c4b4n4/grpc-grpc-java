@@ -29,7 +29,7 @@ public class DeadlineServerStreamingServer {
                 Delays.sleep(i);
 
                 if (context.isCancelled()) {
-                    logger.log(Level.INFO, "client cancelled the call: " + context.cancellationCause());
+                    logger.log(Level.INFO, "cancelled by client: {0}" + context.cancellationCause());
                     return;
                 }
 

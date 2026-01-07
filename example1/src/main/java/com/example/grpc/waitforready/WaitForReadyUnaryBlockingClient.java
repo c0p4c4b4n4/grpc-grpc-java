@@ -23,6 +23,7 @@ public class WaitForReadyUnaryBlockingClient {
             var blockingStub = EchoServiceGrpc.newBlockingStub(channel)
                 .withWaitForReady()
                 .withDeadline(Deadline.after(30, TimeUnit.SECONDS));
+
             var request = EchoRequest.newBuilder().setMessage("world").build();
             var response = blockingStub.unaryEcho(request);
             logger.log(Level.INFO, "response: {0}", response.getMessage());

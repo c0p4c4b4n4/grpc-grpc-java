@@ -6,6 +6,7 @@ import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoServiceGrpc;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
+import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import io.grpc.health.v1.HealthCheckRequest;
 import io.grpc.health.v1.HealthGrpc;
@@ -14,15 +15,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class /*TODO*/ UnaryBlockingClient {
+public class  /*TODO*/ HealthServiceUnaryBlockingClient {
 
-    private static final Logger logger = Logger.getLogger(UnaryBlockingClient.class.getName());
+    private static final Logger logger = Logger.getLogger(HealthServiceUnaryBlockingClient.class.getName());
 
     public static void main(String[] args) throws Exception {
         Loggers.init();
-
-        var channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
-
+        var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         try {
             var echoBlockingStub = EchoServiceGrpc.newBlockingStub(channel);
             var healthBlockingStub = HealthGrpc.newBlockingStub(channel);

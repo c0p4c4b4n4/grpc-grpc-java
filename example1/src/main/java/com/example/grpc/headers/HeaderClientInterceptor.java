@@ -16,7 +16,7 @@ public class HeaderClientInterceptor implements ClientInterceptor {
 
     private static final Logger logger = Logger.getLogger(HeaderClientInterceptor.class.getName());
     private static final Metadata.Key<String> CUSTOM_HEADER_KEY =
-        Metadata.Key.of("custom_client_header_key", Metadata.ASCII_STRING_MARSHALLER);
+        Metadata.Key.of("custom_client_header", Metadata.ASCII_STRING_MARSHALLER);
 
     @Override
     public <ReqT, RespT> ClientCall<ReqT, RespT> interceptCall(
@@ -26,7 +26,7 @@ public class HeaderClientInterceptor implements ClientInterceptor {
         return new SimpleForwardingClientCall<>(next.newCall(method, callOptions)) {
             @Override
             public void start(Listener<RespT> responseListener, Metadata headers) {
-                headers.put(CUSTOM_HEADER_KEY, "customRequestValue");
+                headers.put(CUSTOM_HEADER_KEY, "custom_request_value");
                 super.start(new SimpleForwardingClientCallListener<>(responseListener) {
                     @Override
                     public void onHeaders(Metadata responseHeaders) {

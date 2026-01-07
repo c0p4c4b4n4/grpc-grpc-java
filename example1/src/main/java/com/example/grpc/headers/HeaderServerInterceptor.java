@@ -13,7 +13,7 @@ public class HeaderServerInterceptor implements ServerInterceptor {
 
     private static final Logger logger = Logger.getLogger(HeaderServerInterceptor.class.getName());
     private static final Metadata.Key<String> CUSTOM_HEADER_KEY =
-        Metadata.Key.of("custom_server_header_key", Metadata.ASCII_STRING_MARSHALLER);
+        Metadata.Key.of("custom_server_header", Metadata.ASCII_STRING_MARSHALLER);
 
     @Override
     public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(
@@ -24,7 +24,7 @@ public class HeaderServerInterceptor implements ServerInterceptor {
         return next.startCall(new SimpleForwardingServerCall<>(call) {
             @Override
             public void sendHeaders(Metadata responseHeaders) {
-                responseHeaders.put(CUSTOM_HEADER_KEY, "customRespondValue");
+                responseHeaders.put(CUSTOM_HEADER_KEY, "custom_response_value");
                 super.sendHeaders(responseHeaders);
             }
         }, requestHeaders);

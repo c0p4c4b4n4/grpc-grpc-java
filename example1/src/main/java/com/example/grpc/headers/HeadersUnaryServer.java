@@ -1,21 +1,20 @@
-package com.example.grpc.header;
+package com.example.grpc.headers;
 
-import com.example.grpc.Loggers;
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
+import com.example.grpc.Loggers;
 import com.example.grpc.Servers;
 import io.grpc.ServerBuilder;
 import io.grpc.ServerInterceptors;
 import io.grpc.stub.StreamObserver;
 
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class UnaryServer {
+public class HeadersUnaryServer {
 
-    private static final Logger logger = Logger.getLogger(UnaryServer.class.getName());
+    private static final Logger logger = Logger.getLogger(HeadersUnaryServer.class.getName());
 
     public static void main(String[] args) throws Exception {
         Loggers.init();

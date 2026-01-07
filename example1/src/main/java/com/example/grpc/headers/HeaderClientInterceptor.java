@@ -1,4 +1,4 @@
-package com.example.grpc.header;
+package com.example.grpc.headers;
 
 import io.grpc.CallOptions;
 import io.grpc.Channel;
@@ -12,7 +12,7 @@ import io.grpc.MethodDescriptor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class  HeaderClientInterceptor implements ClientInterceptor {
+public class HeaderClientInterceptor implements ClientInterceptor {
 
     private static final Logger logger = Logger.getLogger(HeaderClientInterceptor.class.getName());
     private static final Metadata.Key<String> CUSTOM_HEADER_KEY =
@@ -30,7 +30,7 @@ public class  HeaderClientInterceptor implements ClientInterceptor {
                 super.start(new SimpleForwardingClientCallListener<>(responseListener) {
                     @Override
                     public void onHeaders(Metadata responseHeaders) {
-                        logger.log(Level.INFO, "header received from server: {0}" , responseHeaders);
+                        logger.log(Level.INFO, "header received from server: {0}", responseHeaders);
                         super.onHeaders(responseHeaders);
                     }
                 }, headers);

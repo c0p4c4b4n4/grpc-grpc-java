@@ -26,11 +26,13 @@ public class DeadlineServerStreamingServer {
             logger.log(Level.INFO, "request: {0}", request.getMessage());
             var context = Context.current();
             for (var i = 0; i <= 9; i++) {
-                Delays.sleep(i);
                 if (context.isCancelled()) {
                     logger.log(Level.WARNING, "cancelled by client: ", context.cancellationCause());
                     return;
                 }
+
+                Delays.sleep(i);
+
                 var response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage() + " " + i).build();
                 logger.log(Level.INFO, "response: {0}", response.getMessage());
                 responseObserver.onNext(response);

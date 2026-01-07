@@ -31,7 +31,7 @@ public class /*TODO*/ ServerStreamingBlockingClient {
 
                     var i = 0;
                     while (responses.hasNext()) {
-                        logger.info("response: " + responses.next().getMessage());
+                        logger.log(Level.INFO, "response: {0}", responses.next().getMessage());
 
                         if (++i > 3) {
                             cancellableContext.cancel(new Exception("Client cancelled streaming"));

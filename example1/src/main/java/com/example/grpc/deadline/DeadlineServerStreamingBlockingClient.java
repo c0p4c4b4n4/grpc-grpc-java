@@ -27,7 +27,7 @@ public class DeadlineServerStreamingBlockingClient {
             var responses = blockingStub.serverStreamingEcho(request);
 
             while (responses.hasNext()) {
-                logger.info("response: " + responses.next().getMessage());
+                logger.log(Level.INFO, "response: {0}", responses.next().getMessage());
             }
         } catch (StatusRuntimeException e) {
             logger.log(Level.WARNING, "RPC error: {0}", e.getStatus());

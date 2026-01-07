@@ -34,8 +34,8 @@ public class DeadlineServerStreamingServer {
                 }
 
                 var message = "hello " + request.getMessage() + " " + i;
-                logger.log(Level.INFO, "response: {0}", message);
                 var response = EchoResponse.newBuilder().setMessage(message).build();
+                logger.log(Level.INFO, "response: {0}", response.getMessage());
                 responseObserver.onNext(response);
             }
 

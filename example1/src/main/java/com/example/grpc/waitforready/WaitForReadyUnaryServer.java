@@ -6,6 +6,7 @@ import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
 import io.grpc.stub.StreamObserver;
 
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,7 +14,7 @@ public class WaitForReadyUnaryServer {
 
     private static final Logger logger = Logger.getLogger(WaitForReadyUnaryServer.class.getName());
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException, InterruptedException {
         Servers.start(new EchoServiceImpl());
     }
 

@@ -15,7 +15,7 @@ public class KeepAliveUnaryBlockingClient {
 
     private static final Logger logger = Logger.getLogger(KeepAliveUnaryBlockingClient.class.getName());
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws InterruptedException {
         Loggers.init();
         Loggers.initIoGrpc();
 

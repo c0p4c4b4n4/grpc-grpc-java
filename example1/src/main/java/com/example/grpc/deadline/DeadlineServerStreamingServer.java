@@ -8,6 +8,7 @@ import com.example.grpc.Servers;
 import io.grpc.Context;
 import io.grpc.stub.StreamObserver;
 
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,7 +16,7 @@ public class DeadlineServerStreamingServer {
 
     private static final Logger logger = Logger.getLogger(DeadlineServerStreamingServer.class.getName());
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException, InterruptedException {
         Servers.start(new EchoServiceImpl());
     }
 

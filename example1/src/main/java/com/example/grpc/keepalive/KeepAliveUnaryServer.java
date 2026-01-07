@@ -8,6 +8,7 @@ import com.example.grpc.Servers;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,7 +17,7 @@ public class KeepAliveUnaryServer {
 
     private static final Logger logger = Logger.getLogger(KeepAliveUnaryServer.class.getName());
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException, InterruptedException {
         Loggers.initIoGrpc();
 
         var port = 50051;

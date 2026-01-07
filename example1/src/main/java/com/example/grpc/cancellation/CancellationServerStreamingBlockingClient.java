@@ -28,7 +28,7 @@ public class CancellationServerStreamingBlockingClient {
 
                 var i = 0;
                 while (responses.hasNext()) {
-                    logger.log(Level.INFO, "response: {0}", responses.next().getMessage());
+                    logger.log(Level.INFO, "next response: {0}", responses.next().getMessage());
                     if (++i > 3) {
                         cancellableContext.cancel(new Exception("Client cancelled call"));
                     }

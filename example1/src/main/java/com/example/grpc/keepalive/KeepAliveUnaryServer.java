@@ -4,8 +4,6 @@ import com.example.grpc.Loggers;
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
-import io.grpc.Grpc;
-import io.grpc.InsecureServerCredentials;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 
@@ -18,7 +16,9 @@ public class KeepAliveUnaryServer {
     private static final Logger logger = Logger.getLogger(KeepAliveUnaryServer.class.getName());
 
     public static void main(String[] args) throws Exception {
-        Loggers.initWithGrpcLogs();
+        Loggers.init();
+        Loggers.initGrpcLogs();
+
         /*TODO*/
         var port = 50051;
         var server = ServerBuilder

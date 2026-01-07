@@ -12,9 +12,7 @@ public interface Loggers {
             "%1$tH:%1$tM:%1$tS.%1$tL %4$s %2$s - %5$s%6$s%n");
     }
 
-    static void initWithGrpcLogs() {
-        init();
-
+    static void initGrpcLogs() {
         var grpcLogger = Logger.getLogger("io.grpc");
         grpcLogger.setLevel(Level.FINE);
 

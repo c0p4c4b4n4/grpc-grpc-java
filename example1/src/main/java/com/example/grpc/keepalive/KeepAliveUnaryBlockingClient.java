@@ -4,8 +4,6 @@ import com.example.grpc.Delays;
 import com.example.grpc.Loggers;
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoServiceGrpc;
-import io.grpc.Grpc;
-import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 
@@ -18,7 +16,8 @@ public class KeepAliveUnaryBlockingClient {
     private static final Logger logger = Logger.getLogger(KeepAliveUnaryBlockingClient.class.getName());
 
     public static void main(String[] args) throws Exception {
-        Loggers.initWithGrpcLogs();
+        Loggers.init();
+        Loggers.initGrpcLogs();
 
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext()
             .keepAliveTime(10, TimeUnit.SECONDS)

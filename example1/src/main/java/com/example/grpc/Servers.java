@@ -12,13 +12,10 @@ public final class Servers {
 
     private static final Logger logger = Logger.getLogger(Servers.class.getName());
 
-    public static void start(BindableService bindableService) throws IOException, InterruptedException {
+    public static void start(int port, ServerBuilder<?> serverBuilder) throws IOException, InterruptedException {
         Loggers.init();
 
-        var port = 50051;
-        var server = ServerBuilder
-            .forPort(port)
-            .addService(bindableService)
+        var server = serverBuilder
             .build()
             .start();
 
@@ -38,29 +35,12 @@ public final class Servers {
         server.awaitTermination();
     }
 
-    public static void start(int port, ServerBuilder serverBuilder) throws IOException, InterruptedException {
-        Loggers.init();
-
+    public static void start(BindableService bindableService) throws IOException, InterruptedException {
         var port = 50051;
-        var server = ServerBuilder
+        var serverBuilder = ServerBuilder
             .forPort(port)
-            .addService(bindableService)
-            .build()
-            .start();
+            .addService(bindableService);
 
-        logger.log(Level.INFO, "server started, listening on {0,number,#}", port);
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.err.println("server is shutting down");
-            try {
-                server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                System.err.println("server shutdown was interrupted");
-                server.shutdownNow();
-            }
-            System.err.println("server has been shut down");
-        }));
-
-        server.awaitTermination();
+        start(port, serverBuilder);
     }
 }

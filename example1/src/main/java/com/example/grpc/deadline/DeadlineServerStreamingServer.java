@@ -5,6 +5,7 @@ import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
 import com.example.grpc.Servers;
+import io.grpc.Context;
 import io.grpc.stub.StreamObserver;
 
 import java.util.logging.Level;
@@ -22,14 +23,22 @@ public class DeadlineServerStreamingServer {
         @Override
         public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
             logger.log(Level.INFO, "request: {0}", request.getMessage());
+
+            var context = Context.current();
             for (var i = 0; i <= 9; i++) {
                 Delays.sleep(i);
+
+                if (context.isCancelled()) {
+                    logger.log(Level.INFO, "client cancelled the call: " + context.cancellationCause());
+                    return;
+                }
 
                 var message = "hello " + request.getMessage() + " " + i;
                 logger.log(Level.INFO, "response: {0}", message);
                 var response = EchoResponse.newBuilder().setMessage(message).build();
                 responseObserver.onNext(response);
             }
+
             responseObserver.onCompleted();
         }
     }

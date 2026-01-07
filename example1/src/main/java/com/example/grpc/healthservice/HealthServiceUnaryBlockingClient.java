@@ -39,7 +39,7 @@ public class HealthServiceUnaryBlockingClient {
 
             unaryEcho(echoBlockingStub, "Delta");
         } finally {
-            channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
+            channel.shutdownNow().awaitTermination(30, TimeUnit.SECONDS);
         }
     }
 

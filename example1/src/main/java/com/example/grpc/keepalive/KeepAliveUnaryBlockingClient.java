@@ -12,9 +12,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class /*TODO*/ UnaryBlockingClient {
+public class KeepAliveUnaryBlockingClient {
 
-    private static final Logger logger = Logger.getLogger(UnaryBlockingClient.class.getName());
+    private static final Logger logger = Logger.getLogger(KeepAliveUnaryBlockingClient.class.getName());
 
     public static void main(String[] args) throws Exception {
         Loggers.initWithGrpcLogs();
@@ -30,7 +30,6 @@ public class /*TODO*/ UnaryBlockingClient {
             var request = EchoRequest.newBuilder().setMessage("world").build();
             var response = blockingStub.unaryEcho(request);
             logger.log(Level.INFO, "response: {0}", response.getMessage());
-
             Delays.sleep(30);
         } catch (StatusRuntimeException e) {
             logger.log(Level.WARNING, "RPC error: {0}", e.getStatus());

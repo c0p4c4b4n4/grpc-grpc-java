@@ -12,9 +12,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class /*TODO*/ UnaryServer {
+public class /*TODO*/ KeepAliveUnaryServer {
 
-    private static final Logger logger = Logger.getLogger(UnaryServer.class.getName());
+    private static final Logger logger = Logger.getLogger(KeepAliveUnaryServer.class.getName());
 
     public static void main(String[] args) throws Exception {
         Loggers.initWithGrpcLogs();
@@ -48,7 +48,7 @@ public class /*TODO*/ UnaryServer {
         server.awaitTermination();
     }
 
-    private static class /*TODO*/ EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
         @Override
         public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
             logger.log(Level.INFO, "request: {0}", request.getMessage());

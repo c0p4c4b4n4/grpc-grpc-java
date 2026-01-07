@@ -17,13 +17,11 @@ public class WaitForReadyUnaryBlockingClient {
 
     public static void main(String[] args) throws Exception {
         Loggers.init();
-
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         try {
             var blockingStub = EchoServiceGrpc.newBlockingStub(channel)
                 .withWaitForReady()
                 .withDeadline(Deadline.after(30, TimeUnit.SECONDS));
-
             var request = EchoRequest.newBuilder().setMessage("world").build();
             var response = blockingStub.unaryEcho(request);
             logger.log(Level.INFO, "response: {0}", response.getMessage());

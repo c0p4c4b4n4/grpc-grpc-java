@@ -23,22 +23,17 @@ public class DeadlineServerStreamingServer {
         @Override
         public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
             logger.log(Level.INFO, "request: {0}", request.getMessage());
-
             var context = Context.current();
             for (var i = 0; i <= 9; i++) {
                 Delays.sleep(i);
-
                 if (context.isCancelled()) {
-                    logger.log(Level.INFO, "cancelled by client: {0}" + context.cancellationCause());
+                    logger.log(Level.WARNING, "cancelled by client: ", context.cancellationCause());
                     return;
                 }
-
-                var message = "hello " + request.getMessage() + " " + i;
-                var response = EchoResponse.newBuilder().setMessage(message).build();
+                var response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage() + " " + i).build();
                 logger.log(Level.INFO, "response: {0}", response.getMessage());
                 responseObserver.onNext(response);
             }
-
             responseObserver.onCompleted();
         }
     }

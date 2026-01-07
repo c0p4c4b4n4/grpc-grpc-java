@@ -17,15 +17,12 @@ public class DeadlineServerStreamingBlockingClient {
 
     public static void main(String[] args) throws InterruptedException {
         Loggers.init();
-
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         try {
             var blockingStub = EchoServiceGrpc.newBlockingStub(channel)
                 .withDeadline(Deadline.after(5, TimeUnit.SECONDS));
-
             var request = EchoRequest.newBuilder().setMessage("world").build();
             var responses = blockingStub.serverStreamingEcho(request);
-
             while (responses.hasNext()) {
                 logger.log(Level.INFO, "response: {0}", responses.next().getMessage());
             }

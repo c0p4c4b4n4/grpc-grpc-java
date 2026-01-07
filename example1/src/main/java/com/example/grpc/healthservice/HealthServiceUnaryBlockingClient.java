@@ -1,11 +1,9 @@
 package com.example.grpc.healthservice;
 
 import com.example.grpc.Delays;
-import com.example.grpc.Loggers;
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoServiceGrpc;
-import io.grpc.Grpc;
-import io.grpc.InsecureChannelCredentials;
+import com.example.grpc.Loggers;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import io.grpc.health.v1.HealthCheckRequest;
@@ -15,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class  /*TODO*/ HealthServiceUnaryBlockingClient {
+public class HealthServiceUnaryBlockingClient {
 
     private static final Logger logger = Logger.getLogger(HealthServiceUnaryBlockingClient.class.getName());
 
@@ -27,21 +25,19 @@ public class  /*TODO*/ HealthServiceUnaryBlockingClient {
             var healthBlockingStub = HealthGrpc.newBlockingStub(channel);
 
             var users = new String[]{"Alpha", "Beta", "Gamma"};
-
             checkHealth(healthBlockingStub, "before all users");
-            greet(echoBlockingStub, users[0]);
-            checkHealth(healthBlockingStub, "after user " + users[0]);
 
             for (var user : users) {
-                greet(echoBlockingStub, user);
+                unaryEcho(echoBlockingStub, user);
                 Thread.sleep(100);
+                checkHealth(healthBlockingStub, "after user " + user);
             }
-            checkHealth(healthBlockingStub, "after all users");
 
+            checkHealth(healthBlockingStub, "after all users");
             Delays.sleep(10);
             checkHealth(healthBlockingStub, "after 10 second wait");
 
-            greet(echoBlockingStub, "Delta");
+            unaryEcho(echoBlockingStub, "Delta");
         } finally {
             channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
         }
@@ -50,15 +46,15 @@ public class  /*TODO*/ HealthServiceUnaryBlockingClient {
     private static void checkHealth(HealthGrpc.HealthBlockingStub healthBlockingStub, String prefix) {
         var request = HealthCheckRequest.getDefaultInstance();
         var response = healthBlockingStub.check(request);
-        logger.info(prefix + ", health is: " + response.getStatus());
+        logger.log(Level.INFO, "{0}, health is: {1}", new Object[]{prefix, response.getStatus()});
     }
 
-    public static void greet(EchoServiceGrpc.EchoServiceBlockingStub echoBlockingStub, String name) {
-        logger.info("will try to greet " + name + " ...");
+    private static void unaryEcho(EchoServiceGrpc.EchoServiceBlockingStub echoBlockingStub, String name) {
         try {
+            logger.log(Level.INFO, "try to request: {0}", name);
             var request = EchoRequest.newBuilder().setMessage(name).build();
             var response = echoBlockingStub.unaryEcho(request);
-            logger.info("greeting: " + response.getMessage());
+            logger.log(Level.INFO, "response: {0}", response.getMessage());
         } catch (StatusRuntimeException e) {
             logger.log(Level.WARNING, "RPC error: {0}", e.getStatus());
         }

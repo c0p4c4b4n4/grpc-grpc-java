@@ -6,13 +6,14 @@ import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
 import io.grpc.Grpc;
 import io.grpc.InsecureServerCredentials;
+import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class /*TODO*/ KeepAliveUnaryServer {
+public class KeepAliveUnaryServer {
 
     private static final Logger logger = Logger.getLogger(KeepAliveUnaryServer.class.getName());
 
@@ -20,7 +21,8 @@ public class /*TODO*/ KeepAliveUnaryServer {
         Loggers.initWithGrpcLogs();
 
         var port = 50051;
-        var server = Grpc.newServerBuilderForPort(port, InsecureServerCredentials.create())
+        var server = ServerBuilder
+            .forPort(port)
             .addService(new EchoServiceImpl())
             .keepAliveTime(5, TimeUnit.SECONDS)
             .keepAliveTimeout(1, TimeUnit.SECONDS)

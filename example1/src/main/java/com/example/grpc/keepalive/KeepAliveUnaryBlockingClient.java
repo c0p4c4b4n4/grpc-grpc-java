@@ -6,6 +6,7 @@ import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoServiceGrpc;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
+import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 
 import java.util.concurrent.TimeUnit;
@@ -19,7 +20,7 @@ public class KeepAliveUnaryBlockingClient {
     public static void main(String[] args) throws Exception {
         Loggers.initWithGrpcLogs();
 
-        var channel = Grpc.newChannelBuilderForAddress("localhost", 50051, InsecureChannelCredentials.create())
+        var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext()
             .keepAliveTime(10, TimeUnit.SECONDS)
             .keepAliveTimeout(1, TimeUnit.SECONDS)
             .keepAliveWithoutCalls(true)

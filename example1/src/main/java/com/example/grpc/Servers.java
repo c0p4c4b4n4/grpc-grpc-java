@@ -8,9 +8,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public final class /*TODO*/ Servers {
+public final class Servers {
 
-    public static void start(BindableService bindableService, Logger logger) throws IOException, InterruptedException {
+    private static final Logger logger = Logger.getLogger(Servers.class.getName());
+
+    public static void start(BindableService bindableService) throws IOException, InterruptedException {
         Loggers.init();
 
         var port = 50051;

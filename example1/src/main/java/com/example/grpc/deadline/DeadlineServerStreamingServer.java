@@ -1,31 +1,32 @@
 package com.example.grpc.deadline;
 
 import com.example.grpc.Delays;
-import com.example.grpc.Servers;
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
+import com.example.grpc.Servers;
 import io.grpc.stub.StreamObserver;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class /*TODO*/ ServerStreamingServer {
+public class DeadlineServerStreamingServer {
 
-    private static final Logger logger = Logger.getLogger(ServerStreamingServer.class.getName());
+    private static final Logger logger = Logger.getLogger(DeadlineServerStreamingServer.class.getName());
 
     public static void main(String[] args) throws Exception {
-        Servers.start(new EchoServiceImpl(), logger);
+        Servers.start(new EchoServiceImpl());
     }
 
-    private static class /*TODO*/ EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
         @Override
         public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
             logger.log(Level.INFO, "request: {0}", request.getMessage());
-            for (var i = 1; i <= 7; i++) {
+            for (var i = 0; i <= 9; i++) {
                 Delays.sleep(i);
 
                 var message = "hello " + request.getMessage() + " " + i;
+                logger.log(Level.INFO, "response: {0}", message);
                 var response = EchoResponse.newBuilder().setMessage(message).build();
                 responseObserver.onNext(response);
             }

@@ -11,9 +11,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class /*TODO*/ UnaryBlockingClient {
+public class WaitForReadyUnaryBlockingClient {
 
-    private static final Logger logger = Logger.getLogger(UnaryBlockingClient.class.getName());
+    private static final Logger logger = Logger.getLogger(WaitForReadyUnaryBlockingClient.class.getName());
 
     public static void main(String[] args) throws Exception {
         Loggers.init();

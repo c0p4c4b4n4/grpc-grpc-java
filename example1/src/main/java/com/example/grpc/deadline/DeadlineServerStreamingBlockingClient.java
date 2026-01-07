@@ -11,9 +11,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class /*TODO*/ ServerStreamingBlockingClient {
+public class DeadlineServerStreamingBlockingClient {
 
-    private static final Logger logger = Logger.getLogger(ServerStreamingBlockingClient.class.getName());
+    private static final Logger logger = Logger.getLogger(DeadlineServerStreamingBlockingClient.class.getName());
 
     public static void main(String[] args) throws InterruptedException {
         Loggers.init();
@@ -21,7 +21,7 @@ public class /*TODO*/ ServerStreamingBlockingClient {
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         try {
             var blockingStub = EchoServiceGrpc.newBlockingStub(channel)
-                .withDeadline(Deadline.after(3, TimeUnit.SECONDS));
+                .withDeadline(Deadline.after(5, TimeUnit.SECONDS));
             var request = EchoRequest.newBuilder().setMessage("world").build();
             var responses = blockingStub.serverStreamingEcho(request);
 

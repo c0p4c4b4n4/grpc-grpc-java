@@ -17,7 +17,7 @@ public class /*TODO*/ ServerStreamingServer {
     private static final Logger logger = Logger.getLogger(ServerStreamingServer.class.getName());
 
     public static void main(String[] args) throws Exception {
-        Servers.start(new EchoServiceImpl(), logger);
+        Servers.start(new EchoServiceImpl());
     }
 
     private static class /*TODO*/ EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {

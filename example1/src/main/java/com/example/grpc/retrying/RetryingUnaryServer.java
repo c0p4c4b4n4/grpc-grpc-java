@@ -16,7 +16,7 @@ public class /*TODO*/ RetryingUnaryServer {
     private static final Logger logger = Logger.getLogger(RetryingUnaryServer.class.getName());
 
     public static void main(String[] args) throws Exception {
-        Servers.start(new EchoServiceImpl(), logger);
+        Servers.start(new EchoServiceImpl());
     }
 
     private static class /*TODO*/ EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {

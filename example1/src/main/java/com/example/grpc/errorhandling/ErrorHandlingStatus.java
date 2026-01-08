@@ -47,6 +47,7 @@ public class /*TODO*/ ErrorHandlingStatus {
 
         channel.shutdown();
         server.shutdown();
+
         channel.awaitTermination(1, TimeUnit.SECONDS);
         server.awaitTermination();
     }

@@ -62,23 +62,19 @@ public class /*TODO*/ ErrorHandlingStatusProto {
             futureCallCallback(channel);
             asyncCall(channel);
         } finally {
-            cleanup(channel, server);
-        }
-    }
+            if (channel != null) {
+                channel.shutdown();
+            }
+            if (server != null) {
+                server.shutdown();
+            }
 
-    private static void cleanup(ManagedChannel channel, Server server) throws InterruptedException {
-        if (channel != null) {
-            channel.shutdown();
-        }
-        if (server != null) {
-            server.shutdown();
-        }
-
-        if (channel != null) {
-            channel.awaitTermination(1, TimeUnit.SECONDS);
-        }
-        if (server != null) {
-            server.awaitTermination(1, TimeUnit.SECONDS);
+            if (channel != null) {
+                channel.awaitTermination(1, TimeUnit.SECONDS);
+            }
+            if (server != null) {
+                server.awaitTermination(1, TimeUnit.SECONDS);
+            }
         }
     }
 

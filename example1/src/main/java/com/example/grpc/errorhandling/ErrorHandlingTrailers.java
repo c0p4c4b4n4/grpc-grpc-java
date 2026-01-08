@@ -64,6 +64,7 @@ public class /*TODO*/ ErrorHandlingTrailers {
 
         channel.shutdown();
         server.shutdown();
+
         channel.awaitTermination(1, TimeUnit.SECONDS);
         server.awaitTermination();
     }

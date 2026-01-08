@@ -1,4 +1,4 @@
-package com.example.grpc.headers;
+package com.example.grpc.header;
 
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;
@@ -12,9 +12,9 @@ import io.grpc.stub.StreamObserver;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class HeadersUnaryServer {
+public class HeaderUnaryServer {
 
-    private static final Logger logger = Logger.getLogger(HeadersUnaryServer.class.getName());
+    private static final Logger logger = Logger.getLogger(HeaderUnaryServer.class.getName());
 
     public static void main(String[] args) throws Exception {
         Loggers.init();

@@ -1,4 +1,4 @@
-package com.example.grpc.headers;
+package com.example.grpc.header;
 
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoServiceGrpc;
@@ -11,9 +11,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class HeadersUnaryBlockingClient {
+public class HeaderUnaryBlockingClient {
 
-    private static final Logger logger = Logger.getLogger(HeadersUnaryBlockingClient.class.getName());
+    private static final Logger logger = Logger.getLogger(HeaderUnaryBlockingClient.class.getName());
 
     public static void main(String[] args) throws Exception {
         Loggers.init();

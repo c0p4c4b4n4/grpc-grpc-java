@@ -1,4 +1,4 @@
-package com.example.grpc.headers;
+package com.example.grpc.header;
 
 import io.grpc.ForwardingServerCall.SimpleForwardingServerCall;
 import io.grpc.Metadata;

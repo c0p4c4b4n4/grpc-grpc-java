@@ -17,8 +17,6 @@ import io.grpc.Channel;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.InsecureServerCredentials;
-import io.grpc.ManagedChannel;
-import io.grpc.Server;
 import io.grpc.protobuf.StatusProto;
 import io.grpc.stub.StreamObserver;
 
@@ -36,52 +34,40 @@ public class /*TODO*/ ErrorHandlingStatusProto {
             .setDetail("detailed error info.").build();
 
     public static void main(String[] args) throws Exception {
-        Server server = null;
-        ManagedChannel channel = null;
+        var server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
+            .addService(new EchoServiceGrpc.EchoServiceImplBase() {
+                @Override
+                public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
+                    var status = Status.newBuilder()
+                        .setCode(Code.INVALID_ARGUMENT.getNumber())
+                        .setMessage("Email or password malformed")
+                        .addDetails(Any.pack(DEBUG_INFO))
+                        .build();
+                    responseObserver.onError(StatusProto.toStatusRuntimeException(status));
+                }
+            })
+            .build()
+            .start();
 
-        try {
-            server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
-                .addService(new EchoServiceGrpc.EchoServiceImplBase() {
-                    @Override
-                    public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-                        var status = Status.newBuilder()
-                            .setCode(Code.INVALID_ARGUMENT.getNumber())
-                            .setMessage("Email or password malformed")
-                            .addDetails(Any.pack(DEBUG_INFO))
-                            .build();
-                        responseObserver.onError(StatusProto.toStatusRuntimeException(status));
-                    }
-                })
-                .build()
-                .start();
+        var channel = Grpc.newChannelBuilderForAddress("localhost", server.getPort(), InsecureChannelCredentials.create()).build();
 
-            channel = Grpc.newChannelBuilderForAddress("localhost", server.getPort(), InsecureChannelCredentials.create()).build();
+        blockingCall(channel);
+        futureCallDirect(channel);
+        futureCallCallback(channel);
+        asyncCall(channel);
 
-            blockingCall(channel);
-            futureCallDirect(channel);
-            futureCallCallback(channel);
-            asyncCall(channel);
-        } finally {
-            if (channel != null) {
-                channel.shutdown();
-            }
-            if (server != null) {
-                server.shutdown();
-            }
+        channel.shutdown();
+        server.shutdown();
 
-            if (channel != null) {
-                channel.awaitTermination(1, TimeUnit.SECONDS);
-            }
-            if (server != null) {
-                server.awaitTermination(1, TimeUnit.SECONDS);
-            }
-        }
+        channel.awaitTermination(1, TimeUnit.SECONDS);
+        server.awaitTermination(1, TimeUnit.SECONDS);
     }
 
-    static void verifyErrorResponse(Throwable t) {
+    private static void verifyError(Throwable t) {
         var status = StatusProto.fromThrowable(t);
         Verify.verify(status.getCode() == Code.INVALID_ARGUMENT.getNumber());
         Verify.verify(status.getMessage().equals("Email or password malformed"));
+
         try {
             var unpackedDetail = status.getDetails(0).unpack(DebugInfo.class);
             Verify.verify(unpackedDetail.equals(DEBUG_INFO));
@@ -90,17 +76,17 @@ public class /*TODO*/ ErrorHandlingStatusProto {
         }
     }
 
-    static void blockingCall(Channel channel) {
+    private static void blockingCall(Channel channel) {
         var stub = EchoServiceGrpc.newBlockingStub(channel);
         try {
             stub.unaryEcho(EchoRequest.newBuilder().build());
         } catch (Exception e) {
-            verifyErrorResponse(e);
+            verifyError(e);
             System.out.println("Blocking call received expected error details");
         }
     }
 
-    static void futureCallDirect(Channel channel) {
+    private static void futureCallDirect(Channel channel) {
         var stub = EchoServiceGrpc.newFutureStub(channel);
         var response = stub.unaryEcho(EchoRequest.newBuilder().build());
 
@@ -110,12 +96,12 @@ public class /*TODO*/ ErrorHandlingStatusProto {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
-            verifyErrorResponse(e.getCause());
+            verifyError(e.getCause());
             System.out.println("Future call direct received expected error details");
         }
     }
 
-    static void futureCallCallback(Channel channel) {
+    private static void futureCallCallback(Channel channel) {
         var stub = EchoServiceGrpc.newFutureStub(channel);
         var response = stub.unaryEcho(EchoRequest.newBuilder().build());
 
@@ -128,7 +114,7 @@ public class /*TODO*/ ErrorHandlingStatusProto {
 
                 @Override
                 public void onFailure(Throwable t) {
-                    verifyErrorResponse(t);
+                    verifyError(t);
                     System.out.println("Future callback received expected error details");
                     done.countDown();
                 }
@@ -140,7 +126,7 @@ public class /*TODO*/ ErrorHandlingStatusProto {
         }
     }
 
-    static void asyncCall(Channel channel) {
+    private static void asyncCall(Channel channel) {
         var stub = EchoServiceGrpc.newStub(channel);
         var request = EchoRequest.newBuilder().build();
 
@@ -154,7 +140,7 @@ public class /*TODO*/ ErrorHandlingStatusProto {
 
             @Override
             public void onError(Throwable t) {
-                verifyErrorResponse(t);
+                verifyError(t);
                 System.out.println("Async call received expected error details");
                 done.countDown();
             }
@@ -171,4 +157,3 @@ public class /*TODO*/ ErrorHandlingStatusProto {
         }
     }
 }
-

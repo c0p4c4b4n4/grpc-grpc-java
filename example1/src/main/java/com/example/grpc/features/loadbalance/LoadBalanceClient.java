@@ -23,19 +23,6 @@ public class /*TODO*/ LoadBalanceClient {
         blockingStub = EchoServiceGrpc.newBlockingStub(channel);
     }
 
-    public void greet(String name) {
-        EchoRequest request = EchoRequest.newBuilder().setMessage(name).build();
-        EchoResponse response;
-        try {
-            response = blockingStub.unaryEcho(request);
-        } catch (StatusRuntimeException e) {
-            logger.log(Level.WARNING, "RPC error: {0}", e.getStatus());
-            return;
-        }
-        logger.log(Level.INFO, "response: {0}", response.getMessage());
-    }
-
-
     public static void main(String[] args) throws Exception {
         NameResolverRegistry.getDefaultRegistry().register(new ExampleNameResolverProvider());
         String target = String.format("%s:///%s", Settings.SCHEME, Settings.SERVICE_NAME);
@@ -73,5 +60,17 @@ public class /*TODO*/ LoadBalanceClient {
         } finally {
             channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
         }
+    }
+
+    public void greet(String name) {
+        EchoRequest request = EchoRequest.newBuilder().setMessage(name).build();
+        EchoResponse response;
+        try {
+            response = blockingStub.unaryEcho(request);
+        } catch (StatusRuntimeException e) {
+            logger.log(Level.WARNING, "RPC error: {0}", e.getStatus());
+            return;
+        }
+        logger.log(Level.INFO, "response: {0}", response.getMessage());
     }
 }

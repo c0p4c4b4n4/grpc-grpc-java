@@ -1,9 +1,9 @@
 package com.example.grpc.echo.streaming.server;
 
-import com.example.grpc.Servers;
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
+import com.example.grpc.Servers;
 import io.grpc.stub.StreamObserver;
 
 import java.util.logging.Level;

@@ -1,9 +1,9 @@
 package com.example.grpc.waitforready;
 
-import com.example.grpc.Servers;
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
+import com.example.grpc.Servers;
 import io.grpc.stub.StreamObserver;
 
 import java.io.IOException;
@@ -18,7 +18,7 @@ public class WaitForReadyUnaryServer {
         Servers.start(new EchoServiceImpl());
     }
 
-    private static class  EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
         @Override
         public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
             logger.log(Level.INFO, "request: {0}", request.getMessage());

@@ -19,6 +19,12 @@ public class /*TODO*/ LoadBalanceServer {
 
     private List<Server> servers;
 
+    public static void main(String[] args) throws IOException, InterruptedException {
+        final LoadBalanceServer server = new LoadBalanceServer();
+        server.start();
+        server.blockUntilShutdown();
+    }
+
     private void start() throws IOException {
         servers = new ArrayList<>();
         for (int port : Settings.SERVER_PORTS) {
@@ -51,12 +57,6 @@ public class /*TODO*/ LoadBalanceServer {
         for (Server server : servers) {
             server.awaitTermination();
         }
-    }
-
-    public static void main(String[] args) throws IOException, InterruptedException {
-        final LoadBalanceServer server = new LoadBalanceServer();
-        server.start();
-        server.blockUntilShutdown();
     }
 
     static class /*TODO*/ GreeterImpl extends EchoServiceGrpc.EchoServiceImplBase {

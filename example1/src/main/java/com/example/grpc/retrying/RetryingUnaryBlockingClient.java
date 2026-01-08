@@ -67,7 +67,7 @@ public class RetryingUnaryBlockingClient {
         var channelBuilder = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext();
         if (enableRetries) {
             var serviceConfig = getRetryingServiceConfig();
-            logger.info("service configuration: " + serviceConfig);
+            logger.log(Level.INFO, "service configuration: {0}", serviceConfig);
             channelBuilder.defaultServiceConfig(serviceConfig).enableRetry();
         }
         return channelBuilder.build();

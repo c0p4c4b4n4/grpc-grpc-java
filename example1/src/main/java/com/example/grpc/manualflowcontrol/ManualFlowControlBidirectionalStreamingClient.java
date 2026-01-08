@@ -1,26 +1,24 @@
 package com.example.grpc.manualflowcontrol;
 
 import com.example.grpc.Constants;
-import com.example.grpc.Loggers;
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
+import com.example.grpc.Loggers;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Status;
 import io.grpc.stub.ClientCallStreamObserver;
 import io.grpc.stub.ClientResponseObserver;
 
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class /*TODO*/ ManualFlowControlClient {
+public class ManualFlowControlBidirectionalStreamingClient {
 
-    private static final Logger logger = Logger.getLogger(ManualFlowControlClient.class.getName());
+    private static final Logger logger = Logger.getLogger(ManualFlowControlBidirectionalStreamingClient.class.getName());
 
     public static void main(String[] args) throws InterruptedException {
         Loggers.init();
@@ -36,14 +34,13 @@ public class /*TODO*/ ManualFlowControlClient {
             @Override
             public void beforeStart(ClientCallStreamObserver<EchoRequest> requestStream) {
                 this.requestStream = requestStream;
-
                 requestStream.disableAutoRequestWithInitial(1);
                 requestStream.setOnReadyHandler(new OnReadyHandler(requestStream, Constants.getAlphabet().iterator()));
             }
 
             @Override
             public void onNext(EchoResponse response) {
-                logger.log(Level.INFO, "response: {0}", response.getMessage());
+                logger.log(Level.INFO, "next response: {0}", response.getMessage());
                 requestStream.request(1);
             }
 
@@ -64,7 +61,7 @@ public class /*TODO*/ ManualFlowControlClient {
         channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
     }
 
-    private static class /*TODO*/ OnReadyHandler implements Runnable {
+    private static class OnReadyHandler implements Runnable {
 
         private final ClientCallStreamObserver<EchoRequest> requestStream;
         private final Iterator<String> iterator;
@@ -79,7 +76,7 @@ public class /*TODO*/ ManualFlowControlClient {
             while (requestStream.isReady()) {
                 if (iterator.hasNext()) {
                     var name = iterator.next();
-                    logger.log(Level.INFO, "request: {0}", name);
+                    logger.log(Level.INFO, "next request: {0}", name);
 
                     var request = EchoRequest.newBuilder().setMessage(name).build();
                     requestStream.onNext(request);

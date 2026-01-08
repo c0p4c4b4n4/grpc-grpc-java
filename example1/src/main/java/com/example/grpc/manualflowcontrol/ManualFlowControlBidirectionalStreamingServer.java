@@ -1,52 +1,29 @@
 package com.example.grpc.manualflowcontrol;
 
 import com.example.grpc.Delays;
-import com.example.grpc.Loggers;
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
-import io.grpc.ServerBuilder;
+import com.example.grpc.Servers;
 import io.grpc.Status;
 import io.grpc.stub.ServerCallStreamObserver;
 import io.grpc.stub.StreamObserver;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class /*TODO*/ ManualFlowControlServer {
+public class ManualFlowControlBidirectionalStreamingServer {
 
-    private static final Logger logger = Logger.getLogger(ManualFlowControlServer.class.getName());
+    private static final Logger logger = Logger.getLogger(ManualFlowControlBidirectionalStreamingServer.class.getName());
 
     public static void main(String[] args) throws InterruptedException, IOException {
-        Loggers.init();
-
-        var port = 50051;
-        var server = ServerBuilder
-            .forPort(port)
-            .addService(new EchoServiceImpl())
-            .build()
-            .start();
-
-        logger.log(Level.INFO, "server started, listening on {0,number,#}", port);
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.err.println("server is shutting down");
-            try {
-                server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                System.err.println("server shutdown was interrupted");
-                server.shutdownNow();
-            }
-            System.err.println("server has been shut down");
-        }));
-
-        server.awaitTermination();
+        Servers.start(new EchoServiceImpl());
     }
 
-    private static class /*TODO*/ EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    private static class  EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
 
         @Override
         public StreamObserver<EchoRequest> bidirectionalStreamingEcho(final StreamObserver<EchoResponse> responseObserver) {
@@ -57,14 +34,14 @@ public class /*TODO*/ ManualFlowControlServer {
             serverCallStreamObserver.setOnReadyHandler(onReadyHandler);
 
             return new StreamObserver<>() {
-                int counter = 0;
+                final AtomicInteger i = new AtomicInteger(0);
 
                 @Override
                 public void onNext(EchoRequest request) {
                     try {
-                        logger.log(Level.INFO, "request: {0}", request.getMessage());
+                        logger.log(Level.INFO, "next request: {0}", request.getMessage());
 
-                        Delays.sleep(++counter % 10 == 0 ? 5 : 0);
+                        Delays.sleep(i.incrementAndGet() % 10 == 0 ? 5 : 0);
 
                         var response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
                         responseObserver.onNext(response);
@@ -94,7 +71,7 @@ public class /*TODO*/ ManualFlowControlServer {
             };
         }
 
-        private static class /*TODO*/ OnReadyHandler implements Runnable {
+        private static class  OnReadyHandler implements Runnable {
 
             private final ServerCallStreamObserver<EchoResponse> serverCallStreamObserver;
             private final AtomicBoolean wasReady;
@@ -108,8 +85,7 @@ public class /*TODO*/ ManualFlowControlServer {
             public void run() {
                 if (serverCallStreamObserver.isReady() && !wasReady.get()) {
                     wasReady.set(true);
-
-                    logger.info("ready");
+                    logger.info("server is ready");
                     serverCallStreamObserver.request(1);
                 }
             }

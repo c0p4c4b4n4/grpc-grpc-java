@@ -27,8 +27,8 @@ public class RetryingUnaryBlockingClient {
         var channel = buildChannel(enableRetries);
         var blockingStub = EchoServiceGrpc.newBlockingStub(channel);
 
-        var totalRPCs = new AtomicInteger();
-        var failedRPCS = new AtomicInteger();
+        var sentRPCs = new AtomicInteger();
+        var failedRPCs = new AtomicInteger();
 
         try {
             var executor = new ForkJoinPool();
@@ -40,20 +40,20 @@ public class RetryingUnaryBlockingClient {
                         logger.log(Level.INFO, "response: {0}", response.getMessage());
                     } catch (StatusRuntimeException e) {
                         logger.log(Level.INFO, "error: {0}", e.getStatus());
-                        failedRPCS.incrementAndGet();
+                        failedRPCs.incrementAndGet();
                     }
 
-                    totalRPCs.incrementAndGet();
+                    sentRPCs.incrementAndGet();
                 });
             }
             executor.awaitQuiescence(120, TimeUnit.SECONDS);
             executor.shutdown();
 
-            logger.log(Level.INFO, "retrying: {0}, calls sent: {1}, calls failed: {2}",
+            logger.log(Level.INFO, "retrying: {0}, total RPCs sent: {1}, total RPCs failed: {2}",
                 new Object[]{
                     enableRetries ? "enabled" : "disabled",
-                    totalRPCs.get(),
-                    failedRPCS.get()
+                    sentRPCs.get(),
+                    failedRPCs.get()
                 }
             );
         } catch (StatusRuntimeException e) {
@@ -70,8 +70,7 @@ public class RetryingUnaryBlockingClient {
             logger.info("client started with service configuration: " + serviceConfig);
             channelBuilder.defaultServiceConfig(serviceConfig).enableRetry();
         }
-        var channel = channelBuilder.build();
-        return channel;
+        return channelBuilder.build();
     }
 
     private static Map<String, ?> getRetryingServiceConfig() {

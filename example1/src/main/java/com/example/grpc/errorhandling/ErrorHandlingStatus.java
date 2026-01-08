@@ -57,7 +57,7 @@ public class ErrorHandlingStatus {
         var stub = EchoServiceGrpc.newBlockingStub(channel);
 
         try {
-            stub.unaryEcho(EchoRequest.newBuilder().setMessage("Alpha").build());
+            stub.unaryEcho(EchoRequest.newBuilder().build());
         } catch (Exception e) {
             verifyErrorResponse(e);
             System.out.println("Blocking call received expected error details");
@@ -66,7 +66,7 @@ public class ErrorHandlingStatus {
 
     private static void futureCallDirect(ManagedChannel channel) {
         var stub = EchoServiceGrpc.newFutureStub(channel);
-        var response = stub.unaryEcho(EchoRequest.newBuilder().setMessage("Beta").build());
+        var response = stub.unaryEcho(EchoRequest.newBuilder().build());
 
         try {
             response.get();
@@ -81,12 +81,12 @@ public class ErrorHandlingStatus {
 
     private static void futureCallCallback(ManagedChannel channel) {
         var stub = EchoServiceGrpc.newFutureStub(channel);
-        var response = stub.unaryEcho(EchoRequest.newBuilder().setMessage("Gamma").build());
+        var responseFuture = stub.unaryEcho(EchoRequest.newBuilder().build());
 
         var done = new CountDownLatch(1);
-        Futures.addCallback(response, new FutureCallback<>() {
+        Futures.addCallback(responseFuture, new FutureCallback<>() {
                 @Override
-                public void onSuccess(EchoResponse result) {
+                public void onSuccess(EchoResponse response) {
                     // won't be called
                 }
 
@@ -106,12 +106,12 @@ public class ErrorHandlingStatus {
 
     private static void asyncCall(ManagedChannel channel) {
         var stub = EchoServiceGrpc.newStub(channel);
-        var request = EchoRequest.newBuilder().setMessage("Delta").build();
+        var request = EchoRequest.newBuilder().build();
 
         var done = new CountDownLatch(1);
         var responseObserver = new StreamObserver<EchoResponse>() {
             @Override
-            public void onNext(EchoResponse value) {
+            public void onNext(EchoResponse response) {
                 // won't be called
             }
 

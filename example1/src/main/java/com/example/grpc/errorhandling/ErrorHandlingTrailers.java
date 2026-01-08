@@ -85,6 +85,7 @@ public class /*TODO*/ ErrorHandlingTrailers {
 
     void blockingCall() {
         var stub = EchoServiceGrpc.newBlockingStub(channel);
+
         try {
             stub.unaryEcho(EchoRequest.newBuilder().build());
         } catch (Exception e) {

@@ -79,6 +79,7 @@ public class  ErrorHandlingStatusProto {
 
     private static void blockingCall(Channel channel) {
         var stub = EchoServiceGrpc.newBlockingStub(channel);
+
         try {
             stub.unaryEcho(EchoRequest.newBuilder().build());
         } catch (Exception e) {
@@ -104,12 +105,12 @@ public class  ErrorHandlingStatusProto {
 
     private static void futureCallCallback(Channel channel) {
         var stub = EchoServiceGrpc.newFutureStub(channel);
-        var response = stub.unaryEcho(EchoRequest.newBuilder().build());
+        var responseFuture = stub.unaryEcho(EchoRequest.newBuilder().build());
 
         var done = new CountDownLatch(1);
-        Futures.addCallback(response, new FutureCallback<>() {
+        Futures.addCallback(responseFuture, new FutureCallback<>() {
                 @Override
-                public void onSuccess(EchoResponse result) {
+                public void onSuccess(EchoResponse response) {
                     // won't be called
                 }
 

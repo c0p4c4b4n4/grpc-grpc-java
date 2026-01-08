@@ -40,10 +40,6 @@ public class /*TODO*/ ErrorHandlingTrailers {
     private ManagedChannel channel;
 
     public static void main(String[] args) throws Exception {
-        new ErrorHandlingTrailers().run();
-    }
-
-    void run() throws Exception {
         var server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
             .addService(new EchoServiceGrpc.EchoServiceImplBase() {
                 @Override
@@ -56,26 +52,28 @@ public class /*TODO*/ ErrorHandlingTrailers {
             .build()
             .start();
 
-        channel = Grpc.newChannelBuilderForAddress("localhost", server.getPort(), InsecureChannelCredentials.create()).build();
+        var channel = Grpc.newChannelBuilderForAddress("localhost", server.getPort(), InsecureChannelCredentials.create()).build();
 
-        blockingCall();
-        futureCallDirect();
-        futureCallCallback();
-        asyncCall();
+        blockingCall(channel);
+        futureCallDirect(channel);
+        futureCallCallback(channel);
+        asyncCall(channel);
 
         channel.shutdown();
         server.shutdown();
 
         channel.awaitTermination(1, TimeUnit.SECONDS);
-        server.awaitTermination();
+        server.awaitTermination(1, TimeUnit.SECONDS);
     }
 
-    void verifyErrorResponse(Throwable t) {
+    private static void verifyErrorResponse(Throwable t) {
         var status = Status.fromThrowable(t);
         var trailers = Status.trailersFromThrowable(t);
+
         Verify.verify(status.getCode() == Status.Code.INTERNAL);
         Verify.verify(trailers.containsKey(DEBUG_INFO_TRAILER_KEY));
         Verify.verify(status.getDescription().equals(DEBUG_DESC));
+
         try {
             Verify.verify(trailers.get(DEBUG_INFO_TRAILER_KEY).equals(DEBUG_INFO));
         } catch (IllegalArgumentException e) {
@@ -83,7 +81,7 @@ public class /*TODO*/ ErrorHandlingTrailers {
         }
     }
 
-    void blockingCall() {
+    private static void blockingCall(ManagedChannel channel) {
         var stub = EchoServiceGrpc.newBlockingStub(channel);
 
         try {
@@ -93,7 +91,7 @@ public class /*TODO*/ ErrorHandlingTrailers {
         }
     }
 
-    void futureCallDirect() {
+    private static void futureCallDirect(ManagedChannel channel) {
         var stub = EchoServiceGrpc.newFutureStub(channel);
         var response = stub.unaryEcho(EchoRequest.newBuilder().build());
 
@@ -107,7 +105,7 @@ public class /*TODO*/ ErrorHandlingTrailers {
         }
     }
 
-    void futureCallCallback() {
+    private static void futureCallCallback(ManagedChannel channel) {
         var stub = EchoServiceGrpc.newFutureStub(channel);
         var response = stub.unaryEcho(EchoRequest.newBuilder().build());
 
@@ -133,7 +131,7 @@ public class /*TODO*/ ErrorHandlingTrailers {
         }
     }
 
-    void asyncCall() {
+    private static void asyncCall(ManagedChannel channel) {
         var stub = EchoServiceGrpc.newStub(channel);
         var request = EchoRequest.newBuilder().build();
 
@@ -161,6 +159,4 @@ public class /*TODO*/ ErrorHandlingTrailers {
             throw new RuntimeException("timeout!");
         }
     }
-
 }
-

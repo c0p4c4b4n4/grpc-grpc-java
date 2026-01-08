@@ -24,7 +24,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class /*TODO*/ ErrorHandlingTrailers {
+public class ErrorHandlingTrailers {
 
     private static final Metadata.Key<DebugInfo> DEBUG_INFO_TRAILER_KEY =
         ProtoUtils.keyForProto(DebugInfo.getDefaultInstance());
@@ -36,8 +36,7 @@ public class /*TODO*/ ErrorHandlingTrailers {
             .addStackEntries("stack_entry_3")
             .setDetail("detailed error info.").build();
 
-    private static final String DEBUG_DESC = "detailed error description";
-    private ManagedChannel channel;
+    private static final String STATUS_DESCRIPTION = "Detailed error description";
 
     public static void main(String[] args) throws Exception {
         var server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
@@ -46,7 +45,7 @@ public class /*TODO*/ ErrorHandlingTrailers {
                 public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
                     var trailers = new Metadata();
                     trailers.put(DEBUG_INFO_TRAILER_KEY, DEBUG_INFO);
-                    responseObserver.onError(Status.INTERNAL.withDescription(DEBUG_DESC).asRuntimeException(trailers));
+                    responseObserver.onError(Status.INTERNAL.withDescription(STATUS_DESCRIPTION).asRuntimeException(trailers));
                 }
             })
             .build()
@@ -69,10 +68,9 @@ public class /*TODO*/ ErrorHandlingTrailers {
     private static void verifyErrorResponse(Throwable t) {
         var status = Status.fromThrowable(t);
         var trailers = Status.trailersFromThrowable(t);
-
         Verify.verify(status.getCode() == Status.Code.INTERNAL);
         Verify.verify(trailers.containsKey(DEBUG_INFO_TRAILER_KEY));
-        Verify.verify(status.getDescription().equals(DEBUG_DESC));
+        Verify.verify(status.getDescription().equals(STATUS_DESCRIPTION));
 
         try {
             Verify.verify(trailers.get(DEBUG_INFO_TRAILER_KEY).equals(DEBUG_INFO));

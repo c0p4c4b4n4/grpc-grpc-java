@@ -4,6 +4,7 @@ import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
 import com.google.common.base.Verify;
+import com.google.common.base.VerifyException;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -25,7 +26,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class  ErrorHandlingStatusProto {
+public class ErrorHandlingStatusProto {
 
     private static final DebugInfo DEBUG_INFO =
         DebugInfo.newBuilder()
@@ -34,6 +35,8 @@ public class  ErrorHandlingStatusProto {
             .addStackEntries("stack_entry_3")
             .setDetail("detailed error info.").build();
 
+    private static final String STATUS_MESSAGE = "Detailed error description";
+
     public static void main(String[] args) throws Exception {
         var server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
             .addService(new EchoServiceGrpc.EchoServiceImplBase() {
@@ -41,7 +44,7 @@ public class  ErrorHandlingStatusProto {
                 public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
                     var status = Status.newBuilder()
                         .setCode(Code.INVALID_ARGUMENT.getNumber())
-                        .setMessage("Some error message")
+                        .setMessage(STATUS_MESSAGE)
                         .addDetails(Any.pack(DEBUG_INFO))
                         .build();
                     responseObserver.onError(StatusProto.toStatusRuntimeException(status));
@@ -67,13 +70,13 @@ public class  ErrorHandlingStatusProto {
     private static void verifyErrorResponse(Throwable t) {
         var status = StatusProto.fromThrowable(t);
         Verify.verify(status.getCode() == Code.INVALID_ARGUMENT.getNumber());
-        Verify.verify(status.getMessage().equals("Some error message"));
+        Verify.verify(status.getMessage().equals(STATUS_MESSAGE));
 
         try {
             var unpackedDetail = status.getDetails(0).unpack(DebugInfo.class);
             Verify.verify(unpackedDetail.equals(DEBUG_INFO));
         } catch (InvalidProtocolBufferException e) {
-            Verify.verify(false, "Message was a different type than expected");
+            throw new VerifyException(e);
         }
     }
 

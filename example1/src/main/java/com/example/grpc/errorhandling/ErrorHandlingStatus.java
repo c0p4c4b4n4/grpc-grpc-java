@@ -22,12 +22,14 @@ import java.util.concurrent.TimeUnit;
 
 public class ErrorHandlingStatus {
 
+    private static final String STATUS_DESCRIPTION = "Detailed error description";
+
     public static void main(String[] args) throws Exception {
         var server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
             .addService(new EchoServiceGrpc.EchoServiceImplBase() {
                 @Override
                 public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-                    responseObserver.onError(Status.INTERNAL.withDescription("Some error message").asRuntimeException());
+                    responseObserver.onError(Status.INTERNAL.withDescription(STATUS_DESCRIPTION).asRuntimeException());
                 }
             })
             .build()
@@ -50,7 +52,7 @@ public class ErrorHandlingStatus {
     private static void verifyErrorResponse(Throwable t) {
         var status = Status.fromThrowable(t);
         Verify.verify(status.getCode() == Status.Code.INTERNAL);
-        Verify.verify(status.getDescription().equals("Some error message"));
+        Verify.verify(status.getDescription().equals(STATUS_DESCRIPTION));
     }
 
     private static void blockingCall(ManagedChannel channel) {

@@ -1,4 +1,4 @@
-package com.example.grpc.echo.streaming.client;
+package com.example.grpc.methodtypes.streaming.client;
 
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;

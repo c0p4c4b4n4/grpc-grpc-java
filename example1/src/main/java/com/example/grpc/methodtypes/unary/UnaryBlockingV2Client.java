@@ -1,18 +1,18 @@
-package com.example.grpc.echo.unary;
+package com.example.grpc.methodtypes.unary;
 
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoServiceGrpc;
 import com.example.grpc.Loggers;
 import io.grpc.ManagedChannelBuilder;
-import io.grpc.StatusRuntimeException;
+import io.grpc.StatusException;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class /*TODO*/ UnaryBlockingClient {
+public class /*TODO*/ UnaryBlockingV2Client {
 
-    private static final Logger logger = Logger.getLogger(UnaryBlockingClient.class.getName());
+    private static final Logger logger = Logger.getLogger(UnaryBlockingV2Client.class.getName());
 
     public static void main(String[] args) throws Exception {
         Loggers.init();
@@ -20,12 +20,12 @@ public class /*TODO*/ UnaryBlockingClient {
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
 
         try {
-            var blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+            var blockingStub = EchoServiceGrpc.newBlockingV2Stub(channel);
             var request = EchoRequest.newBuilder().setMessage("world").build();
             var response = blockingStub.unaryEcho(request);
             logger.log(Level.INFO, "response: {0}", response.getMessage());
-        } catch (StatusRuntimeException e) {
-            logger.log(Level.WARNING, "RPC error: {0}", e.getStatus());
+        } catch (StatusException e) {
+            logger.log(Level.WARNING, "error: {0}", e.getStatus());
         } finally {
             channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
         }

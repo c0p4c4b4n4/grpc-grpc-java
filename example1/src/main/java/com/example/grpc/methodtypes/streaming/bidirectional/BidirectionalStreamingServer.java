@@ -1,4 +1,4 @@
-package com.example.grpc.echo.streaming.bidirectional;
+package com.example.grpc.methodtypes.streaming.bidirectional;
 
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;

@@ -1,4 +1,4 @@
-package com.example.grpc.echo.unary;
+package com.example.grpc.methodtypes.unary;
 
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;

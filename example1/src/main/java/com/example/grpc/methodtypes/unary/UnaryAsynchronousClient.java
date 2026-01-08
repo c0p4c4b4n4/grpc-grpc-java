@@ -1,50 +1,51 @@
-package com.example.grpc.echo.unary;
+package com.example.grpc.methodtypes.unary;
 
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
 import com.example.grpc.Loggers;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.MoreExecutors;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Status;
+import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class /*TODO*/ UnaryFutureClient {
+public class /*TODO*/ UnaryAsynchronousClient {
 
-    private static final Logger logger = Logger.getLogger(UnaryFutureClient.class.getName());
+    private static final Logger logger = Logger.getLogger(UnaryAsynchronousClient.class.getName());
 
     public static void main(String[] args) throws Exception {
         Loggers.init();
 
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
 
-        var futureStub = EchoServiceGrpc.newFutureStub(channel);
+        var asyncStub = EchoServiceGrpc.newStub(channel);
         var request = EchoRequest.newBuilder().setMessage("world").build();
-        var responseFuture = futureStub.unaryEcho(request);
 
         var done = new CountDownLatch(1);
-        Futures.addCallback(responseFuture, new FutureCallback<>() {
+        asyncStub.unaryEcho(request, new StreamObserver<>() {
             @Override
-            public void onSuccess(EchoResponse response) {
-                logger.info("result: " + response.getMessage());
-                done.countDown();
+            public void onNext(EchoResponse response) {
+                logger.log(Level.INFO, "next: {0}", response.getMessage());
             }
 
             @Override
-            public void onFailure(Throwable t) {
+            public void onError(Throwable t) {
                 logger.log(Level.WARNING, "error: {0}", Status.fromThrowable(t));
                 done.countDown();
             }
-        }, MoreExecutors.directExecutor());
+
+            @Override
+            public void onCompleted() {
+                logger.info("completed");
+                done.countDown();
+            }
+        });
 
         done.await();
         channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
     }
 }
-

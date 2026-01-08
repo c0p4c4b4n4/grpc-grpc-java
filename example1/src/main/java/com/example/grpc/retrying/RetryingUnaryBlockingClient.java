@@ -27,31 +27,40 @@ public class RetryingUnaryBlockingClient {
         var channel = buildChannel(enableRetries);
         var blockingStub = EchoServiceGrpc.newBlockingStub(channel);
 
-        final AtomicInteger totalCalls = new AtomicInteger();
-        final AtomicInteger failedCalls = new AtomicInteger();
+        var totalRPCs = new AtomicInteger();
+        var failedRPCS = new AtomicInteger();
 
-        var executor = new ForkJoinPool();
-        for (var name : Constants.getNames()) {
-            executor.execute(() -> {
-                try {
-                    var request = EchoRequest.newBuilder().setMessage(name).build();
-                    var response = blockingStub.unaryEcho(request);
-                    logger.log(Level.INFO, "response: {0}", response.getMessage());
-                } catch (StatusRuntimeException e) {
-                    logger.log(Level.INFO, "error: {0}", e.getStatus());
-                    failedCalls.incrementAndGet();
+        try {
+            var executor = new ForkJoinPool();
+            for (var name : Constants.getNames()) {
+                executor.execute(() -> {
+                    try {
+                        var request = EchoRequest.newBuilder().setMessage(name).build();
+                        var response = blockingStub.unaryEcho(request);
+                        logger.log(Level.INFO, "response: {0}", response.getMessage());
+                    } catch (StatusRuntimeException e) {
+                        logger.log(Level.INFO, "error: {0}", e.getStatus());
+                        failedRPCS.incrementAndGet();
+                    }
+
+                    totalRPCs.incrementAndGet();
+                });
+            }
+            executor.awaitQuiescence(120, TimeUnit.SECONDS);
+            executor.shutdown();
+
+            logger.log(Level.INFO, "retrying: {0}, calls sent: {1}, calls failed: {2}",
+                new Object[]{
+                    enableRetries ? "enabled" : "disabled",
+                    totalRPCs.get(),
+                    failedRPCS.get()
                 }
-
-                totalCalls.incrementAndGet();
-            });
+            );
+        } catch (StatusRuntimeException e) {
+            logger.log(Level.WARNING, "RPC error: {0}", e.getStatus());
+        } finally {
+            channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
         }
-        executor.awaitQuiescence(120, TimeUnit.SECONDS);
-        executor.shutdown();
-
-        logger.log(Level.INFO, "retrying: {0}, calls sent: {1}, calls failed: {2}",
-            new Object[]{enableRetries ? "enabled" : "disabled", totalCalls.get(), failedCalls.get()});
-
-        channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
     }
 
     private static ManagedChannel buildChannel(boolean enableRetries) {

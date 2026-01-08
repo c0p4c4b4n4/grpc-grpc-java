@@ -9,9 +9,9 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.Uninterruptibles;
 import io.grpc.Grpc;
-import io.grpc.InsecureChannelCredentials;
 import io.grpc.InsecureServerCredentials;
 import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
@@ -19,57 +19,52 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class /*TODO*/ ErrorHandlingStatus {
-
-    private ManagedChannel channel;
+public class ErrorHandlingStatus {
 
     public static void main(String[] args) throws Exception {
-        new ErrorHandlingStatus().run();
-    }
-
-    void run() throws Exception {
         var server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
             .addService(new EchoServiceGrpc.EchoServiceImplBase() {
                 @Override
                 public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-                    responseObserver.onError(Status.INTERNAL.withDescription("Eggplant").asRuntimeException());
+                    responseObserver.onError(Status.INTERNAL.withDescription("Some error").asRuntimeException());
                 }
             })
             .build()
             .start();
 
-        channel = Grpc.newChannelBuilderForAddress("localhost", server.getPort(), InsecureChannelCredentials.create()).build();
+        var channel = ManagedChannelBuilder.forAddress("localhost", server.getPort()).usePlaintext().build();
 
-        blockingCall();
-        futureCallDirect();
-        futureCallCallback();
-        asyncCall();
+        blockingCall(channel);
+        futureCallDirect(channel);
+        futureCallCallback(channel);
+        asyncCall(channel);
 
         channel.shutdown();
         server.shutdown();
 
         channel.awaitTermination(1, TimeUnit.SECONDS);
-        server.awaitTermination();
+        server.awaitTermination(1, TimeUnit.SECONDS);
     }
 
-    private void verifyErrorResponse(Throwable t) {
+    private static void verifyError(Throwable t) {
         var status = Status.fromThrowable(t);
         Verify.verify(status.getCode() == Status.Code.INTERNAL);
-        Verify.verify(status.getDescription().equals("Eggplant"));
+        Verify.verify(status.getDescription().equals("Some error"));
     }
 
-    void blockingCall() {
+    private static void blockingCall(ManagedChannel channel) {
         var stub = EchoServiceGrpc.newBlockingStub(channel);
+
         try {
-            stub.unaryEcho(EchoRequest.newBuilder().setMessage("Bart").build());
+            stub.unaryEcho(EchoRequest.newBuilder().setMessage("Alpha").build());
         } catch (Exception e) {
-            verifyErrorResponse(e);
+            verifyError(e);
         }
     }
 
-    void futureCallDirect() {
+    private static void futureCallDirect(ManagedChannel channel) {
         var stub = EchoServiceGrpc.newFutureStub(channel);
-        var response = stub.unaryEcho(EchoRequest.newBuilder().setMessage("Lisa").build());
+        var response = stub.unaryEcho(EchoRequest.newBuilder().setMessage("Beta").build());
 
         try {
             response.get();
@@ -77,13 +72,13 @@ public class /*TODO*/ ErrorHandlingStatus {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
-            verifyErrorResponse(e.getCause());
+            verifyError(e.getCause());
         }
     }
 
-    void futureCallCallback() {
+    private static void futureCallCallback(ManagedChannel channel) {
         var stub = EchoServiceGrpc.newFutureStub(channel);
-        var response = stub.unaryEcho(EchoRequest.newBuilder().setMessage("Maggie").build());
+        var response = stub.unaryEcho(EchoRequest.newBuilder().setMessage("Gamma").build());
 
         var done = new CountDownLatch(1);
         Futures.addCallback(response, new FutureCallback<>() {
@@ -94,7 +89,7 @@ public class /*TODO*/ ErrorHandlingStatus {
 
                 @Override
                 public void onFailure(Throwable t) {
-                    verifyErrorResponse(t);
+                    verifyError(t);
                     done.countDown();
                 }
             },
@@ -105,9 +100,9 @@ public class /*TODO*/ ErrorHandlingStatus {
         }
     }
 
-    void asyncCall() {
+    private static void asyncCall(ManagedChannel channel) {
         var stub = EchoServiceGrpc.newStub(channel);
-        var request = EchoRequest.newBuilder().setMessage("Homer").build();
+        var request = EchoRequest.newBuilder().setMessage("Delta").build();
 
         var done = new CountDownLatch(1);
         var responseObserver = new StreamObserver<EchoResponse>() {
@@ -118,7 +113,7 @@ public class /*TODO*/ ErrorHandlingStatus {
 
             @Override
             public void onError(Throwable t) {
-                verifyErrorResponse(t);
+                verifyError(t);
                 done.countDown();
             }
 
@@ -134,4 +129,3 @@ public class /*TODO*/ ErrorHandlingStatus {
         }
     }
 }
-

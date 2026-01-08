@@ -35,7 +35,7 @@ public class ManualFlowControlBidirectionalStreamingClient {
             public void beforeStart(ClientCallStreamObserver<EchoRequest> requestStream) {
                 this.requestStream = requestStream;
                 requestStream.disableAutoRequestWithInitial(1);
-                requestStream.setOnReadyHandler(new OnReadyHandler(requestStream, Constants.getAlphabet().iterator()));
+                requestStream.setOnReadyHandler(new OnReadyHandler(requestStream, Constants.getNames().iterator()));
             }
 
             @Override

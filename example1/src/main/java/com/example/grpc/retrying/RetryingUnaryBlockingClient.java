@@ -1,5 +1,6 @@
 package com.example.grpc.retrying;
 
+import com.example.grpc.Constants;
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoServiceGrpc;
 import com.example.grpc.Loggers;
@@ -36,11 +37,10 @@ public class RetryingUnaryBlockingClient {
         final AtomicInteger failedCalls = new AtomicInteger();
 
         var executor = new ForkJoinPool();
-        for (var i = 0; i < 50; i++) {
-            var userId = "user" + i;
+        for (var name : Constants.getNames()) {
             executor.execute(() -> {
                 try {
-                    var request = EchoRequest.newBuilder().setMessage("hello " +userId).build();
+                    var request = EchoRequest.newBuilder().setMessage(name).build();
                     var response = blockingStub.unaryEcho(request);
                     logger.log(Level.INFO, "response: {0}", response.getMessage());
                 } catch (StatusRuntimeException e) {

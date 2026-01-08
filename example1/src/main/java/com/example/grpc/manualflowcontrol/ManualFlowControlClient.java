@@ -1,5 +1,6 @@
 package com.example.grpc.manualflowcontrol;
 
+import com.example.grpc.Constants;
 import com.example.grpc.Loggers;
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;
@@ -37,7 +38,7 @@ public class /*TODO*/ ManualFlowControlClient {
                 this.requestStream = requestStream;
 
                 requestStream.disableAutoRequestWithInitial(1);
-                requestStream.setOnReadyHandler(new OnReadyHandler(requestStream, getNames().iterator()));
+                requestStream.setOnReadyHandler(new OnReadyHandler(requestStream, Constants.getAlphabet().iterator()));
             }
 
             @Override
@@ -61,37 +62,6 @@ public class /*TODO*/ ManualFlowControlClient {
 
         done.await();
         channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
-    }
-
-    private static List<String> getNames() {
-        return Arrays.asList(
-            "Alpha",
-            "Bravo",
-            "Charlie",
-            "Delta",
-            "Echo",
-            "Foxtrot",
-            "Golf",
-            "Hotel",
-            "India",
-            "Juliett",
-            "Kilo",
-            "Lima",
-            "Mike",
-            "November",
-            "Oscar",
-            "Papa",
-            "Quebec",
-            "Romeo",
-            "Sierra",
-            "Tango",
-            "Uniform",
-            "Victor",
-            "Whiskey",
-            "X-ray",
-            "Yankee",
-            "Zulu"
-        );
     }
 
     private static class /*TODO*/ OnReadyHandler implements Runnable {

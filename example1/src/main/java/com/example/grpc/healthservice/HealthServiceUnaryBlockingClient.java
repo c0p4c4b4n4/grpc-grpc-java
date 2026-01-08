@@ -32,7 +32,7 @@ public class HealthServiceUnaryBlockingClient {
                 Thread.sleep(100);
                 checkHealth(healthBlockingStub, "after user " + user);
             }
-
+/* TODO */
             checkHealth(healthBlockingStub, "after all users");
             Delays.sleep(10);
             checkHealth(healthBlockingStub, "after 10 second wait");

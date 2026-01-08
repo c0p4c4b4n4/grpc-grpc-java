@@ -1,11 +1,9 @@
 package com.example.grpc.retrying;
 
-import com.example.grpc.Loggers;
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoServiceGrpc;
-import io.grpc.Grpc;
-import io.grpc.InsecureChannelCredentials;
-import io.grpc.ManagedChannel;
+import com.example.grpc.Loggers;
+import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 
 import java.util.List;
@@ -16,45 +14,53 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class /*TODO*/ RetryingUnaryBlockingClient {
+public class RetryingUnaryBlockingClient {
 
     private static final Logger logger = Logger.getLogger(RetryingUnaryBlockingClient.class.getName());
-
-    private final ManagedChannel channel;
-    private final EchoServiceGrpc.EchoServiceBlockingStub blockingStub;
-    private final AtomicInteger totalCalls = new AtomicInteger();
-    private final AtomicInteger failedCalls = new AtomicInteger();
-
-    private RetryingUnaryBlockingClient(String host, int port, boolean enableRetries) {
-        var channelBuilder = Grpc.newChannelBuilderForAddress(host, port, InsecureChannelCredentials.create());
-        if (enableRetries) {
-            var serviceConfig = getRetryingServiceConfig();
-            logger.info("client started with service configuration: " + serviceConfig);
-            channelBuilder.defaultServiceConfig(serviceConfig).enableRetry();
-        }
-        channel = channelBuilder.build();
-        blockingStub = EchoServiceGrpc.newBlockingStub(channel);
-    }
 
     public static void main(String[] args) throws Exception {
         Loggers.init();
 
         var enableRetries = !Boolean.parseBoolean(System.getenv("EXAMPLE_GRPC_DISABLE_RETRYING"));
-        var client = new RetryingUnaryBlockingClient("localhost", 50051, enableRetries);
+
+        var channelBuilder = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext();
+        if (enableRetries) {
+            var serviceConfig = getRetryingServiceConfig();
+            logger.info("client started with service configuration: " + serviceConfig);
+            channelBuilder.defaultServiceConfig(serviceConfig).enableRetry();
+        }
+        var channel = channelBuilder.build();
+        var blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+
+        final AtomicInteger totalCalls = new AtomicInteger();
+        final AtomicInteger failedCalls = new AtomicInteger();
 
         var executor = new ForkJoinPool();
         for (var i = 0; i < 50; i++) {
             var userId = "user" + i;
-            executor.execute(() -> client.unaryEcho(userId));
+            executor.execute(() -> {
+                try {
+                    var request = EchoRequest.newBuilder().setMessage("hello " +userId).build();
+                    var response = blockingStub.unaryEcho(request);
+                    logger.log(Level.INFO, "response: {0}", response.getMessage());
+                } catch (StatusRuntimeException e) {
+                    logger.log(Level.INFO, "error: {0}", e.getStatus());
+                    failedCalls.incrementAndGet();
+                }
+
+                totalCalls.incrementAndGet();
+            });
         }
         executor.awaitQuiescence(120, TimeUnit.SECONDS);
         executor.shutdown();
 
-        client.printSummary(enableRetries);
-        client.shutdown();
+        logger.log(Level.INFO, "retrying: {0}, calls sent: {1}, calls failed: {2}",
+            new Object[]{enableRetries ? "enabled" : "disabled", totalCalls.get(), failedCalls.get()});
+
+        channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
     }
 
-    private Map<String, ?> getRetryingServiceConfig() {
+    private static Map<String, ?> getRetryingServiceConfig() {
         return Map.of(
             "methodConfig", List.of(
                 Map.of(
@@ -74,27 +80,5 @@ public class /*TODO*/ RetryingUnaryBlockingClient {
                 )
             )
         );
-    }
-
-    private void unaryEcho(String message) {
-        try {
-            var request = EchoRequest.newBuilder().setMessage(message).build();
-            var response = blockingStub.unaryEcho(request);
-            logger.log(Level.INFO, "response: {0}", response.getMessage());
-        } catch (StatusRuntimeException e) {
-            failedCalls.incrementAndGet();
-            logger.log(Level.INFO, "error: {0}", e.getStatus());
-        }
-
-        totalCalls.incrementAndGet();
-    }
-
-    private void printSummary(boolean enableRetries) {
-        logger.log(Level.INFO, "retrying: {0}, calls sent: {1}, calls failed: {2}\n",
-            new Object[]{enableRetries ? "enabled" : "disabled", totalCalls.get(), failedCalls.get()});
-    }
-
-    private void shutdown() throws InterruptedException {
-        channel.shutdown().awaitTermination(60, TimeUnit.SECONDS);
     }
 }

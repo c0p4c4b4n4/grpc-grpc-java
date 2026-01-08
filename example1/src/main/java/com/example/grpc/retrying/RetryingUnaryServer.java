@@ -11,7 +11,7 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
-public class /*TODO*/ RetryingUnaryServer {
+public class RetryingUnaryServer {
 
     private static final Logger logger = Logger.getLogger(RetryingUnaryServer.class.getName());
 
@@ -19,20 +19,21 @@ public class /*TODO*/ RetryingUnaryServer {
         Servers.start(new EchoServiceImpl());
     }
 
-    private static class /*TODO*/ EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
 
         private static final float UNAVAILABLE_PERCENTAGE = 0.5F;
+
         private final Random random = new Random();
-        private final AtomicInteger calls = new AtomicInteger(0);
+        private final AtomicInteger i = new AtomicInteger(0);
 
         @Override
         public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-            calls.incrementAndGet();
+            i.incrementAndGet();
             if (random.nextFloat() < UNAVAILABLE_PERCENTAGE) {
-                logger.info("returning UNAVAILABLE error, call: " + calls.get());
-                responseObserver.onError(Status.UNAVAILABLE.withDescription("Server temporarily unavailable...").asRuntimeException());
+                logger.info("returning UNAVAILABLE error: #" + i.get());
+                responseObserver.onError(Status.UNAVAILABLE.withDescription("Server temporarily unavailable").asRuntimeException());
             } else {
-                logger.info("returning successful response, call: " + calls.get());
+                logger.info("returning successful response: #" + i.get());
                 var response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
                 responseObserver.onNext(response);
                 responseObserver.onCompleted();

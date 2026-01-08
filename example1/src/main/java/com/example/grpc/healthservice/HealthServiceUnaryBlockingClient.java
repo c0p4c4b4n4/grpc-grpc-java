@@ -25,28 +25,29 @@ public class HealthServiceUnaryBlockingClient {
             var healthBlockingStub = HealthGrpc.newBlockingStub(channel);
 
             var users = new String[]{"Alpha", "Beta", "Gamma"};
-            checkHealth(healthBlockingStub, "before all users");
+            checkHealth(healthBlockingStub);
 
             for (var user : users) {
                 unaryEcho(echoBlockingStub, user);
                 Thread.sleep(100);
-                checkHealth(healthBlockingStub, "after user " + user);
+                checkHealth(healthBlockingStub);
             }
-/* TODO */
-            checkHealth(healthBlockingStub, "after all users");
-            Delays.sleep(10);
-            checkHealth(healthBlockingStub, "after 10 second wait");
 
-            unaryEcho(echoBlockingStub, "Delta");
+            logger.info("wait 10 seconds...");
+            Delays.sleep(10);
+            checkHealth(healthBlockingStub);
+
+            unaryEcho(echoBlockingStub, "Omega");
+            checkHealth(healthBlockingStub);
         } finally {
             channel.shutdownNow().awaitTermination(30, TimeUnit.SECONDS);
         }
     }
 
-    private static void checkHealth(HealthGrpc.HealthBlockingStub healthBlockingStub, String prefix) {
+    private static void checkHealth(HealthGrpc.HealthBlockingStub healthBlockingStub) {
         var request = HealthCheckRequest.getDefaultInstance();
         var response = healthBlockingStub.check(request);
-        logger.log(Level.INFO, "{0}, health is: {1}", new Object[]{prefix, response.getStatus()});
+        logger.log(Level.INFO, "health is: {0}", response.getStatus());
     }
 
     private static void unaryEcho(EchoServiceGrpc.EchoServiceBlockingStub echoBlockingStub, String name) {

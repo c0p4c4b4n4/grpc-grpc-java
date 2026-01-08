@@ -41,7 +41,7 @@ public class ManualFlowControlBidirectionalStreamingServer {
                     logger.log(Level.INFO, "next request: {0}", request.getMessage());
 
                     if (i.incrementAndGet() % 10 == 0) {
-                        logger.info("delay 5 seconds...");
+                        logger.info("wait 5 seconds...");
                         Delays.sleep(5);
                     }
 

@@ -23,7 +23,7 @@ public class ManualFlowControlBidirectionalStreamingServer {
         Servers.start(new EchoServiceImpl());
     }
 
-    private static class  EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
 
         @Override
         public StreamObserver<EchoRequest> bidirectionalStreamingEcho(final StreamObserver<EchoResponse> responseObserver) {
@@ -41,7 +41,10 @@ public class ManualFlowControlBidirectionalStreamingServer {
                     try {
                         logger.log(Level.INFO, "next request: {0}", request.getMessage());
 
-                        Delays.sleep(i.incrementAndGet() % 10 == 0 ? 5 : 0);
+                        if (i.incrementAndGet() % 10 == 0) {
+                            logger.info("delay 5 seconds...");
+                            Delays.sleep(5);
+                        }
 
                         var response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
                         responseObserver.onNext(response);
@@ -53,7 +56,7 @@ public class ManualFlowControlBidirectionalStreamingServer {
                         }
                     } catch (Throwable t) {
                         logger.log(Level.SEVERE, "failure: {0}", t.getMessage());
-                        responseObserver.onError(Status.UNKNOWN.withDescription("Error handling request").withCause(t).asException());
+                        responseObserver.onError(Status.UNKNOWN.withDescription("Unexpected error").withCause(t).asException());
                     }
                 }
 
@@ -71,7 +74,7 @@ public class ManualFlowControlBidirectionalStreamingServer {
             };
         }
 
-        private static class  OnReadyHandler implements Runnable {
+        private static class OnReadyHandler implements Runnable {
 
             private final ServerCallStreamObserver<EchoResponse> serverCallStreamObserver;
             private final AtomicBoolean wasReady;

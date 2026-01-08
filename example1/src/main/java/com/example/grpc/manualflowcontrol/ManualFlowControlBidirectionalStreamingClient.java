@@ -75,10 +75,8 @@ public class ManualFlowControlBidirectionalStreamingClient {
         public void run() {
             while (requestStream.isReady()) {
                 if (iterator.hasNext()) {
-                    var name = iterator.next();
-                    logger.log(Level.INFO, "next request: {0}", name);
-
-                    var request = EchoRequest.newBuilder().setMessage(name).build();
+                    var request = EchoRequest.newBuilder().setMessage(iterator.next()).build();
+                    logger.log(Level.INFO, "next request: {0}", request.getMessage());
                     requestStream.onNext(request);
                 } else {
                     logger.info("requests completed");

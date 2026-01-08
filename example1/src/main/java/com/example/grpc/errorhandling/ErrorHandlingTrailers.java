@@ -35,9 +35,9 @@ public class ErrorHandlingTrailers {
             .addStackEntries("stack_entry_1")
             .addStackEntries("stack_entry_2")
             .addStackEntries("stack_entry_3")
-            .setDetail("detailed error info.").build();
+            .setDetail("error detail").build();
 
-    private static final String STATUS_DESCRIPTION = "Error details";
+    private static final String STATUS_DESCRIPTION = "Error description";
 
     public static void main(String[] args) throws Exception {
         var server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())

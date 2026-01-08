@@ -9,6 +9,7 @@ import io.grpc.stub.StreamObserver;
 
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class RetryingUnaryServer {
@@ -30,10 +31,10 @@ public class RetryingUnaryServer {
         public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
             i.incrementAndGet();
             if (random.nextFloat() < UNAVAILABLE_PERCENTAGE) {
-                logger.info("returning UNAVAILABLE error: #" + i.get());
+                logger.log(Level.INFO, "returning unavailable error #{0}" , i.get());
                 responseObserver.onError(Status.UNAVAILABLE.withDescription("Server temporarily unavailable").asRuntimeException());
             } else {
-                logger.info("returning successful response: #" + i.get());
+                logger.log(Level.INFO, "returning successful response #{0}" ,i.get());
                 var response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
                 responseObserver.onNext(response);
                 responseObserver.onCompleted();

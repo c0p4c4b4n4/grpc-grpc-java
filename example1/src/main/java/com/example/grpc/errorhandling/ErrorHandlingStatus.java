@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ErrorHandlingStatus {
 
-    private static final String STATUS_DESCRIPTION = "Detailed error description";
+    private static final String STATUS_DESCRIPTION = "Error details";
 
     public static void main(String[] args) throws Exception {
         var server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
@@ -51,6 +51,7 @@ public class ErrorHandlingStatus {
 
     private static void verifyErrorResponse(Throwable t) {
         var status = Status.fromThrowable(t);
+
         Verify.verify(status.getCode() == Status.Code.INTERNAL);
         Verify.verify(status.getDescription().equals(STATUS_DESCRIPTION));
     }

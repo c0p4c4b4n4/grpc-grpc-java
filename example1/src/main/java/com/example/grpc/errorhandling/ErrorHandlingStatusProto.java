@@ -18,6 +18,7 @@ import io.grpc.Channel;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.InsecureServerCredentials;
+import io.grpc.ManagedChannelBuilder;
 import io.grpc.protobuf.StatusProto;
 import io.grpc.stub.StreamObserver;
 import org.jspecify.annotations.NonNull;
@@ -35,7 +36,7 @@ public class ErrorHandlingStatusProto {
             .addStackEntries("stack_entry_3")
             .setDetail("detailed error info.").build();
 
-    private static final String STATUS_MESSAGE = "Detailed error description";
+    private static final String STATUS_MESSAGE = "Error details";
 
     public static void main(String[] args) throws Exception {
         var server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
@@ -53,7 +54,7 @@ public class ErrorHandlingStatusProto {
             .build()
             .start();
 
-        var channel = Grpc.newChannelBuilderForAddress("localhost", server.getPort(), InsecureChannelCredentials.create()).build();
+        var channel = ManagedChannelBuilder.forAddress("localhost", server.getPort()).usePlaintext().build();
 
         blockingCall(channel);
         futureCallDirect(channel);
@@ -69,6 +70,7 @@ public class ErrorHandlingStatusProto {
 
     private static void verifyErrorResponse(Throwable t) {
         var status = StatusProto.fromThrowable(t);
+
         Verify.verify(status.getCode() == Code.INVALID_ARGUMENT.getNumber());
         Verify.verify(status.getMessage().equals(STATUS_MESSAGE));
 

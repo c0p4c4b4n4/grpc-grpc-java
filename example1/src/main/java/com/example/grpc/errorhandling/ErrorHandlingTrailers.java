@@ -14,6 +14,7 @@ import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.InsecureServerCredentials;
 import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import io.grpc.Metadata;
 import io.grpc.Status;
 import io.grpc.protobuf.ProtoUtils;
@@ -36,7 +37,7 @@ public class ErrorHandlingTrailers {
             .addStackEntries("stack_entry_3")
             .setDetail("detailed error info.").build();
 
-    private static final String STATUS_DESCRIPTION = "Detailed error description";
+    private static final String STATUS_DESCRIPTION = "Error details";
 
     public static void main(String[] args) throws Exception {
         var server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
@@ -51,7 +52,7 @@ public class ErrorHandlingTrailers {
             .build()
             .start();
 
-        var channel = Grpc.newChannelBuilderForAddress("localhost", server.getPort(), InsecureChannelCredentials.create()).build();
+        var channel = ManagedChannelBuilder.forAddress("localhost", server.getPort()).usePlaintext().build();
 
         blockingCall(channel);
         futureCallDirect(channel);
@@ -68,6 +69,7 @@ public class ErrorHandlingTrailers {
     private static void verifyErrorResponse(Throwable t) {
         var status = Status.fromThrowable(t);
         var trailers = Status.trailersFromThrowable(t);
+
         Verify.verify(status.getCode() == Status.Code.INTERNAL);
         Verify.verify(trailers.containsKey(DEBUG_INFO_TRAILER_KEY));
         Verify.verify(status.getDescription().equals(STATUS_DESCRIPTION));
@@ -86,6 +88,7 @@ public class ErrorHandlingTrailers {
             stub.unaryEcho(EchoRequest.newBuilder().build());
         } catch (Exception e) {
             verifyErrorResponse(e);
+            System.out.println("Blocking call received expected error details");
         }
     }
 
@@ -100,6 +103,7 @@ public class ErrorHandlingTrailers {
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
             verifyErrorResponse(e.getCause());
+            System.out.println("Future call direct received expected error details");
         }
     }
 
@@ -119,6 +123,7 @@ public class ErrorHandlingTrailers {
                 @Override
                 public void onFailure(@NonNull Throwable t) {
                     verifyErrorResponse(t);
+                    System.out.println("Future callback received expected error details");
                     done.countDown();
                 }
             },
@@ -143,6 +148,7 @@ public class ErrorHandlingTrailers {
             @Override
             public void onError(Throwable t) {
                 verifyErrorResponse(t);
+                System.out.println("Async call received expected error details");
                 done.countDown();
             }
 

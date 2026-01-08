@@ -39,8 +39,8 @@ public class RetryingUnaryBlockingClient {
                         var response = blockingStub.unaryEcho(request);
                         logger.log(Level.INFO, "response: {0}", response.getMessage());
                     } catch (StatusRuntimeException e) {
-                        logger.log(Level.INFO, "error: {0}", e.getStatus());
                         failedRPCs.incrementAndGet();
+                        logger.log(Level.INFO, "error: {0}", e.getStatus());
                     }
 
                     sentRPCs.incrementAndGet();

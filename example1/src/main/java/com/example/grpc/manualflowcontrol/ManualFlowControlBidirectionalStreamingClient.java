@@ -64,18 +64,18 @@ public class ManualFlowControlBidirectionalStreamingClient {
     private static class OnReadyHandler implements Runnable {
 
         private final ClientCallStreamObserver<EchoRequest> requestStream;
-        private final Iterator<String> iterator;
+        private final Iterator<String> names;
 
-        private OnReadyHandler(ClientCallStreamObserver<EchoRequest> requestStream, Iterator<String> iterator) {
+        private OnReadyHandler(ClientCallStreamObserver<EchoRequest> requestStream, Iterator<String> names) {
             this.requestStream = requestStream;
-            this.iterator = iterator;
+            this.names = names;
         }
 
         @Override
         public void run() {
             while (requestStream.isReady()) {
-                if (iterator.hasNext()) {
-                    var request = EchoRequest.newBuilder().setMessage(iterator.next()).build();
+                if (names.hasNext()) {
+                    var request = EchoRequest.newBuilder().setMessage(names.next()).build();
                     logger.log(Level.INFO, "next request: {0}", request.getMessage());
                     requestStream.onNext(request);
                 } else {

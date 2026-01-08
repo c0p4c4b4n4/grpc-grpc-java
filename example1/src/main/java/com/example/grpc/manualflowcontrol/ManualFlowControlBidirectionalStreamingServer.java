@@ -38,25 +38,20 @@ public class ManualFlowControlBidirectionalStreamingServer {
 
                 @Override
                 public void onNext(EchoRequest request) {
-                    try {
-                        logger.log(Level.INFO, "next request: {0}", request.getMessage());
+                    logger.log(Level.INFO, "next request: {0}", request.getMessage());
 
-                        if (i.incrementAndGet() % 10 == 0) {
-                            logger.info("delay 5 seconds...");
-                            Delays.sleep(5);
-                        }
+                    if (i.incrementAndGet() % 10 == 0) {
+                        logger.info("delay 5 seconds...");
+                        Delays.sleep(5);
+                    }
 
-                        var response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
-                        responseObserver.onNext(response);
+                    var response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
+                    responseObserver.onNext(response);
 
-                        if (serverCallStreamObserver.isReady()) {
-                            serverCallStreamObserver.request(1);
-                        } else {
-                            onReadyHandler.wasReady.set(false);
-                        }
-                    } catch (Throwable t) {
-                        logger.log(Level.SEVERE, "failure: {0}", t.getMessage());
-                        responseObserver.onError(Status.UNKNOWN.withDescription("Unexpected error").withCause(t).asException());
+                    if (serverCallStreamObserver.isReady()) {
+                        serverCallStreamObserver.request(1);
+                    } else {
+                        onReadyHandler.wasReady.set(false);
                     }
                 }
 

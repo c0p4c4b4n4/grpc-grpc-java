@@ -14,6 +14,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
+import org.jspecify.annotations.NonNull;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -26,7 +27,7 @@ public class ErrorHandlingStatus {
             .addService(new EchoServiceGrpc.EchoServiceImplBase() {
                 @Override
                 public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-                    responseObserver.onError(Status.INTERNAL.withDescription("Some error").asRuntimeException());
+                    responseObserver.onError(Status.INTERNAL.withDescription("Some error message").asRuntimeException());
                 }
             })
             .build()
@@ -46,10 +47,10 @@ public class ErrorHandlingStatus {
         server.awaitTermination(1, TimeUnit.SECONDS);
     }
 
-    private static void verifyError(Throwable t) {
+    private static void verifyErrorResponse(Throwable t) {
         var status = Status.fromThrowable(t);
         Verify.verify(status.getCode() == Status.Code.INTERNAL);
-        Verify.verify(status.getDescription().equals("Some error"));
+        Verify.verify(status.getDescription().equals("Some error message"));
     }
 
     private static void blockingCall(ManagedChannel channel) {
@@ -58,7 +59,8 @@ public class ErrorHandlingStatus {
         try {
             stub.unaryEcho(EchoRequest.newBuilder().setMessage("Alpha").build());
         } catch (Exception e) {
-            verifyError(e);
+            verifyErrorResponse(e);
+            System.out.println("Blocking call received expected error details");
         }
     }
 
@@ -72,7 +74,8 @@ public class ErrorHandlingStatus {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
-            verifyError(e.getCause());
+            verifyErrorResponse(e.getCause());
+            System.out.println("Future call direct received expected error details");
         }
     }
 
@@ -88,8 +91,9 @@ public class ErrorHandlingStatus {
                 }
 
                 @Override
-                public void onFailure(Throwable t) {
-                    verifyError(t);
+                public void onFailure(@NonNull Throwable t) {
+                    verifyErrorResponse(t);
+                    System.out.println("Future callback received expected error details");
                     done.countDown();
                 }
             },
@@ -113,7 +117,8 @@ public class ErrorHandlingStatus {
 
             @Override
             public void onError(Throwable t) {
-                verifyError(t);
+                verifyErrorResponse(t);
+                System.out.println("Async call received expected error details");
                 done.countDown();
             }
 

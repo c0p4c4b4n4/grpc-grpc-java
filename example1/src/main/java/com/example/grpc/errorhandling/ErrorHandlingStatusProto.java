@@ -19,12 +19,13 @@ import io.grpc.InsecureChannelCredentials;
 import io.grpc.InsecureServerCredentials;
 import io.grpc.protobuf.StatusProto;
 import io.grpc.stub.StreamObserver;
+import org.jspecify.annotations.NonNull;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class /*TODO*/ ErrorHandlingStatusProto {
+public class  ErrorHandlingStatusProto {
 
     private static final DebugInfo DEBUG_INFO =
         DebugInfo.newBuilder()
@@ -40,7 +41,7 @@ public class /*TODO*/ ErrorHandlingStatusProto {
                 public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
                     var status = Status.newBuilder()
                         .setCode(Code.INVALID_ARGUMENT.getNumber())
-                        .setMessage("Email or password malformed")
+                        .setMessage("Some error message")
                         .addDetails(Any.pack(DEBUG_INFO))
                         .build();
                     responseObserver.onError(StatusProto.toStatusRuntimeException(status));
@@ -63,10 +64,10 @@ public class /*TODO*/ ErrorHandlingStatusProto {
         server.awaitTermination(1, TimeUnit.SECONDS);
     }
 
-    private static void verifyError(Throwable t) {
+    private static void verifyErrorResponse(Throwable t) {
         var status = StatusProto.fromThrowable(t);
         Verify.verify(status.getCode() == Code.INVALID_ARGUMENT.getNumber());
-        Verify.verify(status.getMessage().equals("Email or password malformed"));
+        Verify.verify(status.getMessage().equals("Some error message"));
 
         try {
             var unpackedDetail = status.getDetails(0).unpack(DebugInfo.class);
@@ -81,7 +82,7 @@ public class /*TODO*/ ErrorHandlingStatusProto {
         try {
             stub.unaryEcho(EchoRequest.newBuilder().build());
         } catch (Exception e) {
-            verifyError(e);
+            verifyErrorResponse(e);
             System.out.println("Blocking call received expected error details");
         }
     }
@@ -96,7 +97,7 @@ public class /*TODO*/ ErrorHandlingStatusProto {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
-            verifyError(e.getCause());
+            verifyErrorResponse(e.getCause());
             System.out.println("Future call direct received expected error details");
         }
     }
@@ -113,8 +114,8 @@ public class /*TODO*/ ErrorHandlingStatusProto {
                 }
 
                 @Override
-                public void onFailure(Throwable t) {
-                    verifyError(t);
+                public void onFailure(@NonNull Throwable t) {
+                    verifyErrorResponse(t);
                     System.out.println("Future callback received expected error details");
                     done.countDown();
                 }
@@ -132,7 +133,6 @@ public class /*TODO*/ ErrorHandlingStatusProto {
 
         var done = new CountDownLatch(1);
         var responseObserver = new StreamObserver<EchoResponse>() {
-
             @Override
             public void onNext(EchoResponse value) {
                 // won't be called
@@ -140,7 +140,7 @@ public class /*TODO*/ ErrorHandlingStatusProto {
 
             @Override
             public void onError(Throwable t) {
-                verifyError(t);
+                verifyErrorResponse(t);
                 System.out.println("Async call received expected error details");
                 done.countDown();
             }

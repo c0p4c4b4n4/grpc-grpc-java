@@ -18,6 +18,7 @@ import io.grpc.Metadata;
 import io.grpc.Status;
 import io.grpc.protobuf.ProtoUtils;
 import io.grpc.stub.StreamObserver;
+import org.jspecify.annotations.NonNull;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -119,7 +120,7 @@ public class /*TODO*/ ErrorHandlingTrailers {
                 }
 
                 @Override
-                public void onFailure(Throwable t) {
+                public void onFailure(@NonNull Throwable t) {
                     verifyErrorResponse(t);
                     done.countDown();
                 }

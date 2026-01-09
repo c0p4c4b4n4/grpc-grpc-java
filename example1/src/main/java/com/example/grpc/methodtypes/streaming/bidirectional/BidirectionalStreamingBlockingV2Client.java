@@ -30,8 +30,7 @@ public class BidirectionalStreamingBlockingV2Client {
 
             blockingClientCall.halfClose();
 
-            EchoResponse response;
-            while ((response = blockingClientCall.read()) != null) {
+            for (EchoResponse response; (response = blockingClientCall.read()) != null; ) {
                 logger.log(Level.INFO, "next response: {0}", response.getMessage());
             }
 

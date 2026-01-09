@@ -21,15 +21,15 @@ public class /*TODO*/ UnaryAsynchronousClient {
         Loggers.init();
 
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
-
         var asyncStub = EchoServiceGrpc.newStub(channel);
+
         var request = EchoRequest.newBuilder().setMessage("world").build();
 
         var done = new CountDownLatch(1);
         asyncStub.unaryEcho(request, new StreamObserver<>() {
             @Override
             public void onNext(EchoResponse response) {
-                logger.log(Level.INFO, "next: {0}", response.getMessage());
+                logger.log(Level.INFO, "response: {0}", response.getMessage());
             }
 
             @Override

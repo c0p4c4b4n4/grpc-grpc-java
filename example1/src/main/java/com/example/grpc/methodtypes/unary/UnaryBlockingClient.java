@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class /*TODO*/ UnaryBlockingClient {
+public class UnaryBlockingClient {
 
     private static final Logger logger = Logger.getLogger(UnaryBlockingClient.class.getName());
 
@@ -18,7 +18,6 @@ public class /*TODO*/ UnaryBlockingClient {
         Loggers.init();
 
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
-
         try {
             var blockingStub = EchoServiceGrpc.newBlockingStub(channel);
             var request = EchoRequest.newBuilder().setMessage("world").build();

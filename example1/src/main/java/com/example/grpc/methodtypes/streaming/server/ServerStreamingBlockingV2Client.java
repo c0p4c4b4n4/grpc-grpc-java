@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@io.grpc.ExperimentalApi("https://github.com/grpc/grpc-java/issues/10918")
 public class ServerStreamingBlockingV2Client {
 
     private static final Logger logger = Logger.getLogger(ServerStreamingBlockingV2Client.class.getName());
@@ -23,7 +24,6 @@ public class ServerStreamingBlockingV2Client {
             var blockingStub = EchoServiceGrpc.newBlockingV2Stub(channel);
             var request = EchoRequest.newBuilder().setMessage("world").build();
             var blockingClientCall = blockingStub.serverStreamingEcho(request);
-
             for (EchoResponse response; (response = blockingClientCall.read()) != null; ) {
                 logger.log(Level.INFO, "next response: {0}", response.getMessage());
             }
@@ -34,6 +34,5 @@ public class ServerStreamingBlockingV2Client {
         } finally {
             channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
         }
-
     }
 }

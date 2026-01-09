@@ -10,7 +10,7 @@ import io.grpc.stub.StreamObserver;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class /*TODO*/ ClientStreamingServer {
+public class ClientStreamingServer {
 
     private static final Logger logger = Logger.getLogger(ClientStreamingServer.class.getName());
 
@@ -18,7 +18,7 @@ public class /*TODO*/ ClientStreamingServer {
         Servers.start(new EchoServiceImpl());
     }
 
-    private static class /*TODO*/ EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
         @Override
         public StreamObserver<EchoRequest> clientStreamingEcho(StreamObserver<EchoResponse> responseObserver) {
             return new StreamObserver<>() {
@@ -26,7 +26,7 @@ public class /*TODO*/ ClientStreamingServer {
 
                 @Override
                 public void onNext(EchoRequest request) {
-                    logger.log(Level.INFO, "request: {0}", request.getMessage());
+                    logger.log(Level.INFO, "next request: {0}", request.getMessage());
                     accumulator.append(request.getMessage()).append(" ");
                 }
 
@@ -37,9 +37,9 @@ public class /*TODO*/ ClientStreamingServer {
 
                 @Override
                 public void onCompleted() {
-                    var message = accumulator.toString().trim();
-                    logger.info("completed: " + message);
-                    responseObserver.onNext(EchoResponse.newBuilder().setMessage(message).build());
+                    var response = EchoResponse.newBuilder().setMessage(accumulator.toString().trim()).build();
+                    logger.info("completed: " + response.getMessage());
+                    responseObserver.onNext(response);
                     responseObserver.onCompleted();
                 }
             };

@@ -12,9 +12,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class /*TODO*/ ClientStreamingClient {
+@io.grpc.ExperimentalApi("https://github.com/grpc/grpc-java/issues/10918")
+public class ClientStreamingBlockingV2Client {
 
-    private static final Logger logger = Logger.getLogger(ClientStreamingClient.class.getName());
+    private static final Logger logger = Logger.getLogger(ClientStreamingBlockingV2Client.class.getName());
 
     public static void main(String[] args) throws InterruptedException {
         Loggers.init();
@@ -25,7 +26,7 @@ public class /*TODO*/ ClientStreamingClient {
         var requestObserver = asyncStub.clientStreamingEcho(new StreamObserver<>() {
             @Override
             public void onNext(EchoResponse response) {
-                logger.log(Level.INFO, "next: {0}", response.getMessage());
+                logger.log(Level.INFO, "response: {0}", response.getMessage());
             }
 
             @Override

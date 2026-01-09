@@ -21,30 +21,33 @@ public class ClientStreamingBlockingV2Client {
         Loggers.init();
 
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
-        var asyncStub = EchoServiceGrpc.newStub(channel);
+        // 1. Create the V2 Blocking Stub
+        EchoServiceGrpc.EchoServiceBlockingV2Stub blockingStub = EchoServiceGrpc.newBlockingV2Stub(channel);
 
-        var requestObserver = asyncStub.clientStreamingEcho(new StreamObserver<>() {
-            @Override
-            public void onNext(EchoResponse response) {
-                logger.log(Level.INFO, "response: {0}", response.getMessage());
+        // 2. Initiate the client streaming call
+        // This returns a BlockingClientCall object instead of a StreamObserver
+        BlockingClientCall<EchoRequest, EchoResponse> call = blockingStub.echoClientStream();
+
+        try {
+            // 3. Stream multiple messages to the server
+            String[] messages = {"Hello", "from", "BlockingV2", "Stub"};
+            for (String msg : messages) {
+                System.out.println("Sending: " + msg);
+                call.write(EchoRequest.newBuilder().setMessage(msg).build());
             }
 
-            @Override
-            public void onError(Throwable t) {
-                logger.log(Level.WARNING, "error: {0}", Status.fromThrowable(t));
-            }
+            // 4. Signal that the client is done sending
+            call.closeSend();
 
-            @Override
-            public void onCompleted() {
-                logger.info("completed");
-            }
-        });
+            // 5. Read the single response from the server
+            // This blocks until the server calls onCompleted/onNext
+            EchoResponse response = call.read();
+            System.out.println("Server Summary: " + response.getSummary());
 
-        requestObserver.onNext(EchoRequest.newBuilder().setMessage("world").build());
-        requestObserver.onNext(EchoRequest.newBuilder().setMessage("welt").build());
-        requestObserver.onNext(EchoRequest.newBuilder().setMessage("monde").build());
-        requestObserver.onCompleted();
-
-        channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            System.err.println("RPC failed: " + e.getMessage());
+        } finally {
+            channel.shutdown();
+        }
     }
 }

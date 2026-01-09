@@ -8,6 +8,7 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,6 +22,7 @@ public class ClientStreamingAsynchronousClient {
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         var asyncStub = EchoServiceGrpc.newStub(channel);
 
+        var done = new CountDownLatch(1);
         var requestObserver = asyncStub.clientStreamingEcho(new StreamObserver<>() {
             @Override
             public void onNext(EchoResponse response) {
@@ -30,11 +32,13 @@ public class ClientStreamingAsynchronousClient {
             @Override
             public void onError(Throwable t) {
                 logger.log(Level.WARNING, "error: {0}", Status.fromThrowable(t));
+                done.countDown();
             }
 
             @Override
             public void onCompleted() {
                 logger.info("completed");
+                done.countDown();
             }
         });
 
@@ -43,6 +47,7 @@ public class ClientStreamingAsynchronousClient {
         requestObserver.onNext(EchoRequest.newBuilder().setMessage("monde").build());
         requestObserver.onCompleted();
 
+        done.await();
         channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
     }
 }

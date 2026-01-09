@@ -51,11 +51,11 @@ public class LoadBalanceUnaryServer {
         }
     }
 
-    static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
 
-        final int port;
+        private final int port;
 
-        public EchoServiceImpl(int port) {
+        EchoServiceImpl(int port) {
             this.port = port;
         }
 

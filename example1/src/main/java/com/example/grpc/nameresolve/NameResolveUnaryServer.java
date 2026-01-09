@@ -4,7 +4,6 @@ import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
 import com.example.grpc.Loggers;
-import com.example.grpc.loadbalance.LoadBalanceUnaryServer;
 import com.example.grpc.loadbalance.Settings;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
@@ -16,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class  NameResolveUnaryServer {
+public class NameResolveUnaryServer {
 
     private static final Logger logger = Logger.getLogger(NameResolveUnaryServer.class.getName());
 
@@ -53,11 +52,11 @@ public class  NameResolveUnaryServer {
         }
     }
 
-    static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
 
-        final int port;
+        private final int port;
 
-        public EchoServiceImpl(int port) {
+        EchoServiceImpl(int port) {
             this.port = port;
         }
 

@@ -15,13 +15,13 @@ import java.util.stream.Collectors;
 
 public class ExampleNameResolver extends NameResolver {
 
-    private final URI uri;
+    private final URI targetUri;
     private final Map<String, List<InetSocketAddress>> serviceNameToSocketAddresses;
 
     private Listener2 listener;
 
     public ExampleNameResolver(URI targetUri) {
-        this.uri = targetUri;
+        this.targetUri = targetUri;
         this.serviceNameToSocketAddresses = ImmutableMap.<String, List<InetSocketAddress>>builder()
             .put(Settings.SERVICE_NAME,
                 Arrays.stream(Settings.SERVER_PORTS)
@@ -33,8 +33,8 @@ public class ExampleNameResolver extends NameResolver {
 
     @Override
     public String getServiceAuthority() {
-        if (uri.getHost() != null) {
-            return uri.getHost();
+        if (targetUri.getHost() != null) {
+            return targetUri.getHost();
         }
         return "no host";
     }
@@ -55,9 +55,9 @@ public class ExampleNameResolver extends NameResolver {
     }
 
     private void resolve() {
-        List<InetSocketAddress> addresses = serviceNameToSocketAddresses.get(uri.getPath().substring(1));
+        var addresses = serviceNameToSocketAddresses.get(targetUri.getPath().substring(1));
         try {
-            List<EquivalentAddressGroup> equivalentAddressGroups = addresses.stream()
+            var equivalentAddressGroups = addresses.stream()
                 .map(this::toSocketAddress)
                 .map(Arrays::asList)
                 .map(this::toEquivalentAddressGroup)

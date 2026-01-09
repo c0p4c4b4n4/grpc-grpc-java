@@ -31,7 +31,7 @@ public class RetryingUnaryBlockingClient {
 
         try {
             var executor = new ForkJoinPool();
-            for (var name : Constants.getNames()) {
+            for (var name : Constants.getAlphabet()) {
                 executor.execute(() -> {
                     try {
                         var request = EchoRequest.newBuilder().setMessage(name).build();

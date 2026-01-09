@@ -1,8 +1,8 @@
 package com.example.grpc.loadbalance;
 
-public final class Settings {
+interface Settings {
 
-    public static final String SCHEME = "example";
-    public static final String SERVICE_NAME = "example.grpc.loadbalance";
-    public static final int[] SERVER_PORTS = {50051, 50052, 50053};
+    String SCHEME = "example";
+    String SERVICE_NAME = "example.grpc.loadbalance";
+    int[] SERVER_PORTS = {50051, 50052, 50053};
 }

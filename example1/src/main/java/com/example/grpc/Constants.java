@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface Constants {
 
-    static List<String> getNames() {
+    static List<String> getAlphabet() {
         return Arrays.asList(
             "Alpha",
             "Bravo",

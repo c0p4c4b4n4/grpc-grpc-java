@@ -1,4 +1,4 @@
-package com.example.grpc.nameresolve;
+package com.example.grpc.loadbalance;
 
 import com.google.common.collect.ImmutableMap;
 import io.grpc.EquivalentAddressGroup;
@@ -12,22 +12,20 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public class /*TODO*/ ExampleNameResolver extends NameResolver {
+public class ExampleNameResolver extends NameResolver {
 
-    private final URI uri;
-    private final Map<String, List<InetSocketAddress>> addrStore;
+    private final URI targetUri;
+    private final Map<String, List<InetSocketAddress>> serviceNameToSocketAddresses;
 
     private Listener2 listener;
 
     public ExampleNameResolver(URI targetUri) {
-        this.uri = targetUri;
-        this.addrStore = ImmutableMap.<String, List<InetSocketAddress>>builder()
+        this.targetUri = targetUri;
+        this.serviceNameToSocketAddresses = ImmutableMap.<String, List<InetSocketAddress>>builder()
             .put(Settings.SERVICE_NAME,
-                Stream.iterate(NameResolveServer.startPort, p -> p + 1)
-                    .limit(NameResolveServer.serverCount)
-                    .map(port -> new InetSocketAddress("localhost", port))
+                Arrays.stream(Settings.SERVER_PORTS)
+                    .mapToObj(port -> new InetSocketAddress("localhost", port))
                     .collect(Collectors.toList())
             )
             .build();
@@ -35,8 +33,8 @@ public class /*TODO*/ ExampleNameResolver extends NameResolver {
 
     @Override
     public String getServiceAuthority() {
-        if (uri.getHost() != null) {
-            return uri.getHost();
+        if (targetUri.getHost() != null) {
+            return targetUri.getHost();
         }
         return "no host";
     }
@@ -57,18 +55,17 @@ public class /*TODO*/ ExampleNameResolver extends NameResolver {
     }
 
     private void resolve() {
-        List<InetSocketAddress> addresses = addrStore.get(uri.getPath().substring(1));
+        var addresses = serviceNameToSocketAddresses.get(targetUri.getPath().substring(1));
         try {
-            List<EquivalentAddressGroup> equivalentAddressGroup = addresses.stream()
+            var equivalentAddressGroups = addresses.stream()
                 .map(this::toSocketAddress)
                 .map(Arrays::asList)
                 .map(this::toEquivalentAddressGroup)
                 .collect(Collectors.toList());
 
-            ResolutionResult resolutionResult = ResolutionResult.newBuilder()
-                .setAddresses(equivalentAddressGroup)
+            var resolutionResult = ResolutionResult.newBuilder()
+                .setAddresses(equivalentAddressGroups)
                 .build();
-
             this.listener.onResult(resolutionResult);
         } catch (Exception e) {
             this.listener.onError(Status.UNAVAILABLE.withDescription("Unable to resolve host").withCause(e));

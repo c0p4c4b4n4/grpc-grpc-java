@@ -22,15 +22,13 @@ public class ServerStreamingBlockingV2Client {
         try {
             var blockingStub = EchoServiceGrpc.newBlockingV2Stub(channel);
             var request = EchoRequest.newBuilder().setMessage("world").build();
-
             var blockingClientCall = blockingStub.serverStreamingEcho(request);
 
-            EchoResponse response;
-            while ((response = blockingClientCall.read()) != null) {
+            for (EchoResponse response; (response = blockingClientCall.read()) != null; ) {
                 logger.log(Level.INFO, "next response: {0}", response.getMessage());
             }
         } catch (StatusRuntimeException e) {
-            logger.log(Level.WARNING, "RPC error: {0}", e.getStatus());
+            logger.log(Level.WARNING, "RPC runtime error: {0}", e.getStatus());
         } catch (StatusException e) {
             logger.log(Level.WARNING, "RPC checked error: {0}", e.getStatus());
         } finally {

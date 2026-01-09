@@ -22,7 +22,6 @@ public class UnaryAsynchronousClient {
 
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         var asyncStub = EchoServiceGrpc.newStub(channel);
-
         var request = EchoRequest.newBuilder().setMessage("world").build();
 
         var done = new CountDownLatch(1);

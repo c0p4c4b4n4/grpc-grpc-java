@@ -25,7 +25,6 @@ public class UnaryFutureClient {
 
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         var futureStub = EchoServiceGrpc.newFutureStub(channel);
-
         var request = EchoRequest.newBuilder().setMessage("world").build();
         var responseFuture = futureStub.unaryEcho(request);
 

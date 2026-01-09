@@ -10,9 +10,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ServerStreamingBlockingClient {
+public class ServerStreamingBlockingV2Client {
 
-    private static final Logger logger = Logger.getLogger(ServerStreamingBlockingClient.class.getName());
+    private static final Logger logger = Logger.getLogger(ServerStreamingBlockingV2Client.class.getName());
 
     public static void main(String[] args) throws InterruptedException {
         Loggers.init();

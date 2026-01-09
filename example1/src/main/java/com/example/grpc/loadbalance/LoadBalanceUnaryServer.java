@@ -36,7 +36,7 @@ public class LoadBalanceUnaryServer {
             System.err.println("servers are shutting down");
             for (Server server : servers) {
                 try {
-                    server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+                    server.shutdown().awaitTermination(5, TimeUnit.SECONDS);
                 } catch (InterruptedException e) {
                     System.err.println("server shutdown was interrupted");
                     server.shutdownNow();

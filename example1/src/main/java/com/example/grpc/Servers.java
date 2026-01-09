@@ -24,7 +24,7 @@ public final class Servers {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.err.println("server is shutting down");
             try {
-                server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+                server.shutdown().awaitTermination(5, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 System.err.println("server shutdown was interrupted");
                 server.shutdownNow();

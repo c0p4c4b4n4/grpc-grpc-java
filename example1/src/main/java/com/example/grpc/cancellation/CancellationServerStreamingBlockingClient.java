@@ -29,7 +29,7 @@ public class CancellationServerStreamingBlockingClient {
                 while (responses.hasNext()) {
                     logger.log(Level.INFO, "next response: {0}", responses.next().getMessage());
                     if (++i > 3) {
-                        cancellableContext.cancel(new Exception("Client cancelled call"));
+                        cancellableContext.cancel(new Exception("Client cancelled"));
                     }
                 }
             });

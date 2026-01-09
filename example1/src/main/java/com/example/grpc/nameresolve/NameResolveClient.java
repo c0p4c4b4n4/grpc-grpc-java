@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 
 public class /*TODO*/ NameResolveClient {
 
-    public static final String channelTarget = "example:///lb.example.grpc.io";
     private static final Logger logger = Logger.getLogger(NameResolveClient.class.getName());
     private final EchoServiceGrpc.EchoServiceBlockingStub blockingStub;
 
@@ -44,7 +43,7 @@ public class /*TODO*/ NameResolveClient {
           Dial to "example:///resolver.example.grpc.io", use {@link ExampleNameResolver} to create connection
           "resolver.example.grpc.io" is converted to {@link java.net.URI.path}
          */
-        channel = ManagedChannelBuilder.forTarget(channelTarget)
+        channel = ManagedChannelBuilder.forTarget("example:///lb.example.grpc.io")
             .defaultLoadBalancingPolicy("round_robin")
             .usePlaintext()
             .build();

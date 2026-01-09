@@ -27,11 +27,11 @@ public class /*TODO*/ LoadBalanceClient {
         NameResolverRegistry.getDefaultRegistry().register(new ExampleNameResolverProvider());
         String target = String.format("%s:///%s", Settings.SCHEME, Settings.SERVICE_NAME);
 
-        useFirctPickPolicy(target);
+        useFirstPickPolicy(target);
         useRoundRobinPolicy(target);
     }
 
-    private static void useFirctPickPolicy(String target) throws InterruptedException {
+    private static void useFirstPickPolicy(String target) throws InterruptedException {
         logger.info("Use default first_pick load balance policy");
         ManagedChannel channel = ManagedChannelBuilder.forTarget(target)
             .usePlaintext()

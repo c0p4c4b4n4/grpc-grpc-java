@@ -1,4 +1,4 @@
-package com.example.grpc.features.loadbalance;
+package com.example.grpc.nameresolve;
 
 import io.grpc.NameResolver;
 import io.grpc.NameResolverProvider;

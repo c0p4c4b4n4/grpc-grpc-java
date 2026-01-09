@@ -1,4 +1,4 @@
-package com.example.grpc.features.nameresolve;
+package com.example.grpc.nameresolve;
 
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;

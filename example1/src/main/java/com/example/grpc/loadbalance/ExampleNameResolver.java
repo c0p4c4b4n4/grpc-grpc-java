@@ -1,4 +1,4 @@
-package com.example.grpc.features.loadbalance;
+package com.example.grpc.loadbalance;
 
 import com.google.common.collect.ImmutableMap;
 import io.grpc.EquivalentAddressGroup;

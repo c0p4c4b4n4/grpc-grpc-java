@@ -1,4 +1,4 @@
-package com.example.grpc.features.loadbalance;
+package com.example.grpc.nameresolve;
 
 public final class /*TODO*/ Settings {
 

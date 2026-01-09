@@ -6,6 +6,9 @@ import com.example.grpc.EchoServiceGrpc;
 import com.example.grpc.Loggers;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Status;
+import io.grpc.StatusException;
+import io.grpc.StatusRuntimeException;
+import io.grpc.stub.BlockingClientCall;
 import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.TimeUnit;
@@ -21,33 +24,25 @@ public class ClientStreamingBlockingV2Client {
         Loggers.init();
 
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
-        // 1. Create the V2 Blocking Stub
-        EchoServiceGrpc.EchoServiceBlockingV2Stub blockingStub = EchoServiceGrpc.newBlockingV2Stub(channel);
-
-        // 2. Initiate the client streaming call
-        // This returns a BlockingClientCall object instead of a StreamObserver
-        BlockingClientCall<EchoRequest, EchoResponse> call = blockingStub.echoClientStream();
+        var blockingStub = EchoServiceGrpc.newBlockingV2Stub(channel);
+        var blockingClientCall = blockingStub.clientStreamingEcho();
 
         try {
-            // 3. Stream multiple messages to the server
-            String[] messages = {"Hello", "from", "BlockingV2", "Stub"};
-            for (String msg : messages) {
-                System.out.println("Sending: " + msg);
-                call.write(EchoRequest.newBuilder().setMessage(msg).build());
+            for (String message : new String[]{"world", "welt", "monde"}) {
+                var request = EchoRequest.newBuilder().setMessage(message).build();
+                logger.log(Level.INFO, "request: {0}", request.getMessage());
+                blockingClientCall.write(request);
             }
 
             // 4. Signal that the client is done sending
-            call.closeSend();
+            blockingClientCall.halfClose();
 
-            // 5. Read the single response from the server
-            // This blocks until the server calls onCompleted/onNext
-            EchoResponse response = call.read();
-            System.out.println("Server Summary: " + response.getSummary());
-
-        } catch (Exception e) {
-            System.err.println("RPC failed: " + e.getMessage());
+            EchoResponse response = blockingClientCall.read();
+            System.out.println("Server Summary: " + response.getMessage());
+        } catch (StatusException e) {
+            logger.log(Level.WARNING, "RPC error: {0}", e.getStatus());
         } finally {
-            channel.shutdown();
+            channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
         }
     }
 }

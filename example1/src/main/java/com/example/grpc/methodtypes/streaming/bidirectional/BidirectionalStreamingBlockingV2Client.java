@@ -6,43 +6,40 @@ import com.example.grpc.EchoServiceGrpc;
 import com.example.grpc.Loggers;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusException;
+import io.grpc.StatusRuntimeException;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@io.grpc.ExperimentalApi("https://github.com/grpc/grpc-java/issues/10918")
 public class BidirectionalStreamingBlockingV2Client {
-
+    //TODO
     private static final Logger logger = Logger.getLogger(BidirectionalStreamingBlockingV2Client.class.getName());
 
     public static void main(String[] args) throws InterruptedException {
         Loggers.init();
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         var blockingStub = EchoServiceGrpc.newBlockingV2Stub(channel);
+        var blockingClientCall = blockingStub.bidirectionalStreamingEcho();
 
-// 2. Initiate the call. This returns a call object for bi-di interaction.
-        try (var call = blockingStub.bidirectionalStreamingEcho()) {
+        try {
+            blockingClientCall.write(EchoRequest.newBuilder().setMessage("world").build());
+            blockingClientCall.write(EchoRequest.newBuilder().setMessage("welt").build());
+            blockingClientCall.write(EchoRequest.newBuilder().setMessage("monde").build());
 
-            // 3. Send requests using .write()
-            call.write(EchoRequest.newBuilder().setMessage("world").build());
-            call.write(EchoRequest.newBuilder().setMessage("welt").build());
-            call.write(EchoRequest.newBuilder().setMessage("monde").build());
+            blockingClientCall.halfClose();
 
-            // Signal that no more requests will be sent
-            call.halfClose();
-
-            // 4. Read responses synchronously until the stream is exhausted
-            // Note: read() blocks until a message arrives or the stream closes
             EchoResponse response;
-            while ((response = call.read()) != null) {
+            while ((response = blockingClientCall.read()) != null) {
                 logger.log(Level.INFO, "next response: {0}", response.getMessage());
             }
 
             logger.info("completed");
-
+        } catch (StatusRuntimeException e) {
+            logger.log(Level.WARNING, "RPC runtime error: {0}", e.getStatus());
         } catch (StatusException e) {
-            // V2 stubs use checked StatusException for streaming/client calls
-            logger.log(Level.WARNING, "error: {0}", e.getStatus());
+            logger.log(Level.WARNING, "RPC checked error: {0}", e.getStatus());
         } finally {
             channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
         }

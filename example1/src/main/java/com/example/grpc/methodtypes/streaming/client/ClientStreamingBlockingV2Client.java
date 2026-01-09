@@ -6,6 +6,7 @@ import com.example.grpc.EchoServiceGrpc;
 import com.example.grpc.Loggers;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusException;
+import io.grpc.StatusRuntimeException;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -33,8 +34,10 @@ public class ClientStreamingBlockingV2Client {
 
             EchoResponse response = blockingClientCall.read();
             logger.log(Level.INFO, "response: {0}", response.getMessage());
+        } catch (StatusRuntimeException e) {
+            logger.log(Level.WARNING, "RPC runtime error: {0}", e.getStatus());
         } catch (StatusException e) {
-            logger.log(Level.WARNING, "RPC error: {0}", e.getStatus());
+            logger.log(Level.WARNING, "RPC checked error: {0}", e.getStatus());
         } finally {
             channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
         }

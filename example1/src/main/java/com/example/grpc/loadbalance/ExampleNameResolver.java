@@ -13,16 +13,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class /*TODO*/ ExampleNameResolver extends NameResolver {
+public class ExampleNameResolver extends NameResolver {
 
     private final URI uri;
-    private final Map<String, List<InetSocketAddress>> addrStore;
+    private final Map<String, List<InetSocketAddress>> serviceNameToSocketAddresses;
 
     private Listener2 listener;
 
     public ExampleNameResolver(URI targetUri) {
         this.uri = targetUri;
-        this.addrStore = ImmutableMap.<String, List<InetSocketAddress>>builder()
+        this.serviceNameToSocketAddresses = ImmutableMap.<String, List<InetSocketAddress>>builder()
             .put(Settings.SERVICE_NAME,
                 Arrays.stream(Settings.SERVER_PORTS)
                     .mapToObj(port -> new InetSocketAddress("localhost", port))
@@ -55,18 +55,17 @@ public class /*TODO*/ ExampleNameResolver extends NameResolver {
     }
 
     private void resolve() {
-        List<InetSocketAddress> addresses = addrStore.get(uri.getPath().substring(1));
+        List<InetSocketAddress> addresses = serviceNameToSocketAddresses.get(uri.getPath().substring(1));
         try {
-            List<EquivalentAddressGroup> equivalentAddressGroup = addresses.stream()
+            List<EquivalentAddressGroup> equivalentAddressGroups = addresses.stream()
                 .map(this::toSocketAddress)
                 .map(Arrays::asList)
                 .map(this::toEquivalentAddressGroup)
                 .collect(Collectors.toList());
 
-            ResolutionResult resolutionResult = ResolutionResult.newBuilder()
-                .setAddresses(equivalentAddressGroup)
+            var resolutionResult = ResolutionResult.newBuilder()
+                .setAddresses(equivalentAddressGroups)
                 .build();
-
             this.listener.onResult(resolutionResult);
         } catch (Exception e) {
             this.listener.onError(Status.UNAVAILABLE.withDescription("Unable to resolve host").withCause(e));

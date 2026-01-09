@@ -14,9 +14,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class NameResolveBlockingClient {
+public class NameResolveUnaryBlockingClient {
 
-    private static final Logger logger = Logger.getLogger(NameResolveBlockingClient.class.getName());
+    private static final Logger logger = Logger.getLogger(NameResolveUnaryBlockingClient.class.getName());
 
     public static void main(String[] args) throws Exception {
         Loggers.init();

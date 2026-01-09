@@ -12,16 +12,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class LoadBalanceBlockingClient {
+public class LoadBalanceUnaryBlockingClient {
 
-    private static final Logger logger = Logger.getLogger(LoadBalanceBlockingClient.class.getName());
+    private static final Logger logger = Logger.getLogger(LoadBalanceUnaryBlockingClient.class.getName());
 
     public static void main(String[] args) throws Exception {
         Loggers.init();
 
         NameResolverRegistry.getDefaultRegistry().register(new ExampleNameResolverProvider());
-        var target = String.format("%s:///%s", Settings.SCHEME, Settings.SERVICE_NAME);
 
+        var target = String.format("%s:///%s", Settings.SCHEME, Settings.SERVICE_NAME);
         useFirstPickPolicy(target);
         useRoundRobinPolicy(target);
     }

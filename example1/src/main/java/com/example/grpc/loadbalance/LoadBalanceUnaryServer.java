@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class LoadBalanceUnaryServer {
@@ -25,23 +26,25 @@ public class LoadBalanceUnaryServer {
         for (int port : Settings.SERVER_PORTS) {
             servers.add(
                 ServerBuilder.forPort(port)
-                    .addService(new GreeterImpl(port))
+                    .addService(new EchoServiceImpl(port))
                     .build()
                     .start()
             );
-            logger.info("Server started, listening on " + port);
+
+            logger.log(Level.INFO, "server started, listening on {0,number,#}", port);
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.err.println("*** shutting down gRPC server since JVM is shutting down");
-            try {
-                for (Server server : servers) {
+            System.err.println("server is shutting down");
+            for (Server server : servers) {
+                try {
                     server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    System.err.println("server shutdown was interrupted");
+                    server.shutdownNow();
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace(System.err);
             }
-            System.err.println("*** server shut down");
+            System.err.println("server has been shut down");
         }));
 
         for (Server server : servers) {
@@ -49,11 +52,11 @@ public class LoadBalanceUnaryServer {
         }
     }
 
-    static class GreeterImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
 
         final int port;
 
-        public GreeterImpl(int port) {
+        public EchoServiceImpl(int port) {
             this.port = port;
         }
 

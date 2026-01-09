@@ -3,6 +3,7 @@ package com.example.grpc.loadbalance;
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
+import com.example.grpc.Loggers;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
@@ -20,6 +21,8 @@ public class /*TODO*/ LoadBalanceUnaryServer {
     private List<Server> servers;
 
     public static void main(String[] args) throws IOException, InterruptedException {
+        Loggers.init();
+
         final LoadBalanceUnaryServer server = new LoadBalanceUnaryServer();
         server.start();
         server.blockUntilShutdown();

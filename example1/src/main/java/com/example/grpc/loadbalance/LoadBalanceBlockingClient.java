@@ -1,9 +1,8 @@
 package com.example.grpc.loadbalance;
 
 import com.example.grpc.EchoRequest;
-import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
-import io.grpc.Channel;
+import com.example.grpc.Loggers;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.NameResolverRegistry;
@@ -13,19 +12,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class /*TODO*/ LoadBalanceBlockingClient {
+public class LoadBalanceBlockingClient {
 
     private static final Logger logger = Logger.getLogger(LoadBalanceBlockingClient.class.getName());
 
-    private final EchoServiceGrpc.EchoServiceBlockingStub blockingStub;
-
-    public LoadBalanceBlockingClient(Channel channel) {
-        blockingStub = EchoServiceGrpc.newBlockingStub(channel);
-    }
-
     public static void main(String[] args) throws Exception {
+        Loggers.init();
+
         NameResolverRegistry.getDefaultRegistry().register(new ExampleNameResolverProvider());
-        String target = String.format("%s:///%s", Settings.SCHEME, Settings.SERVICE_NAME);
+        var target = String.format("%s:///%s", Settings.SCHEME, Settings.SERVICE_NAME);
 
         useFirstPickLoadBalancingPolicy(target);
         useRoundRobinLoadBalancingPolicy(target);
@@ -33,44 +28,41 @@ public class /*TODO*/ LoadBalanceBlockingClient {
 
     private static void useFirstPickLoadBalancingPolicy(String target) throws InterruptedException {
         logger.info("use default first_pick load balance policy");
-        ManagedChannel channel = ManagedChannelBuilder.forTarget(target)
+        var channel = ManagedChannelBuilder.forTarget(target)
             .usePlaintext()
             .build();
         try {
-            LoadBalanceBlockingClient client = new LoadBalanceBlockingClient(channel);
             for (int i = 0; i < 5; i++) {
-                client.greet("request" + i);
+                unaryEcho(channel, "name" + i);
             }
         } finally {
-            channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
+            channel.shutdownNow().awaitTermination(10, TimeUnit.SECONDS);
         }
     }
 
     private static void useRoundRobinLoadBalancingPolicy(String target) throws InterruptedException {
         logger.info("use round_robin load balance policy");
-        ManagedChannel channel = ManagedChannelBuilder.forTarget(target)
+        var channel = ManagedChannelBuilder.forTarget(target)
             .defaultLoadBalancingPolicy("round_robin")
             .usePlaintext()
             .build();
         try {
-            LoadBalanceBlockingClient client = new LoadBalanceBlockingClient(channel);
             for (int i = 0; i < 5; i++) {
-                client.greet("request" + i);
+                unaryEcho(channel, "name" + i);
             }
         } finally {
-            channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
+            channel.shutdownNow().awaitTermination(10, TimeUnit.SECONDS);
         }
     }
 
-    public void greet(String name) {
-        EchoRequest request = EchoRequest.newBuilder().setMessage(name).build();
-        EchoResponse response;
+    private static void unaryEcho(ManagedChannel channel, String name) {
         try {
-            response = blockingStub.unaryEcho(request);
+            var blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+            var request = EchoRequest.newBuilder().setMessage(name).build();
+            var response = blockingStub.unaryEcho(request);
+            logger.log(Level.INFO, "response: {0}", response.getMessage());
         } catch (StatusRuntimeException e) {
             logger.log(Level.WARNING, "RPC error: {0}", e.getStatus());
-            return;
         }
-        logger.log(Level.INFO, "response: {0}", response.getMessage());
     }
 }

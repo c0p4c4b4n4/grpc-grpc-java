@@ -34,7 +34,7 @@ public class ErrorHandlingStatusProto {
             .addStackEntries("stack_entry_1")
             .addStackEntries("stack_entry_2")
             .addStackEntries("stack_entry_3")
-            .setDetail("error detail").build();
+            .setDetail("Error detail").build();
 
     private static final String STATUS_MESSAGE = "Error description";
 

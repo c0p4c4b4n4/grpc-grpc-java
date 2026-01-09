@@ -3,6 +3,7 @@ package com.example.grpc.nameresolve;
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
+import com.example.grpc.loadbalance.Settings;
 import io.grpc.Channel;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -43,7 +44,8 @@ public class /*TODO*/ NameResolveClient {
           Dial to "example:///resolver.example.grpc.io", use {@link ExampleNameResolver} to create connection
           "resolver.example.grpc.io" is converted to {@link java.net.URI.path}
          */
-        channel = ManagedChannelBuilder.forTarget("example:///example.grpc.loadbalance")
+        var target = String.format("%s:///%s", com.example.grpc.loadbalance.Settings.SCHEME, Settings.SERVICE_NAME);
+        channel = ManagedChannelBuilder.forTarget(target)
             .defaultLoadBalancingPolicy("round_robin")
             .usePlaintext()
             .build();

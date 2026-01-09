@@ -1,4 +1,4 @@
-package com.example.grpc.loadbalance;
+package com.example.grpc.nameresolve;
 
 public final class Settings {
 

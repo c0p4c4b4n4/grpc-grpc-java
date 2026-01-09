@@ -5,10 +5,8 @@ import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
 import com.example.grpc.Loggers;
 import io.grpc.ManagedChannelBuilder;
-import io.grpc.Status;
-import io.grpc.stub.StreamObserver;
+import io.grpc.StatusException;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,34 +18,33 @@ public class BidirectionalStreamingBlockingV2Client {
     public static void main(String[] args) throws InterruptedException {
         Loggers.init();
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
-        var asyncStub = EchoServiceGrpc.newStub(channel);
+        var blockingStub = EchoServiceGrpc.newBlockingV2Stub(channel);
 
-        var done = new CountDownLatch(1);
-        var requestObserver = asyncStub.bidirectionalStreamingEcho(new StreamObserver<>() {
-            @Override
-            public void onNext(EchoResponse response) {
+// 2. Initiate the call. This returns a call object for bi-di interaction.
+        try (var call = blockingStub.bidirectionalStreamingEcho()) {
+
+            // 3. Send requests using .write()
+            call.write(EchoRequest.newBuilder().setMessage("world").build());
+            call.write(EchoRequest.newBuilder().setMessage("welt").build());
+            call.write(EchoRequest.newBuilder().setMessage("monde").build());
+
+            // Signal that no more requests will be sent
+            call.halfClose();
+
+            // 4. Read responses synchronously until the stream is exhausted
+            // Note: read() blocks until a message arrives or the stream closes
+            EchoResponse response;
+            while ((response = call.read()) != null) {
                 logger.log(Level.INFO, "next response: {0}", response.getMessage());
             }
 
-            @Override
-            public void onError(Throwable t) {
-                logger.log(Level.WARNING, "error: {0}", Status.fromThrowable(t));
-                done.countDown();
-            }
+            logger.info("completed");
 
-            @Override
-            public void onCompleted() {
-                logger.info("completed");
-                done.countDown();
-            }
-        });
-
-        requestObserver.onNext(EchoRequest.newBuilder().setMessage("world").build());
-        requestObserver.onNext(EchoRequest.newBuilder().setMessage("welt").build());
-        requestObserver.onNext(EchoRequest.newBuilder().setMessage("monde").build());
-        requestObserver.onCompleted();
-
-        done.await();
-        channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
+        } catch (StatusException e) {
+            // V2 stubs use checked StatusException for streaming/client calls
+            logger.log(Level.WARNING, "error: {0}", e.getStatus());
+        } finally {
+            channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
+        }
     }
 }

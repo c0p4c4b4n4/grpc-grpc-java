@@ -18,7 +18,6 @@ public class HeaderUnaryServer {
 
     public static void main(String[] args) throws Exception {
         Loggers.init();
-
         var port = 50051;
         var serverBuilder = ServerBuilder
             .forPort(port)

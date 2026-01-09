@@ -17,7 +17,6 @@ public class CancellationServerStreamingBlockingClient {
 
     public static void main(String[] args) throws InterruptedException {
         Loggers.init();
-
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         try (var cancellableContext = Context.current().withCancellation()) {
             var blockingStub = EchoServiceGrpc.newBlockingStub(channel);

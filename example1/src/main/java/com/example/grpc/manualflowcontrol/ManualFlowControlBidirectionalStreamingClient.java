@@ -22,7 +22,6 @@ public class ManualFlowControlBidirectionalStreamingClient {
 
     public static void main(String[] args) throws InterruptedException {
         Loggers.init();
-
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         var stub = EchoServiceGrpc.newStub(channel);
 

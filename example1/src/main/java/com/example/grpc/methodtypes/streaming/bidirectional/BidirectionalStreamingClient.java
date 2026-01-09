@@ -12,20 +12,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class /*TODO*/ BidirectionalStreamingClient {
+public class BidirectionalStreamingClient {
 
     private static final Logger logger = Logger.getLogger(BidirectionalStreamingClient.class.getName());
 
     public static void main(String[] args) throws InterruptedException {
         Loggers.init();
-
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         var asyncStub = EchoServiceGrpc.newStub(channel);
 
         var requestObserver = asyncStub.bidirectionalStreamingEcho(new StreamObserver<>() {
             @Override
             public void onNext(EchoResponse response) {
-                logger.log(Level.INFO, "next: {0}", response.getMessage());
+                logger.log(Level.INFO, "next response: {0}", response.getMessage());
             }
 
             @Override

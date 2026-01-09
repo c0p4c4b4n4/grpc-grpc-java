@@ -14,7 +14,6 @@ public final class Servers {
 
     public static void start(int port, ServerBuilder<?> serverBuilder) throws IOException, InterruptedException {
         Loggers.init();
-
         var server = serverBuilder
             .build()
             .start();

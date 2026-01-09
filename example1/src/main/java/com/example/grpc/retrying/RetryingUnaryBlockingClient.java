@@ -22,7 +22,6 @@ public class RetryingUnaryBlockingClient {
 
     public static void main(String[] args) throws Exception {
         Loggers.init();
-
         var enableRetries = !Boolean.parseBoolean(System.getenv("EXAMPLE_GRPC_DISABLE_RETRYING"));
         var channel = buildChannel(enableRetries);
         var blockingStub = EchoServiceGrpc.newBlockingStub(channel);

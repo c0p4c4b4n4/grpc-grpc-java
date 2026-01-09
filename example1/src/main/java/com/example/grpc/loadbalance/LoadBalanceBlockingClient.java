@@ -22,11 +22,11 @@ public class LoadBalanceBlockingClient {
         NameResolverRegistry.getDefaultRegistry().register(new ExampleNameResolverProvider());
         var target = String.format("%s:///%s", Settings.SCHEME, Settings.SERVICE_NAME);
 
-        useFirstPickLoadBalancingPolicy(target);
-        useRoundRobinLoadBalancingPolicy(target);
+        useFirstPickPolicy(target);
+        useRoundRobinPolicy(target);
     }
 
-    private static void useFirstPickLoadBalancingPolicy(String target) throws InterruptedException {
+    private static void useFirstPickPolicy(String target) throws InterruptedException {
         logger.info("use default first_pick load balance policy");
         var channel = ManagedChannelBuilder.forTarget(target)
             .usePlaintext()
@@ -40,7 +40,7 @@ public class LoadBalanceBlockingClient {
         }
     }
 
-    private static void useRoundRobinLoadBalancingPolicy(String target) throws InterruptedException {
+    private static void useRoundRobinPolicy(String target) throws InterruptedException {
         logger.info("use round_robin load balance policy");
         var channel = ManagedChannelBuilder.forTarget(target)
             .defaultLoadBalancingPolicy("round_robin")

@@ -10,7 +10,6 @@ import io.grpc.stub.StreamObserver;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,7 +21,7 @@ public class LoadBalanceUnaryServer {
     public static void main(String[] args) throws IOException, InterruptedException {
         Loggers.init();
 
-        List<Server> servers = new ArrayList<>();
+        var servers = new ArrayList<Server>();
         for (int port : Settings.SERVER_PORTS) {
             servers.add(
                 ServerBuilder.forPort(port)
@@ -35,7 +34,7 @@ public class LoadBalanceUnaryServer {
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.err.println("server is shutting down");
+            System.err.println("servers are shutting down");
             for (Server server : servers) {
                 try {
                     server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
@@ -44,7 +43,7 @@ public class LoadBalanceUnaryServer {
                     server.shutdownNow();
                 }
             }
-            System.err.println("server has been shut down");
+            System.err.println("servers have been shut down");
         }));
 
         for (Server server : servers) {

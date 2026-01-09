@@ -32,7 +32,7 @@ public class ServerStreamingBlockingV2Client {
         } catch (StatusException e) {
             logger.log(Level.WARNING, "RPC checked error: {0}", e.getStatus());
         } finally {
-            channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+            channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
         }
     }
 }

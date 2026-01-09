@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class  ClientStreamingAsynchronousClient {
+public class ClientStreamingAsynchronousClient {
 
     private static final Logger logger = Logger.getLogger(ClientStreamingAsynchronousClient.class.getName());
 
@@ -44,6 +44,6 @@ public class  ClientStreamingAsynchronousClient {
         requestObserver.onNext(EchoRequest.newBuilder().setMessage("monde").build());
         requestObserver.onCompleted();
 
-        channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+        channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
     }
 }

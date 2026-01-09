@@ -5,11 +5,7 @@ import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
 import com.example.grpc.Loggers;
 import io.grpc.ManagedChannelBuilder;
-import io.grpc.Status;
 import io.grpc.StatusException;
-import io.grpc.StatusRuntimeException;
-import io.grpc.stub.BlockingClientCall;
-import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -41,7 +37,7 @@ public class ClientStreamingBlockingV2Client {
         } catch (StatusException e) {
             logger.log(Level.WARNING, "RPC error: {0}", e.getStatus());
         } finally {
-            channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+            channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
         }
     }
 }

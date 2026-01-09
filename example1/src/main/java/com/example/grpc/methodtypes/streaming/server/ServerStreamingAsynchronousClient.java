@@ -45,6 +45,6 @@ public class ServerStreamingAsynchronousClient {
         });
 
         done.await();
-        channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+        channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
     }
 }

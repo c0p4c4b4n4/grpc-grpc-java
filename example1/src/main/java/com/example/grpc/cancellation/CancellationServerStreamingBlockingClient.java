@@ -37,7 +37,7 @@ public class CancellationServerStreamingBlockingClient {
         } catch (StatusRuntimeException e) {
             logger.log(Level.WARNING, "RPC error: {0}", e.getStatus());
         } finally {
-            channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+            channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
         }
     }
 }

@@ -44,6 +44,6 @@ public class /*TODO*/ BidirectionalStreamingClient {
         requestObserver.onNext(EchoRequest.newBuilder().setMessage("monde").build());
         requestObserver.onCompleted();
 
-        channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+        channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
     }
 }

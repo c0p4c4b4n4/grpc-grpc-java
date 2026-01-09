@@ -78,7 +78,7 @@ public class ErrorHandlingStatus {
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
             verifyErrorResponse(e.getCause());
-            System.out.println("Future call direct received expected error details");
+            System.out.println("Future direct call received expected error details");
         }
     }
 

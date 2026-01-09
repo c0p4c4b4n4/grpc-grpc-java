@@ -11,7 +11,6 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.rpc.DebugInfo;
 import io.grpc.Grpc;
-import io.grpc.InsecureChannelCredentials;
 import io.grpc.InsecureServerCredentials;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -103,18 +102,16 @@ public class ErrorHandlingTrailers {
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
             verifyErrorResponse(e.getCause());
-            System.out.println("Future call direct received expected error details");
+            System.out.println("Future direct call received expected error details");
         }
     }
 
     private static void futureCallCallback(ManagedChannel channel) {
         var stub = EchoServiceGrpc.newFutureStub(channel);
-        var response = stub.unaryEcho(EchoRequest.newBuilder().build());
+        var responseFuture = stub.unaryEcho(EchoRequest.newBuilder().build());
 
         var done = new CountDownLatch(1);
-        Futures.addCallback(
-            response,
-            new FutureCallback<>() {
+        Futures.addCallback(responseFuture, new FutureCallback<>() {
                 @Override
                 public void onSuccess(EchoResponse result) {
                     // won't be called

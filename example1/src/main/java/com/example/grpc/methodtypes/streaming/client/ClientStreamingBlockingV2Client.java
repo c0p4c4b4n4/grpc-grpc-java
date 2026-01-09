@@ -28,17 +28,16 @@ public class ClientStreamingBlockingV2Client {
         var blockingClientCall = blockingStub.clientStreamingEcho();
 
         try {
-            for (String message : new String[]{"world", "welt", "monde"}) {
+            for (var message : new String[]{"world", "welt", "monde"}) {
                 var request = EchoRequest.newBuilder().setMessage(message).build();
                 logger.log(Level.INFO, "request: {0}", request.getMessage());
                 blockingClientCall.write(request);
             }
 
-            // 4. Signal that the client is done sending
             blockingClientCall.halfClose();
 
             EchoResponse response = blockingClientCall.read();
-            System.out.println("Server Summary: " + response.getMessage());
+            logger.log(Level.INFO, "response: {0}", response.getMessage());
         } catch (StatusException e) {
             logger.log(Level.WARNING, "RPC error: {0}", e.getStatus());
         } finally {

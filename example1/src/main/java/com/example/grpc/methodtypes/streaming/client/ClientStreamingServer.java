@@ -7,6 +7,9 @@ import com.example.grpc.Servers;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,12 +25,12 @@ public class ClientStreamingServer {
         @Override
         public StreamObserver<EchoRequest> clientStreamingEcho(StreamObserver<EchoResponse> responseObserver) {
             return new StreamObserver<>() {
-                final StringBuilder accumulator = new StringBuilder();
+                final List<String> accumulator = Collections.synchronizedList(new ArrayList<>());
 
                 @Override
                 public void onNext(EchoRequest request) {
                     logger.log(Level.INFO, "next request: {0}", request.getMessage());
-                    accumulator.append("hello ").append(request.getMessage()).append(" ");
+                    accumulator.add("hello " + request.getMessage());
                 }
 
                 @Override
@@ -37,8 +40,7 @@ public class ClientStreamingServer {
 
                 @Override
                 public void onCompleted() {
-                    var response = EchoResponse.newBuilder().setMessage(accumulator.toString().trim()).build();
-                    logger.info("completed: " + response.getMessage());
+                    var response = EchoResponse.newBuilder().setMessage(String.join(", ", accumulator)).build();
                     responseObserver.onNext(response);
                     responseObserver.onCompleted();
                 }

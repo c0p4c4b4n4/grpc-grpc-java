@@ -78,7 +78,7 @@ public class /*TODO*/ ExampleNameResolver extends NameResolver {
         return new InetSocketAddress(address.getHostName(), address.getPort());
     }
 
-    private EquivalentAddressGroup addrToEquivalentAddressGroup(List<SocketAddress> addrList) {
-        return new EquivalentAddressGroup(addrList);
+    private EquivalentAddressGroup addrToEquivalentAddressGroup(List<SocketAddress> addresses) {
+        return new EquivalentAddressGroup(addresses);
     }
 }

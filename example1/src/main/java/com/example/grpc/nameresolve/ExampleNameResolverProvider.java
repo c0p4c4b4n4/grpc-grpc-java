@@ -5,7 +5,7 @@ import io.grpc.NameResolverProvider;
 
 import java.net.URI;
 
-public class /*TODO*/ ExampleNameResolverProvider extends NameResolverProvider {
+public class ExampleNameResolverProvider extends NameResolverProvider {
 
     @Override
     public NameResolver newNameResolver(URI targetUri, NameResolver.Args args) {

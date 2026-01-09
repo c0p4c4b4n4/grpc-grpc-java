@@ -1,9 +1,11 @@
 package com.example.grpc.methodtypes.streaming.server;
 
 import com.example.grpc.EchoRequest;
+import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
 import com.example.grpc.Loggers;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.StatusException;
 import io.grpc.StatusRuntimeException;
 
 import java.util.concurrent.TimeUnit;
@@ -18,16 +20,22 @@ public class ServerStreamingBlockingV2Client {
         Loggers.init();
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         try {
-            var blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+            var blockingStub = EchoServiceGrpc.newBlockingV2Stub(channel);
             var request = EchoRequest.newBuilder().setMessage("world").build();
-            var responses = blockingStub.serverStreamingEcho(request);
-            while (responses.hasNext()) {
-                logger.log(Level.INFO, "next response: {0}", responses.next().getMessage());
+
+            var blockingClientCall = blockingStub.serverStreamingEcho(request);
+
+            EchoResponse response;
+            while ((response = blockingClientCall.read()) != null) {
+                logger.log(Level.INFO, "next response: {0}", response.getMessage());
             }
         } catch (StatusRuntimeException e) {
             logger.log(Level.WARNING, "RPC error: {0}", e.getStatus());
+        } catch (StatusException e) {
+            logger.log(Level.WARNING, "RPC checked error: {0}", e.getStatus());
         } finally {
             channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
         }
+
     }
 }

@@ -30,7 +30,6 @@ public class NameResolveUnaryServer {
                     .build()
                     .start()
             );
-
             logger.log(Level.INFO, "server started, listening on {0,number,#}", port);
         }
 

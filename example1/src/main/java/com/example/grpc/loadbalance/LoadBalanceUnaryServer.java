@@ -14,66 +14,53 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-public class /*TODO*/ LoadBalanceUnaryServer {
+public class LoadBalanceUnaryServer {
 
     private static final Logger logger = Logger.getLogger(LoadBalanceUnaryServer.class.getName());
-
-    private List<Server> servers;
 
     public static void main(String[] args) throws IOException, InterruptedException {
         Loggers.init();
 
-        final LoadBalanceUnaryServer server = new LoadBalanceUnaryServer();
-        server.start();
-        server.blockUntilShutdown();
-    }
-
-    private void start() throws IOException {
-        servers = new ArrayList<>();
+        List<Server> servers = new ArrayList<>();
         for (int port : Settings.SERVER_PORTS) {
             servers.add(
                 ServerBuilder.forPort(port)
                     .addService(new GreeterImpl(port))
                     .build()
-                    .start());
+                    .start()
+            );
             logger.info("Server started, listening on " + port);
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.err.println("*** shutting down gRPC server since JVM is shutting down");
             try {
-                LoadBalanceUnaryServer.this.stop();
+                for (Server server : servers) {
+                    server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace(System.err);
             }
             System.err.println("*** server shut down");
         }));
-    }
 
-    private void stop() throws InterruptedException {
-        for (Server server : servers) {
-            server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
-        }
-    }
-
-    private void blockUntilShutdown() throws InterruptedException {
         for (Server server : servers) {
             server.awaitTermination();
         }
     }
 
-    static class /*TODO*/ GreeterImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    static class GreeterImpl extends EchoServiceGrpc.EchoServiceImplBase {
 
-        int port;
+        final int port;
 
         public GreeterImpl(int port) {
             this.port = port;
         }
 
         @Override
-        public void unaryEcho(EchoRequest req, StreamObserver<EchoResponse> responseObserver) {
-            EchoResponse reply = EchoResponse.newBuilder().setMessage("Echo " + req.getMessage() + " from server<" + this.port + ">").build();
-            responseObserver.onNext(reply);
+        public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
+            var response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage() + " from server<" + this.port + ">").build();
+            responseObserver.onNext(response);
             responseObserver.onCompleted();
         }
     }

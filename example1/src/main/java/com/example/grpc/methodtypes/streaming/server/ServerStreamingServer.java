@@ -21,11 +21,9 @@ public class ServerStreamingServer {
         @Override
         public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
             logger.log(Level.INFO, "request: {0}", request.getMessage());
-
             responseObserver.onNext(EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build());
             responseObserver.onNext(EchoResponse.newBuilder().setMessage("guten tag " + request.getMessage()).build());
             responseObserver.onNext(EchoResponse.newBuilder().setMessage("bonjour " + request.getMessage()).build());
-
             responseObserver.onCompleted();
         }
     }

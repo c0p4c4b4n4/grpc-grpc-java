@@ -25,7 +25,6 @@ public class BidirectionalStreamingServer {
                 @Override
                 public void onNext(EchoRequest request) {
                     logger.log(Level.INFO, "next request: {0}", request.getMessage());
-
                     responseObserver.onNext(EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build());
                     responseObserver.onNext(EchoResponse.newBuilder().setMessage("guten tag " + request.getMessage()).build());
                     responseObserver.onNext(EchoResponse.newBuilder().setMessage("bonjour " + request.getMessage()).build());

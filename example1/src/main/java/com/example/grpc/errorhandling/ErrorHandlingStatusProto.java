@@ -16,7 +16,6 @@ import com.google.rpc.DebugInfo;
 import com.google.rpc.Status;
 import io.grpc.Channel;
 import io.grpc.Grpc;
-import io.grpc.InsecureChannelCredentials;
 import io.grpc.InsecureServerCredentials;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.protobuf.StatusProto;

@@ -31,7 +31,6 @@ public class BidirectionalStreamingBlockingV2Client {
             for (EchoResponse response; (response = blockingClientCall.read()) != null; ) {
                 logger.log(Level.INFO, "next response: {0}", response.getMessage());
             }
-
             logger.info("completed");
         } catch (StatusRuntimeException e) {
             logger.log(Level.WARNING, "RPC runtime error: {0}", e.getStatus());

@@ -1,7 +1,6 @@
 package com.example.grpc.methodtypes.streaming.client;
 
 import com.example.grpc.EchoRequest;
-import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
 import com.example.grpc.Loggers;
 import io.grpc.ManagedChannelBuilder;
@@ -32,7 +31,7 @@ public class ClientStreamingBlockingV2Client {
 
             blockingClientCall.halfClose();
 
-            EchoResponse response = blockingClientCall.read();
+            var response = blockingClientCall.read();
             logger.log(Level.INFO, "response: {0}", response.getMessage());
         } catch (StatusRuntimeException e) {
             logger.log(Level.WARNING, "RPC runtime error: {0}", e.getStatus());

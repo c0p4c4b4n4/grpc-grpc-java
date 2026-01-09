@@ -17,12 +17,11 @@ public class /*TODO*/ ExampleNameResolver extends NameResolver {
 
     private final URI uri;
     private final Map<String, List<InetSocketAddress>> addrStore;
-
     private Listener2 listener;
 
     public ExampleNameResolver(URI targetUri) {
         this.uri = targetUri;
-        addrStore = ImmutableMap.<String, List<InetSocketAddress>>builder()
+        this.addrStore = ImmutableMap.<String, List<InetSocketAddress>>builder()
             .put(Settings.SERVICE_NAME,
                 Arrays.stream(Settings.SERVER_PORTS)
                     .mapToObj(port -> new InetSocketAddress("localhost", port))

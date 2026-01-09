@@ -22,7 +22,7 @@ public class /*TODO*/ ExampleNameResolver extends NameResolver {
 
     public ExampleNameResolver(URI targetUri) {
         this.uri = targetUri;
-        addrStore = ImmutableMap.<String, List<InetSocketAddress>>builder()
+        this.addrStore = ImmutableMap.<String, List<InetSocketAddress>>builder()
             .put(Settings.SERVICE_NAME,
                 Stream.iterate(NameResolveServer.startPort, p -> p + 1)
                     .limit(NameResolveServer.serverCount)

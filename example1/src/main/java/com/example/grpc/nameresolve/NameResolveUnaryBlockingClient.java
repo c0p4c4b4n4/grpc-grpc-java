@@ -4,7 +4,6 @@ import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoServiceGrpc;
 import com.example.grpc.Loggers;
 import com.example.grpc.loadbalance.ExampleNameResolverProvider;
-import com.example.grpc.loadbalance.Settings;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.NameResolverRegistry;

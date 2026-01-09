@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 
 @io.grpc.ExperimentalApi("https://github.com/grpc/grpc-java/issues/10918")
 public class BidirectionalStreamingBlockingV2Client {
-    //TODO
     private static final Logger logger = Logger.getLogger(BidirectionalStreamingBlockingV2Client.class.getName());
 
     public static void main(String[] args) throws InterruptedException {
@@ -27,7 +26,6 @@ public class BidirectionalStreamingBlockingV2Client {
             blockingClientCall.write(EchoRequest.newBuilder().setMessage("world").build());
             blockingClientCall.write(EchoRequest.newBuilder().setMessage("welt").build());
             blockingClientCall.write(EchoRequest.newBuilder().setMessage("monde").build());
-
             blockingClientCall.halfClose();
 
             for (EchoResponse response; (response = blockingClientCall.read()) != null; ) {

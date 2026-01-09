@@ -3,7 +3,6 @@ package com.example.grpc.nameresolve;
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoServiceGrpc;
 import com.example.grpc.Loggers;
-import com.example.grpc.loadbalance.ExampleNameResolverProvider;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.NameResolverRegistry;

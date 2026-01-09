@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ExampleNameResolver extends NameResolver {
+class ExampleNameResolver extends NameResolver {
 
     private final URI targetUri;
     private final Map<String, List<InetSocketAddress>> serviceNameToSocketAddresses;
 
     private Listener2 listener;
 
-    public ExampleNameResolver(URI targetUri) {
+    ExampleNameResolver(URI targetUri) {
         this.targetUri = targetUri;
         this.serviceNameToSocketAddresses = ImmutableMap.<String, List<InetSocketAddress>>builder()
             .put(Settings.SERVICE_NAME,

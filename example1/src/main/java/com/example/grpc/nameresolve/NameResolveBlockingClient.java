@@ -22,14 +22,13 @@ public class NameResolveBlockingClient {
         Loggers.init();
 
         NameResolverRegistry.getDefaultRegistry().register(new ExampleNameResolverProvider());
-        var target = String.format("%s:///%s", com.example.grpc.loadbalance.Settings.SCHEME, Settings.SERVICE_NAME);
 
-        useFirstPickPolicy(target);
-        useRoundRobinPolicy(target);
+        useDnsResolver("localhost:50051");
+        useExampleNameResolver(String.format("%s:///%s", Settings.SCHEME, Settings.SERVICE_NAME));
     }
 
-    private static void useFirstPickPolicy(String target) throws InterruptedException {
-        logger.info("use default first_pick load balance policy");
+    private static void useDnsResolver(String target) throws InterruptedException {
+        logger.info("use default DNS resolver");
         var channel = ManagedChannelBuilder.forTarget(target)
             .usePlaintext()
             .build();
@@ -42,8 +41,8 @@ public class NameResolveBlockingClient {
         }
     }
 
-    private static void useRoundRobinPolicy(String target) throws InterruptedException {
-        logger.info("use round_robin load balance policy");
+    private static void useExampleNameResolver(String target) throws InterruptedException {
+        logger.info("use example name resolver");
         var channel = ManagedChannelBuilder.forTarget(target)
             .defaultLoadBalancingPolicy("round_robin")
             .usePlaintext()

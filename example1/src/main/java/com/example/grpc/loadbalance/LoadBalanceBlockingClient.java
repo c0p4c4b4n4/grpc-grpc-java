@@ -13,13 +13,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class /*TODO*/ LoadBalanceClient {
+public class /*TODO*/ LoadBalanceBlockingClient {
 
-    private static final Logger logger = Logger.getLogger(LoadBalanceClient.class.getName());
+    private static final Logger logger = Logger.getLogger(LoadBalanceBlockingClient.class.getName());
 
     private final EchoServiceGrpc.EchoServiceBlockingStub blockingStub;
 
-    public LoadBalanceClient(Channel channel) {
+    public LoadBalanceBlockingClient(Channel channel) {
         blockingStub = EchoServiceGrpc.newBlockingStub(channel);
     }
 
@@ -27,17 +27,17 @@ public class /*TODO*/ LoadBalanceClient {
         NameResolverRegistry.getDefaultRegistry().register(new ExampleNameResolverProvider());
         String target = String.format("%s:///%s", Settings.SCHEME, Settings.SERVICE_NAME);
 
-        useFirstPickPolicy(target);
-        useRoundRobinPolicy(target);
+        useFirstPickLoadBalancingPolicy(target);
+        useRoundRobinLoadBalancingPolicy(target);
     }
 
-    private static void useFirstPickPolicy(String target) throws InterruptedException {
-        logger.info("Use default first_pick load balance policy");
+    private static void useFirstPickLoadBalancingPolicy(String target) throws InterruptedException {
+        logger.info("use default first_pick load balance policy");
         ManagedChannel channel = ManagedChannelBuilder.forTarget(target)
             .usePlaintext()
             .build();
         try {
-            LoadBalanceClient client = new LoadBalanceClient(channel);
+            LoadBalanceBlockingClient client = new LoadBalanceBlockingClient(channel);
             for (int i = 0; i < 5; i++) {
                 client.greet("request" + i);
             }
@@ -46,14 +46,14 @@ public class /*TODO*/ LoadBalanceClient {
         }
     }
 
-    private static void useRoundRobinPolicy(String target) throws InterruptedException {
-        logger.info("Change to round_robin policy");
+    private static void useRoundRobinLoadBalancingPolicy(String target) throws InterruptedException {
+        logger.info("use round_robin load balance policy");
         ManagedChannel channel = ManagedChannelBuilder.forTarget(target)
             .defaultLoadBalancingPolicy("round_robin")
             .usePlaintext()
             .build();
         try {
-            LoadBalanceClient client = new LoadBalanceClient(channel);
+            LoadBalanceBlockingClient client = new LoadBalanceBlockingClient(channel);
             for (int i = 0; i < 5; i++) {
                 client.greet("request" + i);
             }

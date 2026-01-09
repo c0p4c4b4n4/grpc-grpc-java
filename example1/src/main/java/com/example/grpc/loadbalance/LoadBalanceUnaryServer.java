@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-public class /*TODO*/ LoadBalanceServer {
+public class /*TODO*/ LoadBalanceUnaryServer {
 
-    private static final Logger logger = Logger.getLogger(LoadBalanceServer.class.getName());
+    private static final Logger logger = Logger.getLogger(LoadBalanceUnaryServer.class.getName());
 
     private List<Server> servers;
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        final LoadBalanceServer server = new LoadBalanceServer();
+        final LoadBalanceUnaryServer server = new LoadBalanceUnaryServer();
         server.start();
         server.blockUntilShutdown();
     }
@@ -39,7 +39,7 @@ public class /*TODO*/ LoadBalanceServer {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.err.println("*** shutting down gRPC server since JVM is shutting down");
             try {
-                LoadBalanceServer.this.stop();
+                LoadBalanceUnaryServer.this.stop();
             } catch (InterruptedException e) {
                 e.printStackTrace(System.err);
             }

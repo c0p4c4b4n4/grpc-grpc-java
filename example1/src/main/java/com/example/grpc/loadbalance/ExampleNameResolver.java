@@ -17,6 +17,7 @@ public class /*TODO*/ ExampleNameResolver extends NameResolver {
 
     private final URI uri;
     private final Map<String, List<InetSocketAddress>> addrStore;
+
     private Listener2 listener;
 
     public ExampleNameResolver(URI targetUri) {
@@ -59,7 +60,7 @@ public class /*TODO*/ ExampleNameResolver extends NameResolver {
             List<EquivalentAddressGroup> equivalentAddressGroup = addresses.stream()
                 .map(this::toSocketAddress)
                 .map(Arrays::asList)
-                .map(this::addrToEquivalentAddressGroup)
+                .map(this::toEquivalentAddressGroup)
                 .collect(Collectors.toList());
 
             ResolutionResult resolutionResult = ResolutionResult.newBuilder()
@@ -67,9 +68,8 @@ public class /*TODO*/ ExampleNameResolver extends NameResolver {
                 .build();
 
             this.listener.onResult(resolutionResult);
-
         } catch (Exception e) {
-            this.listener.onError(Status.UNAVAILABLE.withDescription("Unable to resolve host ").withCause(e));
+            this.listener.onError(Status.UNAVAILABLE.withDescription("Unable to resolve host").withCause(e));
         }
     }
 
@@ -77,7 +77,7 @@ public class /*TODO*/ ExampleNameResolver extends NameResolver {
         return new InetSocketAddress(address.getHostName(), address.getPort());
     }
 
-    private EquivalentAddressGroup addrToEquivalentAddressGroup(List<SocketAddress> addresses) {
+    private EquivalentAddressGroup toEquivalentAddressGroup(List<SocketAddress> addresses) {
         return new EquivalentAddressGroup(addresses);
     }
 }

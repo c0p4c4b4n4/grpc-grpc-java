@@ -8,10 +8,11 @@ import io.grpc.ServerBuilder
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 
-class UnaryServer {
+object UnaryServer {
   private val logger = Logger.getLogger(UnaryServer::class.java.name)
 
-  fun main() {
+  @kotlin.jvm.JvmStatic
+  fun main(args: Array<String>) {
     val port = 50051
     val server: Server = ServerBuilder
       .forPort(port)

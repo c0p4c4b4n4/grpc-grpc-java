@@ -7,10 +7,11 @@ import io.grpc.StatusRuntimeException
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 
-class UnaryBlockingClient {
+object UnaryBlockingClient {
   private val logger = Logger.getLogger(UnaryBlockingClient::class.java.name)
 
-  suspend fun main(args: Array<String>) {
+  @kotlin.jvm.JvmStatic
+  fun main(args: Array<String>) {
     val channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build()
     try {
       val stub = EchoServiceGrpcKt.EchoServiceCoroutineStub(channel)

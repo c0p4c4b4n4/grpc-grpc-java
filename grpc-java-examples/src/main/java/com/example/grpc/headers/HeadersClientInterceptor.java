@@ -1,4 +1,4 @@
-package com.example.grpc.header;
+package com.example.grpc.headers;
 
 import io.grpc.CallOptions;
 import io.grpc.Channel;
@@ -12,9 +12,9 @@ import io.grpc.MethodDescriptor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-class HeaderClientInterceptor implements ClientInterceptor {
+class HeadersClientInterceptor implements ClientInterceptor {
 
-    private static final Logger logger = Logger.getLogger(HeaderClientInterceptor.class.getName());
+    private static final Logger logger = Logger.getLogger(HeadersClientInterceptor.class.getName());
     private static final Metadata.Key<String> CUSTOM_HEADER_KEY =
         Metadata.Key.of("custom_client_header", Metadata.ASCII_STRING_MARSHALLER);
 

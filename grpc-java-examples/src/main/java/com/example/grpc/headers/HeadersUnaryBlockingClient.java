@@ -1,4 +1,4 @@
-package com.example.grpc.header;
+package com.example.grpc.headers;
 
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoServiceGrpc;
@@ -11,16 +11,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class HeaderUnaryBlockingClient {
+public class HeadersUnaryBlockingClient {
 
-    private static final Logger logger = Logger.getLogger(HeaderUnaryBlockingClient.class.getName());
+    private static final Logger logger = Logger.getLogger(HeadersUnaryBlockingClient.class.getName());
 
     public static void main(String[] args) throws Exception {
         Loggers.init();
 
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         try {
-            var interceptor = new HeaderClientInterceptor();
+            var interceptor = new HeadersClientInterceptor();
             var blockingStub = EchoServiceGrpc.newBlockingStub(ClientInterceptors.intercept(channel, interceptor));
             var request = EchoRequest.newBuilder().setMessage("world").build();
             var response = blockingStub.unaryEcho(request);

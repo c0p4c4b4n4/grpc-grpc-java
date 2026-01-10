@@ -55,8 +55,8 @@ class ExampleNameResolver extends NameResolver {
     }
 
     private void resolve() {
-        var addresses = serviceNameToSocketAddresses.get(targetUri.getPath().substring(1));
         try {
+            var addresses = serviceNameToSocketAddresses.get(targetUri.getPath().substring(1));
             var equivalentAddressGroups = addresses.stream()
                 .map(this::toSocketAddress)
                 .map(Arrays::asList)

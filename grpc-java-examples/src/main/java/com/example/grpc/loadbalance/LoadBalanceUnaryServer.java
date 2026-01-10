@@ -22,7 +22,7 @@ public class LoadBalanceUnaryServer {
         Loggers.init();
 
         var servers = new ArrayList<Server>();
-        for (int port : Settings.SERVER_PORTS) {
+        for (var port : Settings.SERVER_PORTS) {
             servers.add(
                 ServerBuilder.forPort(port)
                     .addService(new EchoServiceImpl(port))
@@ -33,7 +33,7 @@ public class LoadBalanceUnaryServer {
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            for (Server server : servers) {
+            for (var server : servers) {
                 System.err.println("server is shutting down");
                 try {
                     server.shutdown().awaitTermination(10, TimeUnit.SECONDS);
@@ -44,7 +44,7 @@ public class LoadBalanceUnaryServer {
             }
         }));
 
-        for (Server server : servers) {
+        for (var server : servers) {
             server.awaitTermination();
         }
     }

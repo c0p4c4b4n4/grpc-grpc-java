@@ -1,4 +1,4 @@
-package com.example.grpc.header;
+package com.example.grpc.headers;
 
 import io.grpc.ForwardingServerCall.SimpleForwardingServerCall;
 import io.grpc.Metadata;
@@ -9,9 +9,9 @@ import io.grpc.ServerInterceptor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-class HeaderServerInterceptor implements ServerInterceptor {
+class HeadersServerInterceptor implements ServerInterceptor {
 
-    private static final Logger logger = Logger.getLogger(HeaderServerInterceptor.class.getName());
+    private static final Logger logger = Logger.getLogger(HeadersServerInterceptor.class.getName());
     private static final Metadata.Key<String> CUSTOM_HEADER_KEY =
         Metadata.Key.of("custom_server_header", Metadata.ASCII_STRING_MARSHALLER);
 

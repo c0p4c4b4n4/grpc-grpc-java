@@ -23,7 +23,7 @@ public class HealthServiceUnaryBlockingClient {
         try {
             var echoBlockingStub = EchoServiceGrpc.newBlockingStub(channel);
             var healthBlockingStub = HealthGrpc.newBlockingStub(channel);
-
+//TODO
             var users = new String[]{"Alpha", "Beta", "Gamma"};
             checkHealth(healthBlockingStub);
 

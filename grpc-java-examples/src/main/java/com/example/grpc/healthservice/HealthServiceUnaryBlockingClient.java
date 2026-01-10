@@ -40,7 +40,7 @@ public class HealthServiceUnaryBlockingClient {
             unaryEcho(echoBlockingStub, "Omega");
             checkHealth(healthBlockingStub);
         } finally {
-            channel.shutdownNow().awaitTermination(30, TimeUnit.SECONDS);
+            channel.shutdownNow().awaitTermination(10, TimeUnit.SECONDS);
         }
     }
 

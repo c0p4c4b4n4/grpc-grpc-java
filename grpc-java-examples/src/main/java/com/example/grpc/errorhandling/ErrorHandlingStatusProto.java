@@ -71,12 +71,12 @@ public class ErrorHandlingStatusProto {
     private static void verifyErrorResponse(Throwable t) {
         var status = StatusProto.fromThrowable(t);
 
-        Verify.verify(status.getCode() == Code.INVALID_ARGUMENT.getNumber());
-        Verify.verify(status.getMessage().equals(STATUS_MESSAGE));
+        verify(status.getCode() == Code.INVALID_ARGUMENT.getNumber());
+        verify(status.getMessage().equals(STATUS_MESSAGE));
 
         try {
             var unpackedDetail = status.getDetails(0).unpack(DebugInfo.class);
-            Verify.verify(unpackedDetail.equals(DEBUG_INFO));
+            verify(unpackedDetail.equals(DEBUG_INFO));
         } catch (InvalidProtocolBufferException e) {
             throw new VerifyException("Protobuf message is of a different type than expected");
         }

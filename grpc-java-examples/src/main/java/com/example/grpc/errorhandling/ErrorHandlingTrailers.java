@@ -70,12 +70,12 @@ public class ErrorHandlingTrailers {
         var status = Status.fromThrowable(t);
         var trailers = Status.trailersFromThrowable(t);
 
-        Verify.verify(status.getCode() == Status.Code.INTERNAL);
-        Verify.verify(trailers.containsKey(DEBUG_INFO_TRAILER_KEY));
-        Verify.verify(status.getDescription().equals(STATUS_DESCRIPTION));
+        verify(status.getCode() == Status.Code.INTERNAL);
+        verify(trailers.containsKey(DEBUG_INFO_TRAILER_KEY));
+        verify(status.getDescription().equals(STATUS_DESCRIPTION));
 
         try {
-            Verify.verify(trailers.get(DEBUG_INFO_TRAILER_KEY).equals(DEBUG_INFO));
+            verify(trailers.get(DEBUG_INFO_TRAILER_KEY).equals(DEBUG_INFO));
         } catch (IllegalArgumentException e) {
             throw new VerifyException(e);
         }

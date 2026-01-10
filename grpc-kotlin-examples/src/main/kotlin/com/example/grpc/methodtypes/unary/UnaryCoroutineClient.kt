@@ -8,8 +8,8 @@ import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 
-object UnaryBlockingClient {
-  private val logger = Logger.getLogger(UnaryBlockingClient::class.java.name)
+object UnaryCoroutineClient {
+  private val logger = Logger.getLogger(UnaryCoroutineClient::class.java.name)
 
   @JvmStatic
    fun main(args: Array<String>) = runBlocking {

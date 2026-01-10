@@ -1,13 +1,12 @@
 plugins {
   application
-//  alias(libs.plugins.kotlin.jvm)
 
   alias(libs.plugins.kotlin.jvm)
   alias(libs.plugins.protobuf)
 }
 
 dependencies {
-  protobuf(project(":protos"))
+//  protobuf(project(":protos"))
 
   api(libs.kotlinx.coroutines.core)
 

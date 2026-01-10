@@ -158,7 +158,7 @@ public class ErrorHandlingTrailers {
 
     private static void awaitCompletion(CountDownLatch done) {
         if (!Uninterruptibles.awaitUninterruptibly(done, 1, TimeUnit.SECONDS)) {
-            throw new RuntimeException("timeout!");
+            throw new RuntimeException("Await failed to complete within 1 second");
         }
     }
 }

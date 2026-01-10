@@ -76,7 +76,7 @@ public class ErrorHandlingStatusProto {
             var unpackedDetail = status.getDetails(0).unpack(DebugInfo.class);
             Verify.verify(unpackedDetail.equals(DEBUG_INFO));
         } catch (InvalidProtocolBufferException e) {
-            throw new VerifyException(e);
+            throw new VerifyException("Protobuf message is a different type than expected");
         }
     }
 
@@ -159,7 +159,7 @@ public class ErrorHandlingStatusProto {
 
     private static void awaitCompletion(CountDownLatch done) {
         if (!Uninterruptibles.awaitUninterruptibly(done, 1, TimeUnit.SECONDS)) {
-            throw new RuntimeException("timeout!");
+            throw new RuntimeException("Await failed to complete within 1 second");
         }
     }
 }

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/_raw/_jrthe42.grpc-service-demo.10f25s.unary-streaming" />
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/_raw/_saturnism.grpc-by-example-java.886s337f/gradle-kotlin-dsl" />
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/_raw/_saturnism.grpc-by-example-java.886s337f/simple-grpc-client-android" />
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/_raw/_techdozo.grpc.14f21s.unary-streaming/grpc-example" />
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/_raw/_techdozo.grpc.14f21s.unary-streaming/grpc-server-streaming-rpc" />
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/_raw/_techdozo.grpc.14f21s.unary-streaming/grpc-spring-boot" />
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/_raw/_techdozo.grpc.14f21s.unary-streaming/grpc-unary-rpc" />
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/_raw/_tzutalin.example-grpc.21f14s.file-upload/java" />
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/_raw/example1" />
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/examples" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/examples" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

@@ -4,14 +4,15 @@ import com.example.grpc.EchoServiceGrpcKt
 import com.example.grpc.echoRequest
 import io.grpc.ManagedChannelBuilder
 import io.grpc.StatusRuntimeException
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 
 object UnaryBlockingClient {
   private val logger = Logger.getLogger(UnaryBlockingClient::class.java.name)
 
-  @kotlin.jvm.JvmStatic
-  fun main(args: Array<String>) {
+  @JvmStatic
+   fun main(args: Array<String>) = runBlocking {
     val channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build()
     try {
       val stub = EchoServiceGrpcKt.EchoServiceCoroutineStub(channel)

@@ -11,7 +11,7 @@ import java.util.logging.Logger
 object UnaryServer {
   private val logger = Logger.getLogger(UnaryServer::class.java.name)
 
-  @kotlin.jvm.JvmStatic
+  @JvmStatic
   fun main(args: Array<String>) {
     val port = 50051
     val server: Server = ServerBuilder

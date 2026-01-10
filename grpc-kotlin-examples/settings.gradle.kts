@@ -1,44 +1,24 @@
 rootProject.name = "grpc-kotlin-examples"
 
-// when running the assemble task, ignore the android & graalvm related subprojects
-if (startParameter.taskRequests.find { it.args.contains("assemble") } == null) {
-  include(
+include(
     "protos",
     "stub",
-    "stub2",
-//    "stub-lite",
-    "client",
-//    "native-client",
-      "full",
-      "full2",
-    "server",
-//    "stub-android",
-//    "android"
-  )
-} else {
-  include(
-"protos",
- "stub", 
- "stub2", 
-"full",
-      "full2",
-"server"
+    "full"
 )
-}
 
 pluginManagement {
-  repositories {
-    gradlePluginPortal()
-    google()
-  }
+    repositories {
+        gradlePluginPortal()
+        google()
+    }
 }
 
 dependencyResolutionManagement {
-  @Suppress("UnstableApiUsage")
-  repositories {
-    mavenCentral()
-    google()
-  }
+    @Suppress("UnstableApiUsage")
+    repositories {
+        mavenCentral()
+        google()
+    }
 }
 
 plugins { id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0" }

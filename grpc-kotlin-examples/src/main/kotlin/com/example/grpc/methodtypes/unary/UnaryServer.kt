@@ -3,7 +3,6 @@ package com.example.grpc.methodtypes.unary
 import com.example.grpc.EchoRequest
 import com.example.grpc.EchoServiceGrpcKt
 import com.example.grpc.echoResponse
-import io.grpc.Server
 import io.grpc.ServerBuilder
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
@@ -13,14 +12,13 @@ object UnaryServer {
 
   @JvmStatic
   fun main(args: Array<String>) {
-    val port = 50051
-    val server: Server = ServerBuilder
-      .forPort(port)
+    val server = ServerBuilder
+      .forPort(50051)
       .addService(EchoServiceImpl())
       .build()
       .start()
 
-    logger.info("server started, listening on $port")
+    logger.info("server started, listening on $server.port")
 
     Runtime.getRuntime().addShutdownHook(
       Thread {

@@ -12,7 +12,7 @@ object UnaryCoroutineClient {
   private val logger = Logger.getLogger(UnaryCoroutineClient::class.java.name)
 
   @JvmStatic
-   fun main(args: Array<String>) = runBlocking {
+  fun main(args: Array<String>) = runBlocking {
     val channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build()
     try {
       val stub = EchoServiceGrpcKt.EchoServiceCoroutineStub(channel)

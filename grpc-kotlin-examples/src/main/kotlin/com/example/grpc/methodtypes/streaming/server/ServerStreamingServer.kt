@@ -3,7 +3,7 @@ package com.example.grpc.methodtypes.streaming.server
 import com.example.grpc.EchoRequest
 import com.example.grpc.EchoResponse
 import com.example.grpc.EchoServiceGrpcKt
-import io.grpc.Server
+import com.example.grpc.echoResponse
 import io.grpc.ServerBuilder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -15,14 +15,13 @@ object ServerStreamingServer {
 
   @JvmStatic
   fun main(args: Array<String>) {
-    val port = 50051
-    val server: Server = ServerBuilder
-      .forPort(port)
+    val server = ServerBuilder
+      .forPort(50051)
       .addService(EchoServiceImpl())
       .build()
       .start()
 
-    logger.info("server started, listening on $port")
+    logger.info("server started, listening on ${server.port}")
 
     Runtime.getRuntime().addShutdownHook(
       Thread {
@@ -43,9 +42,9 @@ object ServerStreamingServer {
     override fun serverStreamingEcho(request: EchoRequest): Flow<EchoResponse> {
       logger.info("request: ${request.message}")
       return flow {
-        emit(EchoResponse.newBuilder().setMessage("hello ${request.message}").build())
-        emit(EchoResponse.newBuilder().setMessage("guten tag ${request.message}").build())
-        emit(EchoResponse.newBuilder().setMessage("bonjour ${request.message}").build())
+        emit(echoResponse { message = "hello ${request.message}" })
+        emit(echoResponse { message = "guten tag ${request.message}" })
+        emit(echoResponse { message = "bonjour ${request.message}" })
       }
     }
   }

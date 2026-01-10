@@ -21,6 +21,15 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
   compilerOptions { freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn") }
 }
 
+sourceSets {
+    main {
+        proto {
+            // Adjust the path to where your .proto files are located in the submodule
+            srcDir("/src/main/proto")
+        }
+    }
+}
+
 protobuf {
   protoc { artifact = libs.protoc.asProvider().get().toString() }
   plugins {

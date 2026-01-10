@@ -65,7 +65,7 @@ class RouteGuideClient(private val channel: ManagedChannel) : Closeable {
       hi = point(hiLat, hiLon)
     }
     var i = 1
-    stub.listFeatures(request).collect { feature -> println("Result #${i++}: $feature") }
+     stub.listFeatures(request).collect { feature -> println("Result #${i++}: $feature") }
   }
 
   suspend fun recordRoute(points: Flow<Point>) {

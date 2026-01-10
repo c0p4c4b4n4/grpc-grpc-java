@@ -1,10 +1,12 @@
 package com.example.grpc.methodtypes.streaming.server
 
 import com.example.grpc.EchoRequest
+import com.example.grpc.EchoResponse
 import com.example.grpc.EchoServiceGrpcKt
-import com.example.grpc.echoResponse
 import io.grpc.Server
 import io.grpc.ServerBuilder
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 
@@ -38,8 +40,13 @@ object ServerStreamingServer {
   }
 
   private class EchoServiceImpl : EchoServiceGrpcKt.EchoServiceCoroutineImplBase() {
-    override suspend fun unaryEcho(request: EchoRequest) = echoResponse {
-      message = "hello ${request.message}"
+    override fun serverStreamingEcho(request: EchoRequest): Flow<EchoResponse> {
+      logger.info("request: ${request.message}")
+      return flow {
+        emit(EchoResponse.newBuilder().setMessage("hello ${request.message}").build())
+        emit(EchoResponse.newBuilder().setMessage("guten tag ${request.message}").build())
+        emit(EchoResponse.newBuilder().setMessage("bonjour ${request.message}").build())
+      }
     }
   }
 }

@@ -3,7 +3,6 @@ package com.example.grpc.errorhandling;
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
-import com.google.common.base.Verify;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -19,6 +18,8 @@ import org.jspecify.annotations.NonNull;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+
+import static com.google.common.base.Verify.verify;
 
 public class ErrorHandlingStatus {
 
@@ -51,8 +52,8 @@ public class ErrorHandlingStatus {
     private static void verifyErrorResponse(Throwable t) {
         var status = Status.fromThrowable(t);
 
-        Verify.verify(status.getCode() == Status.Code.INTERNAL);
-        Verify.verify(status.getDescription().equals(STATUS_DESCRIPTION));
+        verify(status.getCode() == Status.Code.INTERNAL);
+        verify(status.getDescription().equals(STATUS_DESCRIPTION));
     }
 
     private static void blockingCall(ManagedChannel channel) {

@@ -24,6 +24,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import static com.google.common.base.Verify.verify;
+
 public class ErrorHandlingTrailers {
 
     private static final Metadata.Key<DebugInfo> DEBUG_INFO_TRAILER_KEY =

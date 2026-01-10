@@ -26,6 +26,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import static com.google.common.base.Verify.verify;
+
 public class ErrorHandlingStatusProto {
 
     private static final DebugInfo DEBUG_INFO =

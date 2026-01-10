@@ -16,7 +16,7 @@ class HeaderClientInterceptor implements ClientInterceptor {
 
     private static final Logger logger = Logger.getLogger(HeaderClientInterceptor.class.getName());
     private static final Metadata.Key<String> CUSTOM_HEADER_KEY =
-        Metadata.Key.of("custom_client_header_key", Metadata.ASCII_STRING_MARSHALLER);
+        Metadata.Key.of("custom_client_header", Metadata.ASCII_STRING_MARSHALLER);
 
     @Override
     public <ReqT, RespT> ClientCall<ReqT, RespT> interceptCall(

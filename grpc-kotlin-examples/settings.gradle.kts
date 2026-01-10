@@ -5,6 +5,7 @@ if (startParameter.taskRequests.find { it.args.contains("assemble") } == null) {
   include(
     "protos",
     "stub",
+    "stub2",
 //    "stub-lite",
     "client",
 //    "native-client",
@@ -17,6 +18,7 @@ if (startParameter.taskRequests.find { it.args.contains("assemble") } == null) {
   include(
 "protos",
  "stub", 
+ "stub2", 
 "full",
 "server"
 )

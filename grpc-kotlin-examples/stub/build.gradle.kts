@@ -1,4 +1,7 @@
 plugins {
+  application
+//  alias(libs.plugins.kotlin.jvm)
+
   alias(libs.plugins.kotlin.jvm)
   alias(libs.plugins.protobuf)
 }
@@ -13,6 +16,8 @@ dependencies {
   api(libs.protobuf.java.util)
   api(libs.protobuf.kotlin)
   api(libs.grpc.kotlin.stub)
+
+  runtimeOnly(libs.grpc.netty)
 }
 
 kotlin { jvmToolchain(17) }

@@ -3,7 +3,6 @@ rootProject.name = "grpc-kotlin-examples"
 include(
     "protos",
     "stub",
-    "full"
 )
 
 pluginManagement {

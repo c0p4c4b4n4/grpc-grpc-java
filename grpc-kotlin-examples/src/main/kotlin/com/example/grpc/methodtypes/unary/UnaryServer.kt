@@ -5,9 +5,6 @@ import com.example.grpc.EchoServiceGrpcKt
 import com.example.grpc.echoResponse
 import io.grpc.Server
 import io.grpc.ServerBuilder
-import io.grpc.examples.helloworld.GreeterGrpcKt
-import io.grpc.examples.helloworld.HelloRequest
-import io.grpc.examples.helloworld.helloReply
 
 class UnaryServer(private val port: Int) {
   val server: Server = ServerBuilder.forPort(port).addService(EchoServiceImpl()).build()
@@ -35,7 +32,7 @@ class UnaryServer(private val port: Int) {
 
   internal class EchoServiceImpl : EchoServiceGrpcKt.EchoServiceCoroutineImplBase() {
     override suspend fun unaryEcho(request: EchoRequest) = echoResponse {
-        message = "Hello ${request.message}"
+      message = "hello ${request.message}"
     }
   }
 }

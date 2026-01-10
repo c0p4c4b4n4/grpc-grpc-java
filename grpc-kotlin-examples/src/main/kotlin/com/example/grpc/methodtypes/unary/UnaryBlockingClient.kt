@@ -4,8 +4,6 @@ import com.example.grpc.EchoServiceGrpcKt
 import com.example.grpc.echoRequest
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
-import io.grpc.examples.helloworld.GreeterGrpcKt.GreeterCoroutineStub
-import io.grpc.examples.helloworld.helloRequest
 import java.io.Closeable
 import java.util.concurrent.TimeUnit
 
@@ -15,7 +13,7 @@ class UnaryBlockingClient(private val channel: ManagedChannel) : Closeable {
   suspend fun greet(name: String) {
     val request = echoRequest { this.message = name }
     val response = stub.unaryEcho(request)
-    println("Received: ${response.message}")
+    println("response: ${response.message}")
   }
 
   override fun close() {
@@ -23,14 +21,8 @@ class UnaryBlockingClient(private val channel: ManagedChannel) : Closeable {
   }
 }
 
-/** Greeter, uses first argument as name to greet if present; greets "world" otherwise. */
 suspend fun main(args: Array<String>) {
-  val port = 50051
-
-  val channel = ManagedChannelBuilder.forAddress("localhost", port).usePlaintext().build()
-
+  val channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build()
   val client = UnaryBlockingClient(channel)
-
-  val user = "world"
-  client.greet(user)
+  client.greet("world")
 }

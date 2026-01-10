@@ -76,7 +76,7 @@ public class ErrorHandlingStatusProto {
             var unpackedDetail = status.getDetails(0).unpack(DebugInfo.class);
             Verify.verify(unpackedDetail.equals(DEBUG_INFO));
         } catch (InvalidProtocolBufferException e) {
-            throw new VerifyException("Protobuf message is a different type than expected");
+            throw new VerifyException("Protobuf message is of a different type than expected");
         }
     }
 

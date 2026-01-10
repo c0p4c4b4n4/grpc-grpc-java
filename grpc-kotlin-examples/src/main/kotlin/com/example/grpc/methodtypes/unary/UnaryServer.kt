@@ -5,41 +5,35 @@ import com.example.grpc.EchoServiceGrpcKt
 import com.example.grpc.echoResponse
 import io.grpc.Server
 import io.grpc.ServerBuilder
-
-class UnaryServer(private val port: Int) {
-  val server: Server = ServerBuilder.forPort(port).addService(EchoServiceImpl()).build()
-
-  fun start() {
-    server.start()
-    println("Server started, listening on $port")
-    Runtime.getRuntime()
-      .addShutdownHook(
-        Thread {
-          println("*** shutting down gRPC server since JVM is shutting down")
-          this@UnaryServer.stop()
-          println("*** server shut down")
-        },
-      )
-  }
-
-  private fun stop() {
-    server.shutdown()
-  }
-
-  fun blockUntilShutdown() {
-    server.awaitTermination()
-  }
-
-  internal class EchoServiceImpl : EchoServiceGrpcKt.EchoServiceCoroutineImplBase() {
-    override suspend fun unaryEcho(request: EchoRequest) = echoResponse {
-      message = "hello ${request.message}"
-    }
-  }
-}
+import java.util.concurrent.TimeUnit
 
 fun main() {
   val port = 50051
-  val server = UnaryServer(port)
-  server.start()
-  server.blockUntilShutdown()
+  val server: Server = ServerBuilder
+    .forPort(port)
+    .addService(EchoServiceImpl())
+    .build()
+    .start()
+
+  println("server started, listening on $port")
+
+  Runtime.getRuntime().addShutdownHook(
+    Thread {
+      println("server is shutting down")
+      try {
+        server.shutdown().awaitTermination(10, TimeUnit.SECONDS)
+      } catch (e: InterruptedException) {
+        server.shutdownNow()
+      }
+      println("server has been shut down")
+    },
+  )
+
+  server.awaitTermination()
+}
+
+private class EchoServiceImpl : EchoServiceGrpcKt.EchoServiceCoroutineImplBase() {
+  override suspend fun unaryEcho(request: EchoRequest) = echoResponse {
+    message = "hello ${request.message}"
+  }
 }

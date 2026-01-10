@@ -62,7 +62,7 @@ public class ErrorHandlingStatus {
             stub.unaryEcho(EchoRequest.newBuilder().build());
         } catch (Exception e) {
             verifyErrorResponse(e);
-            System.out.println("Blocking call received expected error details");
+            System.out.println("Blocking call received expected error response");
         }
     }
 
@@ -77,7 +77,7 @@ public class ErrorHandlingStatus {
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
             verifyErrorResponse(e.getCause());
-            System.out.println("Future direct call received expected error details");
+            System.out.println("Future direct call received expected error response");
         }
     }
 
@@ -95,15 +95,13 @@ public class ErrorHandlingStatus {
                 @Override
                 public void onFailure(@NonNull Throwable t) {
                     verifyErrorResponse(t);
-                    System.out.println("Future callback received expected error details");
+                    System.out.println("Future callback received expected error response");
                     done.countDown();
                 }
             },
             MoreExecutors.directExecutor());
 
-        if (!Uninterruptibles.awaitUninterruptibly(done, 1, TimeUnit.SECONDS)) {
-            throw new RuntimeException("timeout!");
-        }
+        awaitCompletion(done);
     }
 
     private static void asyncCall(ManagedChannel channel) {
@@ -120,7 +118,7 @@ public class ErrorHandlingStatus {
             @Override
             public void onError(Throwable t) {
                 verifyErrorResponse(t);
-                System.out.println("Async call received expected error details");
+                System.out.println("Async call received expected error response");
                 done.countDown();
             }
 
@@ -131,6 +129,10 @@ public class ErrorHandlingStatus {
         };
         stub.unaryEcho(request, responseObserver);
 
+        awaitCompletion(done);
+    }
+
+    private static void awaitCompletion(CountDownLatch done) {
         if (!Uninterruptibles.awaitUninterruptibly(done, 1, TimeUnit.SECONDS)) {
             throw new RuntimeException("timeout!");
         }

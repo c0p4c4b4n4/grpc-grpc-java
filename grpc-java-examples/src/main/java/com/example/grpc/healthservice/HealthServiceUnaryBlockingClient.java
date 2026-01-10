@@ -19,6 +19,7 @@ public class HealthServiceUnaryBlockingClient {
 
     public static void main(String[] args) throws Exception {
         Loggers.init();
+
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         try {
             var echoBlockingStub = EchoServiceGrpc.newBlockingStub(channel);

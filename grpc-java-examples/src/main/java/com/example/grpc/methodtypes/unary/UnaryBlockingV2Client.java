@@ -16,6 +16,7 @@ public class UnaryBlockingV2Client {
 
     public static void main(String[] args) throws Exception {
         Loggers.init();
+
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         try {
             var blockingStub = EchoServiceGrpc.newBlockingV2Stub(channel);

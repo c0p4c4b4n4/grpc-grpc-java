@@ -22,6 +22,7 @@ public class HealthServiceUnaryServer {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         Loggers.init();
+
         var health = new HealthStatusManager();
 
         var port = 50051;

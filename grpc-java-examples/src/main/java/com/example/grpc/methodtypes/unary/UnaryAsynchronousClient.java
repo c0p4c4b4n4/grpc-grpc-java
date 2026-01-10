@@ -19,6 +19,7 @@ public class UnaryAsynchronousClient {
 
     public static void main(String[] args) throws Exception {
         Loggers.init();
+
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         var asyncStub = EchoServiceGrpc.newStub(channel);
         var request = EchoRequest.newBuilder().setMessage("world").build();

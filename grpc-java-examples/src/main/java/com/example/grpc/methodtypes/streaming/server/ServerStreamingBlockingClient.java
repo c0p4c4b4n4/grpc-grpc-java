@@ -16,6 +16,7 @@ public class ServerStreamingBlockingClient {
 
     public static void main(String[] args) throws InterruptedException {
         Loggers.init();
+
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         try {
             var blockingStub = EchoServiceGrpc.newBlockingStub(channel);

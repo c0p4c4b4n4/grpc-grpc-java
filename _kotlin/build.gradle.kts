@@ -7,7 +7,6 @@ plugins {
 
 repositories {
     mavenCentral()
-    mavenLocal()
 }
 
 kotlin {
@@ -19,11 +18,15 @@ dependencies {
     implementation("io.grpc:grpc-services:${grpcVersion}")
     implementation("io.grpc:grpc-stub:$grpcVersion")
 
+//    implementation("com.google.protobuf:protobuf-kotlin:3.25.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+
     implementation("io.grpc:grpc-kotlin-stub:$grpcKotlinVersion")
     implementation("com.google.protobuf:protobuf-kotlin:$protobufVersion")
-    implementation(kotlin("stdlib"))
+//    implementation(kotlin("stdlib"))
 
-    runtimeOnly("io.grpc:grpc-netty-shaded:$grpcVersion")
+    // Transport (runtime only)
+    runtimeOnly("io.grpc:grpc-netty:1.63.0")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
@@ -31,58 +34,28 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 }
 
 protobuf {
-    protoc { artifact = libs.protoc.asProvider().get().toString() }
-    plugins {
-        create("grpc") { artifact = libs.protoc.gen.grpc.java.get().toString() }
-        create("grpckt") { artifact = libs.protoc.gen.grpc.kotlin.get().toString() + ":jdk8@jar" }
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.25.3"
     }
-    generateProtoTasks {
-        all().forEach {
-            it.plugins {
-                create("grpc")
-                create("grpckt")
-            }
-            it.builtins { create("kotlin") }
+
+    plugins {
+        id("grpc") {
+            artifact = "io.grpc:protoc-gen-grpc-java:1.63.0"
+        }
+        id("grpckt") {
+            artifact = "io.grpc:protoc-gen-grpc-kotlin:1.4.1:jdk8@jar"
         }
     }
-}
 
-//protobuf {
-//    protoc {
-//        artifact = "com.google.protobuf:protoc:$protobufVersion"
-//    }
-//
-//    plugins {
-////        id("grpc") {
-////            artifact = "io.grpc:protoc-gen-grpc-java:$grpcVersion"
-////        }
-//        id("grpckt") {
-//            artifact = "io.grpc:protoc-gen-grpc-kotlin:$grpcKotlinVersion:jdk8@jar"
-//        }
-//    }
-//
-//    generateProtoTasks {
-//        all().forEach {
-////            task ->
-////            task.plugins {
-//////                id("grpc")
-////                id("grpckt")
-////            }
-//            it.plugins {
-//                // Create a plugin configuration for gRPC Kotlin
-//                create("grpckt") {
-//                    artifact = "io.grpc:protoc-gen-grpc-kotlin:1.4.0:jdk8@jar" // Use a compatible gRPC Kotlin version
-//                }
-//            }
-//            it.builtins {
-//                // Also create a configuration for the default Kotlin built-in generator
-//                create("kotlin")
-//            }
-//        }
-//    }
-//}
-
-tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
-    mergeServiceFiles()
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    generateProtoTasks {
+        all().forEach { task ->
+            task.plugins {
+                id("grpc")
+                id("grpckt")
+            }
+            task.builtins {
+                id("kotlin")
+            }
+        }
+    }
 }

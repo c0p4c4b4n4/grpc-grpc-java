@@ -9,7 +9,8 @@ if (startParameter.taskRequests.find { it.args.contains("assemble") } == null) {
 //    "stub-lite",
     "client",
 //    "native-client",
-"full",
+      "full",
+      "full2",
     "server",
 //    "stub-android",
 //    "android"
@@ -20,6 +21,7 @@ if (startParameter.taskRequests.find { it.args.contains("assemble") } == null) {
  "stub", 
  "stub2", 
 "full",
+      "full2",
 "server"
 )
 }

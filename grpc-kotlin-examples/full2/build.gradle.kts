@@ -1,57 +1,39 @@
 plugins {
-    application
-    kotlin("jvm") version "1.9.23"
-    id("com.google.protobuf") version "0.9.4"
-}
-
-repositories {
-    mavenCentral()
-}
-
-kotlin {
-    jvmToolchain(17)
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.protobuf)
 }
 
 dependencies {
-    // gRPC + Protobuf
-    implementation("io.grpc:grpc-stub:1.63.0")
-    implementation("io.grpc:grpc-protobuf:1.63.0")
-    implementation("io.grpc:grpc-kotlin-stub:1.4.1")
+    protobuf(project(":protos"))
 
-    implementation("com.google.protobuf:protobuf-kotlin:3.25.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+    api(libs.kotlinx.coroutines.core)
 
-    // Transport (runtime only)
-    runtimeOnly("io.grpc:grpc-netty:1.63.0")
+    api(libs.grpc.stub)
+    api(libs.grpc.protobuf)
+    api(libs.protobuf.java.util)
+    api(libs.protobuf.kotlin)
+    api(libs.grpc.kotlin.stub)
 }
 
-application {
-    mainClass.set("com.example.main.AppKt")
+kotlin { jvmToolchain(17) }
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    compilerOptions { freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn") }
 }
 
 protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:3.25.3"
-    }
-
+    protoc { artifact = libs.protoc.asProvider().get().toString() }
     plugins {
-        id("grpc") {
-            artifact = "io.grpc:protoc-gen-grpc-java:1.63.0"
-        }
-        id("grpckt") {
-            artifact = "io.grpc:protoc-gen-grpc-kotlin:1.4.1:jdk8@jar"
-        }
+        create("grpc") { artifact = libs.protoc.gen.grpc.java.get().toString() }
+        create("grpckt") { artifact = libs.protoc.gen.grpc.kotlin.get().toString() + ":jdk8@jar" }
     }
-
     generateProtoTasks {
-        all().forEach { task ->
-            task.plugins {
-                id("grpc")
-                id("grpckt")
+        all().forEach {
+            it.plugins {
+                create("grpc")
+                create("grpckt")
             }
-            task.builtins {
-                id("kotlin")
-            }
+            it.builtins { create("kotlin") }
         }
     }
 }

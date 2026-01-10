@@ -24,12 +24,12 @@ public class HealthServiceUnaryBlockingClient {
         try {
             var echoBlockingStub = EchoServiceGrpc.newBlockingStub(channel);
             var healthBlockingStub = HealthGrpc.newBlockingStub(channel);
-//TODO
-            var users = new String[]{"Alpha", "Beta", "Gamma"};
+
+            var names = new String[]{"Alpha", "Beta", "Gamma"};
             checkHealth(healthBlockingStub);
 
-            for (var user : users) {
-                unaryEcho(echoBlockingStub, user);
+            for (var name : names) {
+                unaryEcho(echoBlockingStub, name);
                 Thread.sleep(100);
                 checkHealth(healthBlockingStub);
             }
@@ -38,7 +38,7 @@ public class HealthServiceUnaryBlockingClient {
             Delays.sleep(10);
             checkHealth(healthBlockingStub);
 
-            unaryEcho(echoBlockingStub, "Omega");
+            unaryEcho(echoBlockingStub, "Delta");
             checkHealth(healthBlockingStub);
         } finally {
             channel.shutdownNow().awaitTermination(10, TimeUnit.SECONDS);

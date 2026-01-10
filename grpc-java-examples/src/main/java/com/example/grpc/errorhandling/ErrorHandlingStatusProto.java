@@ -3,7 +3,6 @@ package com.example.grpc.errorhandling;
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
-import com.google.common.base.Verify;
 import com.google.common.base.VerifyException;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -73,10 +72,9 @@ public class ErrorHandlingStatusProto {
 
         verify(status.getCode() == Code.INVALID_ARGUMENT.getNumber());
         verify(status.getMessage().equals(STATUS_MESSAGE));
-
         try {
-            var unpackedDetail = status.getDetails(0).unpack(DebugInfo.class);
-            verify(unpackedDetail.equals(DEBUG_INFO));
+            var unpackedMessage = status.getDetails(0).unpack(DebugInfo.class);
+            verify(unpackedMessage.equals(DEBUG_INFO));
         } catch (InvalidProtocolBufferException e) {
             throw new VerifyException("Protobuf message is of a different type than expected");
         }

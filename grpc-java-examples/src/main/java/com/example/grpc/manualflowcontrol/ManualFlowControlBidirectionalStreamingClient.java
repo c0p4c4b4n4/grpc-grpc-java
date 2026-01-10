@@ -22,6 +22,7 @@ public class ManualFlowControlBidirectionalStreamingClient {
 
     public static void main(String[] args) throws InterruptedException {
         Loggers.init();
+
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         var stub = EchoServiceGrpc.newStub(channel);
 
@@ -34,7 +35,7 @@ public class ManualFlowControlBidirectionalStreamingClient {
             public void beforeStart(ClientCallStreamObserver<EchoRequest> requestStream) {
                 this.requestStream = requestStream;
                 requestStream.disableAutoRequestWithInitial(1);
-                requestStream.setOnReadyHandler(new OnReadyHandler(requestStream, Constants.getAlphabet().iterator()));
+                requestStream.setOnReadyHandler(new OnReadyHandler(requestStream, Constants.getNames().iterator()));
             }
 
             @Override

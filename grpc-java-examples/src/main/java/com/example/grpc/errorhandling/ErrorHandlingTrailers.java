@@ -3,8 +3,6 @@ package com.example.grpc.errorhandling;
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoResponse;
 import com.example.grpc.EchoServiceGrpc;
-import com.google.common.base.Verify;
-import com.google.common.base.VerifyException;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -73,12 +71,7 @@ public class ErrorHandlingTrailers {
         verify(status.getCode() == Status.Code.INTERNAL);
         verify(trailers.containsKey(DEBUG_INFO_TRAILER_KEY));
         verify(status.getDescription().equals(STATUS_DESCRIPTION));
-
-        try {
-            verify(trailers.get(DEBUG_INFO_TRAILER_KEY).equals(DEBUG_INFO));
-        } catch (IllegalArgumentException e) {
-            throw new VerifyException(e);
-        }
+        verify(trailers.get(DEBUG_INFO_TRAILER_KEY).equals(DEBUG_INFO));
     }
 
     private static void blockingCall(ManagedChannel channel) {

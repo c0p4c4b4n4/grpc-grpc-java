@@ -22,6 +22,7 @@ public class RetryingUnaryBlockingClient {
 
     public static void main(String[] args) throws Exception {
         Loggers.init();
+
         var enableRetries = !Boolean.parseBoolean(System.getenv("EXAMPLE_GRPC_DISABLE_RETRYING"));
         var channel = buildChannel(enableRetries);
         var blockingStub = EchoServiceGrpc.newBlockingStub(channel);
@@ -31,7 +32,7 @@ public class RetryingUnaryBlockingClient {
 
         try {
             var executor = new ForkJoinPool();
-            for (var name : Constants.getAlphabet()) {
+            for (var name : Constants.getNames()) {
                 executor.execute(() -> {
                     try {
                         var request = EchoRequest.newBuilder().setMessage(name).build();
@@ -48,13 +49,8 @@ public class RetryingUnaryBlockingClient {
             executor.awaitQuiescence(120, TimeUnit.SECONDS);
             executor.shutdown();
 
-            logger.log(Level.INFO, "retrying: {0}, total RPCs sent: {1}, total RPCs failed: {2}",
-                new Object[]{
-                    enableRetries ? "enabled" : "disabled",
-                    sentRPCs.get(),
-                    failedRPCs.get()
-                }
-            );
+            logger.log(Level.INFO, "retrying: {0}, sent RPCs: {1}, failed RPCs: {2}",
+                new Object[]{enableRetries ? "enabled" : "disabled", sentRPCs.get(), failedRPCs.get()});
         } catch (StatusRuntimeException e) {
             logger.log(Level.WARNING, "RPC error: {0}", e.getStatus());
         } finally {

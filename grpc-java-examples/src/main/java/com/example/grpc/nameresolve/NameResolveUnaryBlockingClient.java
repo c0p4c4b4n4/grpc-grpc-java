@@ -1,5 +1,6 @@
 package com.example.grpc.nameresolve;
 
+import com.example.grpc.Constants;
 import com.example.grpc.EchoRequest;
 import com.example.grpc.EchoServiceGrpc;
 import com.example.grpc.Loggers;
@@ -32,7 +33,7 @@ public class NameResolveUnaryBlockingClient {
             .build();
         try {
             for (int i = 0; i < 5; i++) {
-                unaryEcho(channel, "name" + i);
+                unaryEcho(channel, Constants.getNames().get(i));
             }
         } finally {
             channel.shutdownNow().awaitTermination(10, TimeUnit.SECONDS);
@@ -47,7 +48,7 @@ public class NameResolveUnaryBlockingClient {
             .build();
         try {
             for (int i = 0; i < 5; i++) {
-                unaryEcho(channel, "name" + i);
+                unaryEcho(channel, Constants.getNames().get(i));
             }
         } finally {
             channel.shutdownNow().awaitTermination(10, TimeUnit.SECONDS);

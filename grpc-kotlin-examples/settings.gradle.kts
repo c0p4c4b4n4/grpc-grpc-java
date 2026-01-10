@@ -1,9 +1,5 @@
 rootProject.name = "grpc-kotlin-examples"
 
-include(
-    "stub"
-)
-
 pluginManagement {
     repositories {
         gradlePluginPortal()

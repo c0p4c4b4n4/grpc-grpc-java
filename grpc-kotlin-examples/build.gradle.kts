@@ -1,10 +1,41 @@
 plugins {
-//  alias(libs.plugins.android.application) apply false
-//  alias(libs.plugins.android.library) apply false
-  alias(libs.plugins.compose.compiler) apply false
-  alias(libs.plugins.kotlin.jvm) apply false
-//  alias(libs.plugins.kotlin.android) apply false
-  alias(libs.plugins.protobuf) apply false
+    application
+
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.protobuf)
 }
 
-tasks.create("assemble").dependsOn(":server:installDist")
+dependencies {
+    api(libs.kotlinx.coroutines.core)
+
+    api(libs.grpc.stub)
+    api(libs.grpc.protobuf)
+    api(libs.protobuf.java.util)
+    api(libs.protobuf.kotlin)
+    api(libs.grpc.kotlin.stub)
+
+    runtimeOnly(libs.grpc.netty)
+}
+
+kotlin { jvmToolchain(17) }
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    compilerOptions { freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn") }
+}
+
+protobuf {
+    protoc { artifact = libs.protoc.asProvider().get().toString() }
+    plugins {
+        create("grpc") { artifact = libs.protoc.gen.grpc.java.get().toString() }
+        create("grpckt") { artifact = libs.protoc.gen.grpc.kotlin.get().toString() + ":jdk8@jar" }
+    }
+    generateProtoTasks {
+        all().forEach {
+            it.plugins {
+                create("grpc")
+                create("grpckt")
+            }
+            it.builtins { create("kotlin") }
+        }
+    }
+}

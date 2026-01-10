@@ -25,6 +25,7 @@ public class DeadlineServerStreamingServer {
         public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
             logger.log(Level.INFO, "request: {0}", request.getMessage());
             var context = Context.current();
+
             for (var i = 0; i <= 9; i++) {
                 if (context.isCancelled()) {
                     logger.log(Level.WARNING, "cancelled by client: ", context.cancellationCause());

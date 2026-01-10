@@ -17,6 +17,7 @@ public class CancellationServerStreamingBlockingClient {
 
     public static void main(String[] args) throws InterruptedException {
         Loggers.init();
+
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         try (var cancellableContext = Context.current().withCancellation()) {
             var blockingStub = EchoServiceGrpc.newBlockingStub(channel);
@@ -29,7 +30,7 @@ public class CancellationServerStreamingBlockingClient {
                 while (responses.hasNext()) {
                     logger.log(Level.INFO, "next response: {0}", responses.next().getMessage());
                     if (++i > 3) {
-                        cancellableContext.cancel(new Exception("Client cancelled"));
+                        cancellableContext.cancel(new Exception("Client cancelled the context"));
                     }
                 }
             });

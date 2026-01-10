@@ -25,6 +25,7 @@ public class CancellationServerStreamingServer {
         public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
             logger.log(Level.INFO, "request: {0}", request.getMessage());
             var serverObserver = (ServerCallStreamObserver<EchoResponse>) responseObserver;
+
             for (var i = 0; i <= 9; i++) {
                 if (serverObserver.isCancelled()) {
                     logger.info("server received cancellation");

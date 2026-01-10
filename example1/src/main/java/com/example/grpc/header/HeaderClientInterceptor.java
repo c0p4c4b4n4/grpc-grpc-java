@@ -12,7 +12,7 @@ import io.grpc.MethodDescriptor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class HeaderClientInterceptor implements ClientInterceptor {
+class HeaderClientInterceptor implements ClientInterceptor {
 
     private static final Logger logger = Logger.getLogger(HeaderClientInterceptor.class.getName());
     private static final Metadata.Key<String> CUSTOM_HEADER_KEY =

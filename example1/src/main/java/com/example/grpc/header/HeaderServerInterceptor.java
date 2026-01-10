@@ -9,7 +9,7 @@ import io.grpc.ServerInterceptor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class HeaderServerInterceptor implements ServerInterceptor {
+class HeaderServerInterceptor implements ServerInterceptor {
 
     private static final Logger logger = Logger.getLogger(HeaderServerInterceptor.class.getName());
     private static final Metadata.Key<String> CUSTOM_HEADER_KEY =

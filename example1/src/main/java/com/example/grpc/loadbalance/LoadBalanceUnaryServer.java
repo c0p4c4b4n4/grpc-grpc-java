@@ -33,16 +33,16 @@ public class LoadBalanceUnaryServer {
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.err.println("servers are shutting down");
             for (Server server : servers) {
+                System.err.println("server is shutting down");
                 try {
                     server.shutdown().awaitTermination(5, TimeUnit.SECONDS);
                 } catch (InterruptedException e) {
                     System.err.println("server shutdown was interrupted");
                     server.shutdownNow();
                 }
+                System.err.println("server has been shut down");
             }
-            System.err.println("servers have been shut down");
         }));
 
         for (Server server : servers) {

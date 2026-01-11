@@ -1,6 +1,7 @@
 package com.example.grpc.methodtypes.streaming.server
 
 import com.example.grpc.EchoServiceGrpcKt
+import com.example.grpc.Loggers
 import com.example.grpc.echoRequest
 import io.grpc.ManagedChannelBuilder
 import io.grpc.StatusRuntimeException
@@ -13,6 +14,8 @@ object ServerStreamingCoroutineClient {
 
   @JvmStatic
   fun main(args: Array<String>) = runBlocking {
+    Loggers.init()
+
     val channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build()
     try {
       val stub = EchoServiceGrpcKt.EchoServiceCoroutineStub(channel)

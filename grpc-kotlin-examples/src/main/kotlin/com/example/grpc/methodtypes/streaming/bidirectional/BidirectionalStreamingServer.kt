@@ -4,6 +4,7 @@ import com.example.grpc.EchoRequest
 import com.example.grpc.EchoResponse
 import com.example.grpc.EchoServiceGrpcKt
 import com.example.grpc.Servers
+import com.example.grpc.echoResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.util.logging.Logger
@@ -20,10 +21,9 @@ object BidirectionalStreamingServer {
     override fun bidirectionalStreamingEcho(requests: Flow<EchoRequest>): Flow<EchoResponse> = flow {
       requests.collect { request ->
         logger.info("next request: ${request.message}")
-        emit(EchoResponse.newBuilder().setMessage("hello ${request.message}").build())
-        emit(EchoResponse.newBuilder().setMessage("guten tag ${request.message}").build())
-        emit(EchoResponse.newBuilder().setMessage("bonjour ${request.message}").build())
-      }
+        emit(echoResponse { message = "hello ${request.message}" })
+        emit(echoResponse { message = "guten tag ${request.message}" })
+        emit(echoResponse { message = "bonjour ${request.message}" })      }
     }
   }
 }

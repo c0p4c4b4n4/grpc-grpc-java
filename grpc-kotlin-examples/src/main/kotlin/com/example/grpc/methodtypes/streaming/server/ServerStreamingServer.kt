@@ -19,11 +19,12 @@ object ServerStreamingServer {
 
   private class EchoServiceImpl : EchoServiceGrpcKt.EchoServiceCoroutineImplBase() {
     override fun serverStreamingEcho(request: EchoRequest): Flow<EchoResponse> {
-      logger.info("request: ${request.message}")
+      val name = request.message
+      logger.info("request: $name")
       return flow {
-        emit(echoResponse { message = "hello ${request.message}" })
-        emit(echoResponse { message = "guten tag ${request.message}" })
-        emit(echoResponse { message = "bonjour ${request.message}" })
+        emit(echoResponse { message = "hello $name" })
+        emit(echoResponse { message = "guten tag $name" })
+        emit(echoResponse { message = "bonjour $name" })
       }
     }
   }

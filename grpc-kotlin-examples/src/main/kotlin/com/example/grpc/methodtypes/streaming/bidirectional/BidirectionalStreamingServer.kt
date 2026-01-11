@@ -20,10 +20,11 @@ object BidirectionalStreamingServer {
   private class EchoServiceImpl : EchoServiceGrpcKt.EchoServiceCoroutineImplBase() {
     override fun bidirectionalStreamingEcho(requests: Flow<EchoRequest>): Flow<EchoResponse> = flow {
       requests.collect { request ->
-        logger.info("next request: ${request.message}")
-        emit(echoResponse { message = "hello ${request.message}" })
-        emit(echoResponse { message = "guten tag ${request.message}" })
-        emit(echoResponse { message = "bonjour ${request.message}" })      }
+        val name = request.message
+        logger.info("next request: $name")
+        emit(echoResponse { message = "hello $name" })
+        emit(echoResponse { message = "guten tag $name" })
+        emit(echoResponse { message = "bonjour $name" })      }
     }
   }
 }

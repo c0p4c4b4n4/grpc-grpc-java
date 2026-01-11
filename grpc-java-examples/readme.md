@@ -3,7 +3,7 @@
 
 #### What is gRPC?
 
-gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed for high-performance inter-service communication both on-premise and in the cloud, as well as for resource-constrained mobile and IoT applications.
+gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed for high-performance inter-service communication on-premise, in the cloud or in the container, as well as for resource-constrained mobile and IoT applications.
 
 gRPC uses HTTP/2 as the transport protocol and Protocol Buffers as a binary serialization format and RPC interface description language. Thanks to these features, gRPC can provide qualitative and quantitative characteristics of communication between services that are not available for RESTful applications, which typically means transferring textual JSONs over the HTTP/1.1 protocol.
 
@@ -20,12 +20,12 @@ However, with REST architecture, problems arise when implementing client-server 
 * Low-latency and high-throughput communication.
 * Client streaming or bidirectional streaming.
 
-RPC is based on the technique of calling methods in another process — either on the same machine or on a different machine over the network — as if they were local methods. RPC frameworks provide code generation tools that create client and server stubs based on a given RPC interface. These stubs handle data serialization and network communication. As a result, when a client calls a remote method with parameters and receives a return value, it looks like a local method call. RPC frameworks aim to hide the complexity of serialization and network communication from developers.
+RPC is based on the technique of calling methods in another process — either on the same machine or on a different machine over the network — as if they were local methods. RPC frameworks provide code generation tools that create client and server stubs based on a given RPC interface. These stubs handle data serialization and network communication. As a result, when a client invokes a remote method with parameters and receives a return value, it looks like a local method call. RPC frameworks aim to hide the complexity of serialization and network communication from developers.
 
 
 #### The problem
 
-When developing an effective RPC framework, developers had to address two primary challenges. First, developers needed to ensure efficient cross-language serialization. Solutions, based on textual formats (such as JSON, YAML, or XML), are typically an order of magnitude less efficient than binary formats. They require additional computational resources for serialization and additional network resources for transmitting larger messages.
+When developing an effective RPC framework, developers had to address two primary challenges. First, developers needed to ensure efficient cross-language serialization. Solutions, based on textual formats (such as JSON, YAML, or XML), are typically an order of magnitude less efficient than binary formats. They require additional computational resources for serialization and additional network bandwidth for transmitting larger messages.
 
 Second, there was an absence of an efficient application-layer protocol specifically designed for modern inter-service communication. The HTTP protocol was originally designed for browsers to retrieve resources within the hypermedia network. It was not designed to support high-speed, bidirectional, simultaneous communication. Various workarounds based on this protocol (short and long polling, streaming, webhooks) were inherently inefficient in their utilization of computational and network resources.
 
@@ -36,7 +36,7 @@ Since 2001, Google has been developing an internal RPC framework named Stubby. I
 
 Only in 2015, with the emergence of the innovative HTTP/2 protocol, Google decided to leverage its features in a redesigned version of Stubby. References to Google's internal infrastructure (mainly name resolution and load balancing) were removed from the framework, and the project was redesigned to comply with public open source standards. The framework has also been adapted for use in mobile devices, IoT, and cloud-native applications. This updated version was released as gRPC (which recursively stands for **g**RPC **R**emote **P**rocedure **C**alls).
 
-Today, gRPC remains the primary mechanism for inter-service communication at Google. Also, Google offers gRPC interfaces alongside REST interfaces for many of its public services. This is because gRPC provides notable performance benefits and supports bidirectional streaming — a feature that is not achievable with traditional RESTful services. At the time of writing, gRPC applications running in Google data centers support extremely high *queries per second* at the 10<sup>10</sup> scale.
+Today, gRPC remains the primary mechanism for inter-service communication at Google. Also, Google offers gRPC interfaces alongside REST interfaces for many of its public services. This is because gRPC provides notable performance benefits and supports bidirectional streaming — a feature that is not achievable with traditional RESTful services. At the time of writing, gRPC applications running in Google data centers support extremely high O(10<sup>10</sup>) queries per second.
 
 
 #### gRPC foundations
@@ -46,7 +46,7 @@ The gRPC framework includes two main components:
 
 
 * HTTP/2 — an application-layer protocol used as transport protocol
-* Protocol Buffers — an serialization framework and interface definition language
+* Protocol Buffers — a serialization framework and interface definition language
 
 
 ##### HTTP/2
@@ -66,7 +66,7 @@ The third improvement is header compression using the HPACK algorithm, which lev
 
 Protocol Buffers (Protobuf) is a multi-language interface definition language and serialization framework for effective data exchange over the network. Protobuf definitions describe the service contract, including the RPC methods exposed by the server as well as the structure of request and response messages. This contract is strongly typed and explicitly designed to support forward and backward compatibility.
 
-As a serialization framework, Protobuf is designed to encode structured data — which is common for the object-oriented programming languages — into a compact binary format. The resulting binary messages are efficient not only for network transmission but also for persistent storage. Protobuff message format conceptually similar to JSON, but it is significantly smaller and faster in terms of both transferred bytes and computational overhead.
+As a serialization framework, Protobuf is designed to encode structured data — which is common for the object-oriented programming languages — into a compact binary format. The resulting binary messages are efficient not only for transmission over the network, but also for persistent storage. Protobuf message format conceptually similar to JSON, but it is significantly smaller and faster in terms of both transferred bytes and computational resources.
 
 As an interface definition language (IDL), the Protobuf compiler generates client and service stubs from declared RPC methods, which developers should use to implement their application-specific logic. The compiler also generates immutable message classes with convenient builders. The Protobuf compiler provides language-specific runtime libraries that transparently handle binary serialization and deserialization and transmission binary messages over the network. While this auto-generated code is not always as readable as human-written code, as it is primarily highly optimized for performance.
 
@@ -149,18 +149,6 @@ For the EchoService, an EchoServiceGrpc class is generated, containing inner cla
 * EchoServiceBlockingV2Stub: to make synchronous calls (it supports unary calls as a stable feature and all 3 streaming calls as experimental features), but can throw checked StatusException instead of runtime StatusRuntimeException.
 * EchoServiceFutureStub: to asynchronous calls with the [ListenableFuture](https://javadoc.io/doc/com.google.guava/guava/latest/com/google/common/util/concurrent/ListenableFuture.html) interface (it supports unary calls only)
 
-The [StreamObserver](https://grpc.github.io/grpc-java/javadoc/io/grpc/stub/StreamObserver.html) interface serves as the API for an observable stream of messages. It is used by both clients and services to send and receive messages. For outbound messages, the gRPC library provides an observer instance, and the sender should invoke its methods to transmit messages. To send the next message, you should invoke the onNext method; to complete the RPC with an error, you should invoke the onError method; to successfully complete the RPC, you should invoke the onCompleted method. For inbound messages, the receiver implements this interface and passes it to the gRPC library, which will call the appropriate methods upon the corresponding events:
-
-
-```
-public interface StreamObserver<V> {
-  void onNext(V value);
-  void onError(Throwable t);
-  void onCompleted();
-}
-```
-
-
 
 ##### Creating the server
 
@@ -178,19 +166,15 @@ To process a client request, the server performs the following steps: for each m
 
 ```
 private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
-    @Override
-    public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-        logger.log(Level.INFO, "request: {0}", request.getMessage());
-
-        var response1 = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
-        responseObserver.onNext(response1);
-        var response2 = EchoResponse.newBuilder().setMessage("guten tag " + request.getMessage()).build();
-        responseObserver.onNext(response2);
-        var response3 = EchoResponse.newBuilder().setMessage("bonjour " + request.getMessage()).build();
-        responseObserver.onNext(response3);
-
-        responseObserver.onCompleted();
-    }
+   @Override
+   public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
+       var message = request.getMessage();
+       logger.log(Level.INFO, "request: {0}", message);
+       responseObserver.onNext(EchoResponse.newBuilder().setMessage("hello " + message).build());
+       responseObserver.onNext(EchoResponse.newBuilder().setMessage("guten tag " + message).build());
+       responseObserver.onNext(EchoResponse.newBuilder().setMessage("bonjour " + message).build());
+       responseObserver.onCompleted();
+   }
 }
 ```
 
@@ -200,13 +184,13 @@ To implement a gRPC server that provides this service, use the ServerBuilder cla
 
 
 ```
-var port = 50051;
-var server = ServerBuilder.forPort(port)
+var server = ServerBuilder
+   .forPort(50051)
    .addService(new EchoServiceImpl())
    .build()
    .start();
 
-logger.log(Level.INFO, "server started, listening on {0}", port);
+logger.log(Level.INFO, "server started, listening on {0}", server.getPort());
 
 Runtime.getRuntime().addShutdownHook(new Thread(() -> {
    System.err.println("server is shutting down");
@@ -338,9 +322,9 @@ gRPC is an effective framework for implementing inter-service communication. How
 * The application requires client streaming or bidirectional streaming, which cannot be efficiently implemented using HTTP/1.1.
 * Automatic generation of gRPC service and client stubs is available for all required programming languages and platforms.
 * Both the client and server are developed within the same organization, and the application operates in a controlled environment.
-* Your organization has strong development standards that require clearly defined client-server contracts specified in *.proto* files.
-* Developers benefit from built-in gRPC request hadling capabilities, such as deadline, retries, cancellation, manual flow control, error handling, etc.
-* Developers benefit from built-in gRPC cloud-native capabilities, such as load balancing, authentication, health checking, etc.
+* Your organization has strong development standards that require strongly defined client-server contracts.
+* Developers benefit from built-in gRPC request handling capabilities, such as retry/deadline/cancellation, manual flow control, error handling, interceptors, etc.
+* Developers benefit from built-in gRPC cloud-native capabilities, such as authentication, name resolution, client-side load balancing, health checking, proxyless service mesh, etc.
 
 However, REST is a more appropriate architecture if the application meets most of the following conditions:
 

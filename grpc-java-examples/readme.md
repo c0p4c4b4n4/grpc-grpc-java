@@ -5,7 +5,7 @@
 
 gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed for high-performance inter-service communication on-premise or in the cloud, as well as for resource-constrained mobile and IoT applications.
 
-gRPC uses HTTP/2 as the transport protocol and Protocol Buffers as a binary serialization format and RPC interface description language. Thanks to these features, gRPC can provide qualitative and quantitative characteristics of communication between services that are not available for RESTful applications, which typically means transferring textual JSONs over the HTTP/1.1 protocol.
+gRPC uses HTTP/2 as the transport protocol along with Protocol Buffers as a binary serialization format and RPC interface description language. Thanks to these features, gRPC can provide qualitative and quantitative characteristics of communication between services that are not available for RESTful applications, which typically means transferring textual JSONs over the HTTP/1.1 protocol.
 
 
 #### Why not REST?
@@ -168,11 +168,13 @@ To process a client request, the server performs the following steps: for each m
 private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
    @Override
    public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-       var message = request.getMessage();
+       var name = request.getMessage();
        logger.log(Level.INFO, "request: {0}", message);
-       responseObserver.onNext(EchoResponse.newBuilder().setMessage("hello " + message).build());
-       responseObserver.onNext(EchoResponse.newBuilder().setMessage("guten tag " + message).build());
-       responseObserver.onNext(EchoResponse.newBuilder().setMessage("bonjour " + message).build());
+
+       responseObserver.onNext(EchoResponse.newBuilder().setMessage("hello " + name).build());
+       responseObserver.onNext(EchoResponse.newBuilder().setMessage("guten tag " + name).build());
+       responseObserver.onNext(EchoResponse.newBuilder().setMessage("bonjour " + name).build());
+
        responseObserver.onCompleted();
    }
 }
@@ -190,7 +192,7 @@ var server = ServerBuilder
    .build()
    .start();
 
-logger.log(Level.INFO, "server started, listening on {0}", server.getPort());
+logger.log(Level.INFO, "server started, listening on {0,number,#}", server.getPort());
 
 Runtime.getRuntime().addShutdownHook(new Thread(() -> {
    System.err.println("server is shutting down");
@@ -287,29 +289,7 @@ In this implementation, the client *does not block* on the serverStreamingEcho m
 
 To build the application, run the Gradle *shadowJar* task to produce a self-contained (über) JAR that does not declare a main Java class. Then, start the client and server in any order. Because the client stub is configured to wait for server readiness, it will wait until the server becomes available or the specified deadline is reached.
 
-
-```
-./gradlew clean shadowJar
-
-java -cp build/libs/examples-all.jar com.example.grpc.echo.streaming.server.ServerStreamingEchoServer
-server started, listening on 50051
-request: world
-
-java -cp build/libs/examples-all.jar com.example.grpc.echo.streaming.server.ServerStreamingEchoBlockingClient
-response: hello world
-response: guten tag world
-response: bonjour world
-```
-
-
-To stop the server, press Ctrl+C to send a SIGINT signal. The server then shuts down gracefully as the JVM executes its registered shutdown hooks. We use logging to *stderr* here since the logger may have been reset by its JVM shutdown hook:
-
-
-```
-server is shutting down
-server has been shut down
-```
-
+After the client has sent a request to the server and received a response from it, it closes the channel and stops itself. To stop the server, press Ctrl+C to send a SIGINT signal to it. The server then shuts down gracefully as the JVM executes its registered shutdown hooks. We use logging to *stderr* here since the logger may have been reset by its JVM shutdown hook:
 
 
 #### Conclusion
@@ -323,8 +303,8 @@ gRPC is an effective framework for implementing inter-service communication. How
 * Automatic generation of gRPC service and client stubs is available for all required programming languages and platforms.
 * Both the client and server are developed within the same organization, and the application operates in a controlled environment.
 * Your organization has strong development standards that require strongly defined client-server contracts.
-* Developers benefit from built-in gRPC request handling capabilities, such as retry/deadline/cancellation, manual flow control, error handling, interceptors, etc.
-* Developers benefit from built-in gRPC cloud-native capabilities, such as authentication, name resolution, client-side load balancing, health checking, proxyless service mesh, etc.
+* Development will benefit from built-in gRPC request handling capabilities, such as retry/deadline/cancellation, manual flow control, error handling, interceptors, etc.
+* Development will benefit from built-in gRPC cloud-native capabilities, such as authentication, name resolution, client-side load balancing, health checking, proxyless service mesh, etc.
 
 However, REST is a more appropriate architecture if the application meets most of the following conditions:
 

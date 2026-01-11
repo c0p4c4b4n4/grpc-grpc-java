@@ -1,4 +1,4 @@
-package com.example.grpc.methodtypes.streaming.client
+package com.example.grpc.methodtypes.streaming.bidirectional
 
 import com.example.grpc.EchoServiceGrpcKt
 import com.example.grpc.echoRequest
@@ -9,8 +9,8 @@ import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 
-object ClientStreamingCoroutineClient {
-  private val logger = Logger.getLogger(ClientStreamingCoroutineClient::class.java.name)
+object BidirectionalStreamingCoroutineClient {
+  private val logger = Logger.getLogger(BidirectionalStreamingCoroutineClient::class.java.name)
 
   @JvmStatic
   fun main(args: Array<String>) = runBlocking {

@@ -31,7 +31,6 @@ object BidirectionalStreamingCoroutineClient {
       responses.collect { response ->
         logger.info("next response: ${response.message}")
       }
-      logger.info("completed")
     } catch (e: StatusRuntimeException) {
       logger.warning("RPC error: ${e.status}")
     } finally {

@@ -1,4 +1,4 @@
-package com.example.grpc.methodtypes.streaming.bidirectional
+package com.example.grpc
 
 import com.example.grpc.EchoRequest
 import com.example.grpc.EchoResponse
@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.flow
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 
-object BidirectionalStreamingServer {
-  private val logger = Logger.getLogger(BidirectionalStreamingServer::class.java.name)
+object Servers {
+  private val logger = Logger.getLogger(Servers::class.java.name)
 
   @JvmStatic
   fun main(args: Array<String>) {

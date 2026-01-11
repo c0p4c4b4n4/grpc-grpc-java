@@ -19,12 +19,10 @@ object ClientStreamingServer {
   private class EchoServiceImpl : EchoServiceGrpcKt.EchoServiceCoroutineImplBase() {
     override suspend fun clientStreamingEcho(requests: Flow<EchoRequest>): EchoResponse {
       val responses = mutableListOf<String>()
-
       requests.collect { request ->
         logger.info("next request: ${request.message}")
         responses.add("hello ${request.message}")
       }
-
       return echoResponse { message = responses.joinToString(", ") }
     }
   }

@@ -20,13 +20,11 @@ object BidirectionalStreamingCoroutineClient {
     val channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build()
     try {
       val stub = EchoServiceGrpcKt.EchoServiceCoroutineStub(channel)
-
       val requests = flow {
         emit(echoRequest { this.message = "world" })
         emit(echoRequest { this.message = "welt" })
         emit(echoRequest { this.message = "monde" })
       }
-
       val responses = stub.bidirectionalStreamingEcho(requests)
       responses.collect { response ->
         logger.info("next response: ${response.message}")

@@ -20,13 +20,11 @@ object ClientStreamingCoroutineClient {
     val channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build()
     try {
       val stub = EchoServiceGrpcKt.EchoServiceCoroutineStub(channel)
-
       val requests = flow {
         emit(echoRequest { this.message = "world" })
         emit(echoRequest { this.message = "welt" })
         emit(echoRequest { this.message = "monde" })
       }
-
       val response = stub.clientStreamingEcho(requests)
       logger.info("response: ${response.message}")
     } catch (e: StatusRuntimeException) {

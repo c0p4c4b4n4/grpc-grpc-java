@@ -4,9 +4,6 @@ import com.example.grpc.EchoRequest
 import com.example.grpc.EchoServiceGrpcKt
 import com.example.grpc.Servers
 import com.example.grpc.echoResponse
-import io.grpc.ServerBuilder
-import java.util.concurrent.TimeUnit
-import java.util.logging.Logger
 
 object UnaryServer {
 

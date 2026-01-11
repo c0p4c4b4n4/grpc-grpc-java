@@ -4,6 +4,7 @@ import com.example.grpc.EchoServiceGrpcKt
 import com.example.grpc.echoRequest
 import io.grpc.ManagedChannelBuilder
 import io.grpc.StatusRuntimeException
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
@@ -16,10 +17,15 @@ object ClientStreamingCoroutineClient {
     val channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build()
     try {
       val stub = EchoServiceGrpcKt.EchoServiceCoroutineStub(channel)
-      val request = echoRequest { this.message = "world" }
-      stub.serverStreamingEcho(request).collect { response ->
-        logger.info("response: ${response.message}")
+
+      val requestFlow = flow {
+        emit(echoRequest { this.message = "world" })
+        emit(echoRequest { this.message = "welt" })
+        emit(echoRequest { this.message = "monde" })
       }
+
+      val response = stub.clientStreamingEcho(requestFlow)
+      logger.info("response: ${response.message}")
     } catch (e: StatusRuntimeException) {
       logger.warning("RPC error: ${e.status}")
     } finally {

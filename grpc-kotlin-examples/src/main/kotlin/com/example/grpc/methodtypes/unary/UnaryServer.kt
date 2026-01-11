@@ -37,6 +37,6 @@ object UnaryServer {
 
   private class EchoServiceImpl : EchoServiceGrpcKt.EchoServiceCoroutineImplBase() {
     override suspend fun unaryEcho(request: EchoRequest) =
-      echoResponse { message = "hello ${request.message}"}
+      echoResponse { message = "hello ${request.message}" }
   }
 }

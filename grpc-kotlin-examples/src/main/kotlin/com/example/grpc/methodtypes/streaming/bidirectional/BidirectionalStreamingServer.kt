@@ -3,6 +3,7 @@ package com.example.grpc.methodtypes.streaming.bidirectional
 import com.example.grpc.EchoRequest
 import com.example.grpc.EchoResponse
 import com.example.grpc.EchoServiceGrpcKt
+import com.example.grpc.Loggers
 import io.grpc.ServerBuilder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -14,6 +15,8 @@ object BidirectionalStreamingServer {
 
   @JvmStatic
   fun main(args: Array<String>) {
+    Loggers.init()
+
     val server = ServerBuilder
       .forPort(50051)
       .addService(EchoServiceImpl())
@@ -45,6 +48,7 @@ object BidirectionalStreamingServer {
         emit(EchoResponse.newBuilder().setMessage("guten tag ${request.message}").build())
         emit(EchoResponse.newBuilder().setMessage("bonjour ${request.message}").build())
       }
+      logger.info("completed")
     }
   }
 }

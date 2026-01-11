@@ -24,8 +24,11 @@ object BidirectionalStreamingCoroutineClient {
         emit(echoRequest { this.message = "monde" })
       }
 
-      val response = stub.clientStreamingEcho(requests)
-      logger.info("response: ${response.message}")
+      val responses = stub.bidirectionalStreamingEcho(requests)
+      responses.collect { response ->
+        logger.info("next response: ${response.message}")
+      }
+      logger.info("completed")
     } catch (e: StatusRuntimeException) {
       logger.warning("RPC error: ${e.status}")
     } finally {

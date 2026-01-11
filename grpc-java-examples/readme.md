@@ -3,7 +3,7 @@
 
 #### What is gRPC?
 
-gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed for high-performance inter-service communication on-premise, in the cloud or in the container, as well as for resource-constrained mobile and IoT applications.
+gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed for high-performance inter-service communication on-premise or in the cloud, as well as for resource-constrained mobile and IoT applications.
 
 gRPC uses HTTP/2 as the transport protocol and Protocol Buffers as a binary serialization format and RPC interface description language. Thanks to these features, gRPC can provide qualitative and quantitative characteristics of communication between services that are not available for RESTful applications, which typically means transferring textual JSONs over the HTTP/1.1 protocol.
 
@@ -45,7 +45,7 @@ The gRPC framework includes two main components:
 
 
 
-* HTTP/2 — an application-layer protocol used as transport protocol
+* HTTP/2 — an application-layer protocol used as a transport protocol
 * Protocol Buffers — a serialization framework and interface definition language
 
 
@@ -53,7 +53,7 @@ The gRPC framework includes two main components:
 
 HTTP/2 is the next version of the HTTP application-layer protocol. Initially, the HTTP protocol was designed to allow clients (typically browsers) to request resources such as HTML documents, images, and scripts from servers over the hypermedia network. However, using this protocol to implement modern client-server systems with simultaneous bi-directional streaming results in complex and inefficient solutions. Even new features introduced in HTTP/1.1, such as persistent connections, pipelining, and chunked transfer encoding, proved insufficient for these demands.
 
-HTTP/2 started as an internal Google project named SPDY, whose main motivation was to reduce latency in the Web. HTTP/2 retains the semantics of the previous version of the protocol (methods, response codes, headers), but introduces significant changes in implementation. While HTTP/2 brings several improvements that benefit various platforms (browsers, mobile devices, and IoT), only a subset of these changes is relevant to gRPC.
+HTTP/2 started as an internal Google project named SPDY, whose main motivation was to reduce latency on the Web. HTTP/2 retains the semantics of the previous version of the protocol (methods, response codes, headers), but introduces significant changes in implementation. While HTTP/2 brings several improvements that benefit various platforms (browsers, mobile devices, and IoT), only a subset of these changes is relevant to gRPC.
 
 The first improvement is multiplexing, which allows multiple concurrent requests and responses to be sent over a single TCP connection. This solves the HTTP *head-of-line blocking* problem, where a slow response to one request delays subsequent requests on the same connection. In HTTP/2, requests and responses are divided into frames that can be transmitted interleaved and independently of each other within a stream. This approach allowed efficient streaming from client to server, server to client, and simultaneous bidirectional streaming.
 
@@ -66,9 +66,9 @@ The third improvement is header compression using the HPACK algorithm, which lev
 
 Protocol Buffers (Protobuf) is a multi-language interface definition language and serialization framework for effective data exchange over the network. Protobuf definitions describe the service contract, including the RPC methods exposed by the server as well as the structure of request and response messages. This contract is strongly typed and explicitly designed to support forward and backward compatibility.
 
-As a serialization framework, Protobuf is designed to encode structured data — which is common for the object-oriented programming languages — into a compact binary format. The resulting binary messages are efficient not only for transmission over the network, but also for persistent storage. Protobuf message format conceptually similar to JSON, but it is significantly smaller and faster in terms of both transferred bytes and computational resources.
+As a serialization framework, Protobuf is designed to encode structured data — which is common for object-oriented programming languages — into a compact binary format. The resulting binary messages are efficient not only for transmission over the network, but also for persistent storage. Protobuf is highly optimized to reduce message size on the wire. However, for resource-constrained IoT or mobile devices, using a zero-copy FlatBuffers serialization framework provides significantly less computational overhead at the cost of a larger message size.
 
-As an interface definition language (IDL), the Protobuf compiler generates client and service stubs from declared RPC methods, which developers should use to implement their application-specific logic. The compiler also generates immutable message classes with convenient builders. The Protobuf compiler provides language-specific runtime libraries that transparently handle binary serialization and deserialization and transmission binary messages over the network. While this auto-generated code is not always as readable as human-written code, as it is primarily highly optimized for performance.
+As an interface definition language (IDL), the Protobuf compiler generates client and service stubs from declared RPC methods, which developers should use to implement their application-specific logic. The compiler also generates immutable message classes with convenient builders. The Protobuf compiler provides language-specific runtime libraries that transparently handle binary serialization and deserialization and transmission of binary messages over the network. While this auto-generated code is not always as readable as human-written code, as it is primarily highly optimized for performance.
 
 Streaming is one of the most important features of gRPC, enabled by the underlying HTTP/2 protocol. Depending on whether the client sends a single parameter or a stream of parameters, and whether the service returns a single response or a stream of responses, there are four supported RPC method types:
 

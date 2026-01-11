@@ -1,0 +1,14 @@
+@startuml
+participant "Caller (Client)" as Client
+participant "Callee (Server)" as Server
+
+Client -> Server : Procedure call
+activate Server
+
+Server -> Server : Receive parameters
+Server -> Server : Execute procedure
+
+Server --> Client : Send result
+deactivate Server
+
+@enduml

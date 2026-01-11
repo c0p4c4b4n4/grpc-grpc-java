@@ -1,14 +1,17 @@
-package com.example.grpc.methodtypes.unary
+package com.example.grpc.methodtypes.streaming.client
 
 import com.example.grpc.EchoRequest
+import com.example.grpc.EchoResponse
 import com.example.grpc.EchoServiceGrpcKt
 import com.example.grpc.echoResponse
 import io.grpc.ServerBuilder
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 
-object UnaryServer {
-  private val logger = Logger.getLogger(UnaryServer::class.java.name)
+object ClientStreamingServer {
+  private val logger = Logger.getLogger(ClientStreamingServer::class.java.name)
 
   @JvmStatic
   fun main(args: Array<String>) {
@@ -18,7 +21,7 @@ object UnaryServer {
       .build()
       .start()
 
-    logger.info("server started, listening on $server.port")
+    logger.info("server started, listening on ${server.port}")
 
     Runtime.getRuntime().addShutdownHook(
       Thread {
@@ -36,7 +39,13 @@ object UnaryServer {
   }
 
   private class EchoServiceImpl : EchoServiceGrpcKt.EchoServiceCoroutineImplBase() {
-    override suspend fun unaryEcho(request: EchoRequest) =
-      echoResponse { message = "hello ${request.message}"}
+    override fun serverStreamingEcho(request: EchoRequest): Flow<EchoResponse> {
+      logger.info("request: ${request.message}")
+      return flow {
+        emit(echoResponse { message = "hello ${request.message}" })
+        emit(echoResponse { message = "guten tag ${request.message}" })
+        emit(echoResponse { message = "bonjour ${request.message}" })
+      }
+    }
   }
 }

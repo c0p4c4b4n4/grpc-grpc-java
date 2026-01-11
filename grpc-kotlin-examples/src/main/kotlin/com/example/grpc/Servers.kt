@@ -1,25 +1,19 @@
 package com.example.grpc
 
-import com.example.grpc.EchoRequest
-import com.example.grpc.EchoResponse
-import com.example.grpc.EchoServiceGrpcKt
-import com.example.grpc.Loggers
+import io.grpc.BindableService
 import io.grpc.ServerBuilder
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 
 object Servers {
   private val logger = Logger.getLogger(Servers::class.java.name)
 
-  @JvmStatic
-  fun main(args: Array<String>) {
+  fun start(service: BindableService) {
     Loggers.init()
 
     val server = ServerBuilder
       .forPort(50051)
-      .addService(EchoServiceImpl())
+      .addService(service)
       .build()
       .start()
 
@@ -38,16 +32,5 @@ object Servers {
     )
 
     server.awaitTermination()
-  }
-
-  private class EchoServiceImpl : EchoServiceGrpcKt.EchoServiceCoroutineImplBase() {
-    override fun bidirectionalStreamingEcho(requests: Flow<EchoRequest>): Flow<EchoResponse> = flow {
-      requests.collect { request ->
-        logger.info("next request: ${request.message}")
-        emit(EchoResponse.newBuilder().setMessage("hello ${request.message}").build())
-        emit(EchoResponse.newBuilder().setMessage("guten tag ${request.message}").build())
-        emit(EchoResponse.newBuilder().setMessage("bonjour ${request.message}").build())
-      }
-    }
   }
 }

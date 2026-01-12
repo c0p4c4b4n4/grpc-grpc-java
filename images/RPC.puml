@@ -2,7 +2,9 @@
 !theme mono
 scale 1.2
 hide footbox
+title Remote Procedure Call (RPC)
 skinparam TitleFontStyle plain
+skinparam TitleFontSize 14
 skinparam sequenceMessageAlign center
 
 activate client
@@ -21,5 +23,6 @@ activate client
 note left of client: receive result
 
 ||20||
+'client -[#white]->]
 
 @enduml

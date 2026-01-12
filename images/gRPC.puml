@@ -1,44 +1,48 @@
 @startuml
-
-scale 1.1
+!theme mono
+scale 1.2
 skinparam linetype ortho
 
-skinparam rectangle {
-  BackgroundColor transparent
-  BorderColor black
-}
-
-skinparam file {
-  BackgroundColor transparent
-  BorderColor black
-}
-
-skinparam cloud {
-  BackgroundColor transparent
-  BorderColor black
-}
+'skinparam rectangle {
+'  BackgroundColor transparent
+'  BorderColor black
+'}
+'
+'skinparam file {
+'  BackgroundColor transparent
+'  BorderColor black
+'}
+'
+'skinparam cloud {
+'  BackgroundColor transparent
+'  BorderColor black
+'}
 
 rectangle "Client" as C1
 rectangle "Client stub" as C2
 rectangle "gRPC runtime" as C3
+rectangle "Transport" as C4
 
 rectangle "Server" as S1
 rectangle "Service stub" as S2
 rectangle "gRPC runtime" as S3
+rectangle "Transport" as S4
 
-file "ProtoBuf" as P
-cloud "HTTP/2" as H
+'file "ProtoBuf" as P
+card "HTTP/2" as H
 
 C1 -down- C2
 C2 -down- C3
+C3 -down- C4
 
 S1 -down- S2
 S2 -down- S3
+S3 -down- S4
 
-C2 --[dotted]right-- P
-P --[dotted]right-- S2
+'C2 --[dotted]right-- P
+'P --[dotted]right-- S2
 
-C3 --right-- H
-H --right-- S3
+C4 --right-- H
+H --right-- S4
 
 @enduml

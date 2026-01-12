@@ -14,7 +14,7 @@ participant "client" as Client
 participant "server" as Server
 
 activate Client
-'note left of Client: invoke procedure
+note left of Client: invoke procedure
 Client ->> Server : procedure call
 deactivate Client
 activate Server
@@ -27,7 +27,7 @@ Server ->> Client : result from procedure execution
 deactivate Server
 activate Client
 
-||20||
+||40||
 'client -[#white]->]
 
 @enduml

@@ -22,6 +22,8 @@ However, with REST architecture, problems arise when implementing client-server 
 
 RPC is based on the technique of calling methods in another process — either on the same machine or on a different machine over the network — as if they were local methods. RPC frameworks provide code generation tools that create client and server stubs based on a given RPC interface. These stubs handle data serialization and network communication. As a result, when a client invokes a remote method with parameters and receives a return value, it appears to be a local method call. RPC frameworks aim to hide the complexity of serialization and network communication from developers.
 
+![Remote Procedure Call](/images/RPC.png)
+
 
 #### The problem
 
@@ -94,7 +96,7 @@ To implement this application, complete the following steps:
 
 ##### The contract between the service and the client
 
-A *.proto* file defines the contract between a service and a client. This example shows the *.proto* file used by both clients and servers in the application. Beyond the message and service definitions, the file also includes additional metadata. Specifically, it declares the use of Protobuf language version 3, and defines options specific to Java applications:
+A *.proto* file defines the contract between a service and a client. This example shows the *.proto* file used by both clients and servers in the application. Beyond the message and service definitions, the file also includes additional metadata. The *syntax* option defines the use of Protobuf version 3 (version 2 is still supported). The *package* option defines the global cross-language Protobuf namespace. Each programming language may have its own specific Protobuff options. For Java the *java_package* option defines the package where the generated Java classes are placed, and *the java_multiple_files = true* option defines generating separate Java files for each message and service defined in the *.proto* file.
 
 
 ```
@@ -127,12 +129,10 @@ service EchoService {
 ```
 
 
-The *java_package* option defines the package where the generated Java classes are placed. In contrast, the *package* directive defines the Protobuf cross-language service namespace.
-
 
 ##### Generating service and client stubs
 
-To use gRPC in your Gradle project, place your *.proto* file in the *src/main/proto* directory, add the required implementation and runtime gRPC dependencies, and configure the Protobuf Gradle plugin. Next, execute a Gradle task (*generateProto*, *compileJava*, or *build*), and the generated Java classes will be placed in a designated directory (in our example, *build/generated/source/proto/main/java*). These generated classes fall into two categories: message definition classes and service definition classes.
+To use gRPC in your Gradle project, place your *.proto* file in the *src/main/proto* directory, add the required implementation and runtime gRPC dependencies, and configure the Protobuf Gradle plugin. Next, execute the Gradle task *generateProto*, and the generated Java classes will be placed in a designated directory (in our example, *build/generated/source/proto/main/java*). These generated classes fall into two categories: message definition classes and service definition classes.
 
 For the EchoRequest message, an immutable EchoRequest class is generated to handle data storage and serialization, along with an inner EchoRequest.Builder class to create the EchoRequest class using the builder pattern. Similar classes are generated for the EchoResponse message.
 
@@ -166,11 +166,9 @@ private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase
    public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
        var name = request.getMessage();
        logger.log(Level.INFO, "request: {0}", message);
-
        responseObserver.onNext(EchoResponse.newBuilder().setMessage("hello " + name).build());
        responseObserver.onNext(EchoResponse.newBuilder().setMessage("guten tag " + name).build());
        responseObserver.onNext(EchoResponse.newBuilder().setMessage("bonjour " + name).build());
-
        responseObserver.onCompleted();
    }
 }
@@ -187,7 +185,6 @@ var server = ServerBuilder
    .addService(new EchoServiceImpl())
    .build()
    .start();
-
 logger.log(Level.INFO, "server started, listening on {0,number,#}", server.getPort());
 
 Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -230,7 +227,6 @@ try {
 
    var request = EchoRequest.newBuilder().setMessage("world").build();
    var responses = blockingStub.serverStreamingEcho(request);
-
    while (responses.hasNext()) {
        logger.log(Level.INFO, "response: {0}", responses.next().getMessage());
    }

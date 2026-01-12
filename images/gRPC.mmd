@@ -1,0 +1,20 @@
+block-beta
+    columns 5
+
+    A1["Client"]        space space space           B1["Server"]
+    space               space space space           space
+    A2["Client stub"]   space P["ProtoBuf"] space   B2["Service stub"]
+    space               space space space           space
+    A3["gRPC runtime"]  space E["HTTP/2"] space     B3["gRPC runtime"]
+
+    A1 <--> A2
+    A2 <--> A3
+
+    B1 <--> B2
+    B2 <--> B3
+
+    A3 <--> E
+    B3 <--> E
+
+    P -.-> A2
+    P -.-> B2

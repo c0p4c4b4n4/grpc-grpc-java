@@ -24,16 +24,22 @@ C0 -down- C1
 C1 -down- C2
 C2 -down- C3
 C3 -down- C4
+C3 -[hidden]down- C4
+C3 -[hidden]down- C4
+C3 -[hidden]down- C4
 
 S0 -down- S1
 S1 -down- S2
 S2 -down- S3
 S3 -down- S4
+S3 -[hidden]down- S4
+S3 -[hidden]down- S4
+S3 -[hidden]down- S4
 
 C2 -[dotted]right- P
 P -[dotted]right- S2
 
-C4 --right-- H
-H --right-- S4
+C4 -right- H
+H -right- S4
 
 @enduml

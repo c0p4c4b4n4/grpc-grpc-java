@@ -1,8 +1,8 @@
 @startuml
 '!pragma teoz true
-!theme plain
+!theme mono
 scale 1.1
-title Remote Procedure Calls (RPC)
+'title Remote Procedure Calls (RPC)
 hide footbox
 'skinparam monochrome true
 skinparam TitleFontStyle plain

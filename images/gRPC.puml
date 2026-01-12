@@ -1,20 +1,23 @@
 @startuml
 !theme plain
-scale 1.0
+scale 1.1
+title gRPC life cycle
+skinparam TitleFontStyle plain
+skinparam TitleFontSize 14
 skinparam defaultTextAlignment center
 skinparam linetype ortho
 
-rectangle "Client" as C0
-rectangle "Channel" as C1
-rectangle "Client stub" as C2
+rectangle "client" as C0
+rectangle "channel" as C1
+rectangle "client stub" as C2
 rectangle "gRPC runtime" as C3
-rectangle "Transport" as C4
+rectangle "transport" as C4
 
-rectangle "Server" as S0
-rectangle "Service" as S1
-rectangle "Service stub" as S2
+rectangle "server" as S0
+rectangle "service" as S1
+rectangle "service stub" as S2
 rectangle "gRPC runtime" as S3
-rectangle "Transport" as S4
+rectangle "transport" as S4
 
 rectangle "ProtoBuf" as P
 rectangle "HTTP/2" as H

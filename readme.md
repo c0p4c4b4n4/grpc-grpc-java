@@ -82,7 +82,7 @@ Streaming is one of the most important features of gRPC, enabled by the underlyi
 
 #### gRPC in practice
 
-The following example demonstrates how to build a simple server-streaming gRPC application using plain Java. The application consists of an echo client that sends one or many requests, and an echo server that receives those requests, modifies them, and returns responses. The client receives the responses and displays them. (Client and server examples using the other types of methods are available in the GitHub repository.)
+The following example demonstrates how to build a simple server-streaming gRPC application using plain Java. The application consists of an echo client that sends one or many requests, and an echo server that receives those requests, modifies them, and returns responses. The client receives the responses and displays them. (Client and server examples using the other types of methods are available in the GitHub [repository](https://github.com/alexander-linden/grpc-java-examples).)
 
 To implement this application, complete the following steps:
 
@@ -93,7 +93,6 @@ To implement this application, complete the following steps:
 3. Implement a server that provides this service.
 4. Implement a client that consumes this service.
 
-![gRPC](/images/gRPC.png)
 
 ##### The contract between the service and the client
 
@@ -137,7 +136,7 @@ To use gRPC in your Gradle project, place your *.proto* file in the *src/main/pr
 
 For the `EchoRequest` message, an immutable `EchoRequest` class is generated to handle data storage and serialization, along with an inner `EchoRequest.Builder` class to create the `EchoRequest` class using the builder pattern. Similar classes are generated for the `EchoResponse` message.
 
-For the `EchoService service`, an `EchoServiceGrpc` class is generated, containing inner classes for both providing and consuming the remote service. For the server-side, an abstract inner class `EchoServiceImplBase` is generated as the server stub, which you should extend and implement to provide the service logic. For the client-side, four types of client stubs are generated:
+For the `EchoService` service, an `EchoServiceGrpc` class is generated, containing inner classes for both providing and consuming the remote service. For the server-side, an abstract inner class `EchoServiceImplBase` is generated as the server stub, which you should extend and implement to provide the service logic. For the client-side, four types of client stubs are generated:
 
 
 
@@ -156,7 +155,7 @@ The next step in the application implementation is to create an echo server. To 
 1. Override the service methods in the generated service stub.
 2. Start a server to listen for client requests.
 
-We create the `EchoServiceImpl` class that extends and implements the generated `EchoServiceGrpc.ServiceImplBase` abstract class. The class overrides the `serverStreamingEcho` method, which receives the request as an `EchoRequest` instance to read from, and a provided `EchoResponse` stream observer to write responses to.
+We create the `EchoServiceImpl` class that extends and implements the auto-generated `EchoServiceGrpc.ServiceImplBase` abstract class. The class overrides the `serverStreamingEcho` method, which receives the request as an `EchoRequest` instance to read from, and a provided `EchoResponse` stream observer to write responses to.
 
 To process a client request, the server performs the following steps: for each message, it constructs an `EchoResponse` using the builder and sends it to the client by calling the response stream observer’s `onNext` method. After all messages have been sent, the server calls the response stream observer’s `onCompleted` method to indicate that server-side streaming has finished.
 
@@ -166,7 +165,7 @@ private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase
    @Override
    public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
        var name = request.getMessage();
-       logger.log(Level.INFO, "request: {0}", message);
+       logger.log(Level.INFO, "request: {0}", name);
        responseObserver.onNext(EchoResponse.newBuilder().setMessage("hello " + name).build());
        responseObserver.onNext(EchoResponse.newBuilder().setMessage("guten tag " + name).build());
        responseObserver.onNext(EchoResponse.newBuilder().setMessage("bonjour " + name).build());
@@ -186,6 +185,7 @@ var server = ServerBuilder
    .addService(new EchoServiceImpl())
    .build()
    .start();
+
 logger.log(Level.INFO, "server started, listening on {0,number,#}", server.getPort());
 
 Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -213,7 +213,7 @@ The next step in the application implementation is to create an echo client. To 
 * Obtain a client stub for the required communication pattern.
 * Invoke the service method using the obtained client stub.
 
-We create a channel using the `ManagedChannelBuilder` class, specifying the server host and port we want to connect to. In the first client example, a blocking stub is used. This stub is obtained from the auto-generated `EchoServiceGrpc` class by calling the `newBlockingStub` factory method and passing the channel as an argument. With this approach, the client blocks while invoking the `serverStreamingEcho` method and waits for the server’s response. The call either returns a response from the server or throws a `StatusRuntimeException`, in which a gRPC error is encoded as a `Status`.
+We create a channel using the `ManagedChannelBuilder` class, specifying the server host and port we want to connect to. In the first client example, a blocking stub is used. This stub is obtained from the generated `EchoServiceGrpc` class by calling the `newBlockingStub` factory method and passing the channel as an argument. With this approach, the client blocks while invoking the `serverStreamingEcho` method and waits for the server’s response. The call either returns a response from the server or throws a `StatusRuntimeException`, in which a gRPC error is encoded as a `Status`.
 
 Because this example demonstrates server-side streaming with a blocking stub, the request is provided as a method parameter, and the response is returned as an iterator. After the call is completed, the channel is shut down to ensure that the underlying resources (threads and TCP connections) are released.
 
@@ -296,8 +296,7 @@ gRPC is an effective framework for implementing inter-service communication. How
 * Automatic generation of gRPC service and client stubs is available for all required programming languages and platforms.
 * Both the client and server are developed within the same organization, and the application operates in a controlled environment.
 * Your organization has strong development standards that require strongly defined client-server contracts.
-* Development will benefit from built-in gRPC request handling capabilities, such as retry/deadline/cancellation, manual flow control, error handling, interceptors, etc.
-* Development will benefit from built-in gRPC cloud-native capabilities, such as authentication, name resolution, client-side load balancing, health checking, proxyless service mesh, etc.
+* Development will benefit from built-in gRPC features, such as retry/deadline/cancellation, manual flow control, error handling, interceptors, authentication, name resolution, client-side load balancing, health checking, proxyless service mesh, etc.
 
 However, REST is a more appropriate architecture if the application meets most of the following conditions:
 

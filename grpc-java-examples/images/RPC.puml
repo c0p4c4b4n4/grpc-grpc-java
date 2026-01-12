@@ -1,4 +1,12 @@
 @startuml
+scale 1.1
+title Remote Procedure Calls
+hide footbox
+skinparam monochrome true
+skinparam defaultFontName Source Sans Pro
+skinparam titleFontSize 15
+skinparam sequenceMessageAlign center
+
 participant "Caller (Client)" as Client
 participant "Callee (Server)" as Server
 

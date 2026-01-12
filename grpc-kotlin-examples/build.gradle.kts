@@ -7,14 +7,21 @@ plugins {
 
 dependencies {
     api(libs.kotlinx.coroutines.core)
+    //implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${project.findProperty("grpcVersion")}")
 
     api(libs.grpc.stub)
+    //implementation("io.grpc:grpc-stub:${project.findProperty("grpcVersion")}")
     api(libs.grpc.protobuf)
+    //implementation("io.grpc:grpc-protobuf:${project.findProperty("grpcVersion")}")
     api(libs.protobuf.java.util)
+    //implementation("com.google.protobuf:protobuf-java-util:${project.findProperty("grpcVersion")}")
     api(libs.protobuf.kotlin)
+    //implementation("com.google.protobuf:protobuf-kotlin:${project.findProperty("grpcVersion")}")
     api(libs.grpc.kotlin.stub)
+    //implementation("io.grpc:grpc-kotlin-stub:${project.findProperty("grpcVersion")}")
 
     runtimeOnly(libs.grpc.netty)
+    //runtimeOnly("io.grpc:grpc-netty:${project.findProperty("grpcVersion")}")
 }
 
 kotlin { jvmToolchain(17) }

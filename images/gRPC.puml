@@ -3,21 +3,6 @@
 scale 1.1
 skinparam defaultTextAlignment center
 skinparam linetype ortho
-'
-'skinparam rectangle {
-'  BackgroundColor transparent
-'  BorderColor black
-'}
-'
-'skinparam file {
-'  BackgroundColor transparent
-'  BorderColor black
-'}
-'
-'skinparam cloud {
-'  BackgroundColor transparent
-'  BorderColor black
-'}
 
 rectangle "Client" as C0
 rectangle "Channel" as C1

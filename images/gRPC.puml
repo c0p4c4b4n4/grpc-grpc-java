@@ -1,6 +1,5 @@
 @startuml
 !theme plain
-'!pragma layout smetana
 scale 1.0
 skinparam defaultTextAlignment center
 skinparam linetype ortho
@@ -20,26 +19,26 @@ rectangle "Transport" as S4
 rectangle "ProtoBuf" as P
 rectangle "HTTP/2" as H
 
-C0 -down- C1
-C1 -down- C2
-C2 -down- C3
-C3 -down- C4
-C3 -[hidden]down- C4
-C3 -[hidden]down- C4
-C3 -[hidden]down- C4
+C0 -d- C1
+C1 -d- C2
+C2 -d- C3
+C3 -d- C4
+C3 -[hidden]d- C4
+C3 -[hidden]d- C4
+C3 -[hidden]d- C4
 
-S0 -down- S1
-S1 -down- S2
-S2 -down- S3
-S3 -down- S4
-S3 -[hidden]down- S4
-S3 -[hidden]down- S4
-S3 -[hidden]down- S4
+S0 -d- S1
+S1 -d- S2
+S2 -d- S3
+S3 -d- S4
+S3 -[hidden]d- S4
+S3 -[hidden]d- S4
+S3 -[hidden]d- S4
 
-C2 -[dotted]right- P
-P -[dotted]right- S2
+C2 -[dotted]r- P
+P -[dotted]r- S2
 
-C4 -right- H
-H -right- S4
+C4 -r- H
+H -r- S4
 
 @enduml

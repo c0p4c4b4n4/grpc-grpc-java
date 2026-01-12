@@ -23,6 +23,7 @@ However, with REST architecture, problems arise when implementing client-server 
 RPC is based on the technique of calling methods in another process — either on the same machine or on a different machine over the network — as if they were local methods. RPC frameworks provide code generation tools that create client and server stubs based on a given RPC interface. These stubs handle data serialization and network communication. As a result, when a client invokes a remote method with parameters and receives a return value, it appears to be a local method call. RPC frameworks aim to hide the complexity of serialization and network communication from developers.
 
 ![Remote Procedure Call](/images/RPC.png)
+![gRPC](/images/gRPC.png)
 
 
 #### The problem

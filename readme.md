@@ -93,6 +93,7 @@ To implement this application, complete the following steps:
 3. Implement a server that provides this service.
 4. Implement a client that consumes this service.
 
+![gRPC](/images/gRPC.png)
 
 ##### The contract between the service and the client
 

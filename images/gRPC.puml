@@ -1,7 +1,7 @@
 @startuml
 !theme plain
 '!pragma layout smetana
-scale 1.1
+scale 1.0
 skinparam defaultTextAlignment center
 skinparam linetype ortho
 

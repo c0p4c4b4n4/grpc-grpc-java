@@ -68,7 +68,7 @@ Protocol Buffers (Protobuf) is a multi-language serialization framework and RPC 
 
 As a serialization framework, Protobuf is designed to encode structured data — which is common for object-oriented programming languages — into a compact binary format. The resulting binary messages are efficient not only for transmission over the network, but also for persistent storage. Protobuf is highly optimized to reduce message size on the wire. (However, for resource-constrained IoT or mobile devices, using a zero-copy FlatBuffers serialization framework provides significantly less computational overhead at the cost of a larger message size.)
 
-As an interface definition language (IDL), the Protobuf compiler generates client and service stubs from declared RPC methods, which developers should use to implement their application-specific logic. The compiler also generates immutable message classes with convenient builders. The Protobuf compiler provides language-specific runtime libraries that transparently handle binary serialization and deserialization and transmission of binary messages over the network.
+As an interface definition language (IDL), the Protobuf compiler generates client and service stubs from declared RPC methods, which developers should use to implement their application-specific logic. The Protobuf compiler provides language-specific runtime libraries that transparently handle binary serialization and deserialization and transmission of binary messages over the network.
 
 Streaming is one of the most important features of gRPC, enabled by the underlying HTTP/2 protocol. Depending on whether the client sends a single parameter or a stream of parameters, and whether the service returns a single response or a stream of responses, there are four supported RPC method types:
 
@@ -82,7 +82,7 @@ Streaming is one of the most important features of gRPC, enabled by the underlyi
 
 #### gRPC in practice
 
-The following example demonstrates how to build a simple server-streaming gRPC application using plain Java. The application consists of an echo client that sends one or many requests, and an echo server that receives those requests, modifies them, and returns responses. The client receives the responses and displays them.
+The following example demonstrates how to build a simple server-streaming gRPC application using plain Java. The application consists of an echo client that sends one or many requests, and an echo server that receives those requests, modifies them, and returns responses. The client receives the responses and displays them. (Client and server examples using the other types of methods are available in the GitHub repository.)
 
 To implement this application, complete the following steps:
 
@@ -96,7 +96,7 @@ To implement this application, complete the following steps:
 
 ##### The contract between the service and the client
 
-A *.proto* file defines the contract between a service and a client. This example shows the *.proto* file used by both clients and servers in the application. Beyond the message and service definitions, the file also includes additional metadata. The *syntax* option defines the use of Protobuf version 3 (version 2 is still supported). The *package* option defines the global cross-language Protobuf namespace. Each programming language may have its own specific Protobuff options. For Java the *java_package* option defines the package where the generated Java classes are placed, and *the java_multiple_files = true* option defines generating separate Java files for each message and service defined in the *.proto* file.
+A *.proto* file defines the contract between a service and a client. This example shows the *.proto* file used by both clients and servers in the application. Beyond the message and service definitions, the file also contains additional metadata. The *syntax* option defines the use of Protobuf version 3. The *package* option defines the global cross-language Protobuf namespace. Also, each programming language may have its own specific Protobuff options. For Java the *java_package* option defines the package where the generated Java classes are placed, and *the java_multiple_files = true* option defines generating separate Java files for each message and service defined in the *.proto* file.
 
 
 ```
@@ -134,16 +134,16 @@ service EchoService {
 
 To use gRPC in your Gradle project, place your *.proto* file in the *src/main/proto* directory, add the required implementation and runtime gRPC dependencies, and configure the Protobuf Gradle plugin. Next, execute the Gradle task *generateProto*, and the generated Java classes will be placed in a designated directory (in our example, *build/generated/source/proto/main/java*). These generated classes fall into two categories: message definition classes and service definition classes.
 
-For the EchoRequest message, an immutable EchoRequest class is generated to handle data storage and serialization, along with an inner EchoRequest.Builder class to create the EchoRequest class using the builder pattern. Similar classes are generated for the EchoResponse message.
+For the `EchoRequest` message, an immutable `EchoRequest` class is generated to handle data storage and serialization, along with an inner `EchoRequest.Builder` class to create the `EchoRequest` class using the builder pattern. Similar classes are generated for the `EchoResponse` message.
 
-For the EchoService, an EchoServiceGrpc class is generated, containing inner classes for both providing and consuming the remote service. For the server-side, an abstract inner class EchoServiceImplBase is generated as the server stub, which you should extend and implement to provide the service logic. For the client-side, four types of client stubs are generated:
+For the `EchoService service`, an `EchoServiceGrpc` class is generated, containing inner classes for both providing and consuming the remote service. For the server-side, an abstract inner class `EchoServiceImplBase` is generated as the server stub, which you should extend and implement to provide the service logic. For the client-side, four types of client stubs are generated:
 
 
 
-* EchoServiceStub: to make asynchronous calls using the StreamObserver interface (it supports all four communication patterns)
-* EchoServiceBlockingStub: to make synchronous calls (it supports unary and server-streaming calls only)
-* EchoServiceBlockingV2Stub: to make synchronous calls (it supports unary calls as a stable feature and all 3 streaming calls as experimental features), but can throw checked StatusException instead of runtime StatusRuntimeException.
-* EchoServiceFutureStub: to asynchronous calls with the [ListenableFuture](https://javadoc.io/doc/com.google.guava/guava/latest/com/google/common/util/concurrent/ListenableFuture.html) interface (it supports unary calls only)
+* `EchoServiceStub`: to make asynchronous calls using the `StreamObserver` interface (it supports all four communication patterns)
+* `EchoServiceBlockingStub`: to make synchronous calls (it supports unary and server-streaming calls only)
+* `EchoServiceBlockingV2Stub`: to make synchronous calls (it supports unary calls as a stable feature and all 3 streaming calls as experimental features), but can throw checked `StatusException` instead of runtime `StatusRuntimeException`.
+* `EchoServiceFutureStub`: to asynchronous calls with the `ListenableFuture` interface (it supports unary calls only)
 
 
 ##### Creating the server
@@ -155,9 +155,9 @@ The next step in the application implementation is to create an echo server. To 
 1. Override the service methods in the generated service stub.
 2. Start a server to listen for client requests.
 
-We create the EchoServiceImpl class that extends and implements the generated EchoServiceGrpc.ServiceImplBase abstract class. The class overrides the serverStreamingEcho method, which receives the request as an EchoRequest instance to read from, and a provided EchoResponse stream observer to write responses to.
+We create the `EchoServiceImpl` class that extends and implements the generated `EchoServiceGrpc.ServiceImplBase` abstract class. The class overrides the `serverStreamingEcho` method, which receives the request as an `EchoRequest` instance to read from, and a provided `EchoResponse` stream observer to write responses to.
 
-To process a client request, the server performs the following steps: for each message, it constructs an EchoResponse using the builder and sends it to the client by calling the response stream observer’s onNext method. After all messages have been sent, the server calls the response stream observer’s onCompleted method to indicate that server-side streaming has finished.
+To process a client request, the server performs the following steps: for each message, it constructs an `EchoResponse` using the builder and sends it to the client by calling the response stream observer’s `onNext` method. After all messages have been sent, the server calls the response stream observer’s `onCompleted` method to indicate that server-side streaming has finished.
 
 
 ```
@@ -176,7 +176,7 @@ private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase
 
 
 
-To implement a gRPC server that provides this service, use the ServerBuilder class. First, specify the port to listen for client requests by calling the forPort method. Next, create an instance of the EchoServiceImpl service and register it with the server using the addService method. Finally, build and start the server using a modified version of the Netty server.
+To implement a gRPC server that provides this service, use the `ServerBuilder` class. First, specify the port to listen for client requests by calling the `forPort` method. Next, create an instance of the `EchoServiceImpl` service and register it with the server using the `addService` method. Finally, build and start the server using a modified version of the Netty server.
 
 
 ```
@@ -212,7 +212,7 @@ The next step in the application implementation is to create an echo client. To 
 * Obtain a client stub for the required communication pattern.
 * Invoke the service method using the obtained client stub.
 
-We create a channel using the ManagedChannelBuilder class, specifying the server host and port we want to connect to. In the first client example, a blocking stub is used. This stub is obtained from the auto-generated EchoServiceGrpc class by calling the newBlockingStub factory method and passing the channel as an argument. With this approach, the client blocks while invoking the serverStreamingEcho method and waits for the server’s response. The call either returns a response from the server or throws a StatusRuntimeException, in which a gRPC error is encoded as a Status.
+We create a channel using the `ManagedChannelBuilder` class, specifying the server host and port we want to connect to. In the first client example, a blocking stub is used. This stub is obtained from the auto-generated `EchoServiceGrpc` class by calling the `newBlockingStub` factory method and passing the channel as an argument. With this approach, the client blocks while invoking the `serverStreamingEcho` method and waits for the server’s response. The call either returns a response from the server or throws a `StatusRuntimeException`, in which a gRPC error is encoded as a `Status`.
 
 Because this example demonstrates server-side streaming with a blocking stub, the request is provided as a method parameter, and the response is returned as an iterator. After the call is completed, the channel is shut down to ensure that the underlying resources (threads and TCP connections) are released.
 
@@ -238,9 +238,9 @@ try {
 ```
 
 
-In the second client example, we demonstrate the use of the same server-streaming service method with an asynchronous, non-blocking stub. This stub is obtained from the auto-generated EchoServiceGrpc class by invoking the newStub factory method. As in the previous example, the request is provided as the first method parameter. The response is handled through a stream observer, which the client implements and passes as the second method parameter.
+In the second client example, we demonstrate the use of the same server-streaming service method with an asynchronous, non-blocking stub. This stub is obtained from the auto-generated `EchoServiceGrpc` class by invoking the `newStub` factory method. As in the previous example, the request is provided as the first method parameter. The response is handled through a stream observer, which the client implements and passes as the second method parameter.
 
-The onNext method is called each time the client receives a single response from the server. The onError method can be called once if the call has completed exceptionally. The onCompleted method is invoked once after the server has successfully sent all responses and the call has completed successfully.
+The `onNext` method is called each time the client receives a single response from the server. The `onError` method can be called once if the call has completed exceptionally. The `onCompleted` method is invoked once after the server has successfully sent all responses and the call has completed successfully.
 
 
 ```
@@ -274,12 +274,12 @@ channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
 ```
 
 
-In this implementation, the client does not block on the serverStreamingEcho method. To wait for the asynchronous interaction to complete — either successfully or with an exception — we use a CountDownLatch as a thread barrier. The main thread will be blocked until the countDown method is called, which occurs in either the onCompleted or onError handler of the response stream observer.
+In this implementation, the client does not block on the `serverStreamingEcho` method. To wait for the asynchronous interaction to complete — either successfully or with an exception — we use a `CountDownLatch` as a thread barrier. The main thread will be blocked until the `countDown` method is called, which occurs in either the `onCompleted` or `onError` handler of the response stream observer.
 
 
 ##### Running the server and client
 
-To build the application, run the Gradle *shadowJar* task to produce a self-contained (über) JAR that does not declare a main Java class. Then, start the client and server in any order. Because the client stub is configured to wait for server readiness, it will wait until the server becomes available or the specified deadline is reached.
+To build the application, run the Gradle *shadowJar* task to produce a self-contained (über) JAR that does not have a main Java class. Then, start the client and server in any order. Because the client stub is configured to wait for server readiness, it will wait until the server becomes available or the specified deadline is reached.
 
 After the client has sent a request to the server and received a response from it, it closes the channel and stops itself. To stop the server, press Ctrl+C to send a SIGINT signal to it. The server then shuts down gracefully as the JVM executes its registered shutdown hooks. We use logging to *stderr* here since the logger may have been reset by its JVM shutdown hook.
 

@@ -1,11 +1,13 @@
 @startuml
-!pragma teoz true
+'!pragma teoz true
+!theme plain
 scale 1.1
 title Remote Procedure Calls (RPC)
 hide footbox
-skinparam monochrome true
-skinparam defaultFontName Source Sans Pro
-skinparam titleFontSize 15
+'skinparam monochrome true
+skinparam TitleFontStyle plain
+'skinparam defaultFontName Source Sans Pro
+'skinparam titleFontSize 15
 skinparam sequenceMessageAlign center
 
 participant "client" as Client
@@ -13,7 +15,7 @@ participant "server" as Server
 
 activate Client
 'note left of Client: invoke procedure
-Client -> Server : procedure call
+Client ->> Server : procedure call
 deactivate Client
 activate Server
 
@@ -21,11 +23,11 @@ note right of Server: receive parameters
 note right of Server: execute procedure
 note right of Server: send result
 
-Server -> Client : result from procedure execution
-activate Client
+Server ->> Client : result from procedure execution
 deactivate Server
+activate Client
 
-'||1||
+||20||
 'client -[#white]->]
 
 @enduml

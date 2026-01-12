@@ -5,7 +5,7 @@
 
 gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed for high-performance inter-service communication on-premise or in the cloud, as well as for resource-constrained mobile and IoT applications.
 
-gRPC uses HTTP/2 as the transport protocol along with Protocol Buffers as a binary serialization framework and RPC interface description language. Thanks to these features, gRPC can provide qualitative and quantitative characteristics of communication between services that are not available for RESTful applications, which typically means transferring textual JSONs over the HTTP/1.1 protocol.
+gRPC uses HTTP/2 as the transport protocol along with Protocol Buffers (Protobuf) as a binary serialization framework and RPC interface description language. Thanks to these features, gRPC can provide qualitative and quantitative characteristics of communication between services that are not available for RESTful services, which typically means transferring textual JSONs over the HTTP/1.1 protocol.
 
 
 #### Why not REST?
@@ -25,18 +25,18 @@ RPC is based on the technique of calling methods in another process — either o
 
 #### The problem
 
-When developing an effective RPC framework, developers had to address two primary challenges. First, developers needed to ensure efficient cross-language serialization. Solutions, based on textual formats (such as JSON, YAML, or XML), are typically an order of magnitude less efficient than binary formats. They require additional computational resources for serialization and additional network bandwidth for transmitting larger messages.
+When developing an effective RPC framework, developers had to address two primary challenges. First, it is necessary to ensure efficient cross-language serialization. Solutions, based on textual formats (such as JSON, YAML, or XML), are typically an order of magnitude less efficient than binary formats. They require additional computational resources for serialization and additional network bandwidth for transmitting larger messages.
 
-Second, there was an absence of an efficient application-layer protocol specifically designed for modern inter-service communication. Initially, the HTTP protocol was designed to allow clients (typically browsers) to request resources such as HTML documents, images, and scripts from servers in the hypermedia systems. It was not designed to support high-speed, bidirectional, simultaneous communication. Various workarounds based on this protocol (short and long polling, streaming, webhooks) were inherently inefficient in their utilization of computational and network resources.
+Second, there was an absence of an efficient application-layer protocol specifically designed for modern inter-service communication. Initially, the HTTP protocol was designed to allow clients (typically browsers) to request resources such as HTML documents, images, and scripts from servers in the hypermedia systems. It was not designed to support high-speed, bidirectional, simultaneous communication. Various workarounds based on HTTP/1.0 — short and long polling, webhooks — were inherently inefficient in their utilization of computational and network resources. Even new features introduced in HTTP/1.1, such as persistent connections, pipelining, and chunked transfer encoding, proved insufficient for these demands.
 
 
 #### The solution
 
 Since 2001, Google has been developing an internal RPC framework named Stubby. It was designed to connect almost all internal services, both within and across Google data centers. Stubby was a high-performance and multi-language framework built on Protobuf for serialization.
 
-Only in 2015, with the emergence of the innovative HTTP/2 protocol, Google decided to leverage its features in a redesigned version of Stubby. References to Google's internal infrastructure (mainly name resolution and load balancing) were removed from the framework, and the project was redesigned to comply with public open source standards. The framework has also been adapted for use in mobile devices, IoT, and cloud-native applications. This updated version was released as gRPC (which recursively stands for **g**RPC **R**emote **P**rocedure **C**alls).
+Only in 2015, with the emergence of the innovative HTTP/2 protocol, Google decided to leverage its features in a redesigned version of Stubby. References to Google's internal infrastructure (mainly name resolution and load balancing) were removed from the framework, and the project was redesigned to comply with open source standards. The framework has also been adapted for use in mobile devices, IoT, and cloud-native applications. This updated version was released as gRPC (which recursively stands for **g**RPC **R**emote **P**rocedure **C**alls).
 
-Today, gRPC remains the primary mechanism for inter-service communication at Google. Also, Google offers gRPC interfaces alongside REST interfaces for many of its public services. This is because gRPC provides notable performance benefits and supports bidirectional streaming — a feature that is not achievable with traditional RESTful services. At the time of writing, gRPC applications running in Google data centers support extremely high O(10<sup>10</sup>) queries per second.
+Today, gRPC remains the primary mechanism for inter-service communication at Google. Also, Google offers gRPC interfaces alongside REST interfaces for many of its public services. This is because gRPC provides notable performance benefits and supports bidirectional streaming — a feature that is not achievable with traditional RESTful services. At the time of writing, gRPC applications running in Google data centers support as many as O(10<sup>10</sup>) *queries per second*.
 
 
 #### gRPC foundations
@@ -45,17 +45,15 @@ The gRPC framework includes two main components:
 
 
 
-* HTTP/2 — an application-layer protocol used as the transport protocol
+* HTTP/2 — an application-layer protocol used as a transport protocol
 * Protocol Buffers — a serialization framework and RPC interface definition language
 
 
 ##### HTTP/2
 
-HTTP/2 is the next version of the HTTP application-layer protocol. Initially, the HTTP protocol was designed to allow clients (typically browsers) to request resources such as HTML documents, images, and scripts from servers over the hypermedia systems. However, using this protocol to implement modern client-server systems with simultaneous bidirectional streaming results in complex and inefficient solutions. Even new features introduced in HTTP/1.1, such as persistent connections, pipelining, and chunked transfer encoding, proved insufficient for these demands.
+HTTP/2 is the next version of the HTTP application-layer protocol. HTTP/2 started as an internal Google project named SPDY, whose main design goal was to reduce latency on the Web. HTTP/2 retains the semantics of the previous version of the protocol (methods, response codes, headers), but introduces significant changes in implementation. While HTTP/2 brings several improvements that benefit various platforms (browsers, mobile devices, and IoT), only a subset of these changes is relevant to gRPC.
 
-HTTP/2 started as an internal Google project named SPDY, whose main motivation was to reduce latency on the Web. HTTP/2 retains the semantics of the previous version of the protocol (methods, response codes, headers), but introduces significant changes in implementation. While HTTP/2 brings several improvements that benefit various platforms (browsers, mobile devices, and IoT), only a subset of these changes is relevant to gRPC.
-
-The first improvement is multiplexing, which allows multiple concurrent requests and responses to be sent over a single TCP connection. This solves the HTTP *head-of-line blocking* problem, where a slow response to one request delays subsequent requests on the same connection. In HTTP/2, requests and responses are divided into frames that can be transmitted interleaved and independently of each other within a stream. This approach allowed efficient streaming from client to server, server to client, and simultaneous bidirectional streaming.
+The first improvement is multiplexing, which allows multiple concurrent requests and responses to be sent over a single TCP connection. This solves the HTTP *head-of-line blocking* problem, where a slow response to one request delays subsequent requests on the same connection. In HTTP/2, requests and responses are divided into frames that can be transmitted interleaved and independently of each other within a stream. This approach allowed efficient streaming from client to server, from server to client, and simultaneous bidirectional streaming.
 
 The second improvement is the transition from text-based headers and bodies to a binary format. The binary framing layer encodes all communication between the client and server — headers, data, control, and other frame types — into a structured binary representation. This approach reduces the number of transmitted bytes that use network bandwidth more efficiently, and lowers computational overhead for data encoding and decoding.
 
@@ -64,9 +62,9 @@ The third improvement is header compression using the HPACK algorithm, which lev
 
 ##### Protocol Buffers
 
-Protocol Buffers (Protobuf) is a multi-language interface definition language and serialization framework for effective data exchange over the network. Protobuf definitions describe the service contract, including the RPC methods exposed by the server as well as the structure of request and response messages. This contract is strongly typed and explicitly designed to support forward and backward compatibility.
+Protocol Buffers (Protobuf) is a multi-language serialization framework and RPC interface definition language for effective data exchange over the network. Protobuf definitions describe the service contract, including the RPC methods exposed by the server as well as the structure of request and response messages. This contract is strongly typed and explicitly designed to support forward and backward compatibility.
 
-As a serialization framework, Protobuf is designed to encode structured data — which is common for object-oriented programming languages — into a compact binary format. The resulting binary messages are efficient not only for transmission over the network, but also for persistent storage. Protobuf is highly optimized to reduce message size on the wire. However, for resource-constrained IoT or mobile devices, using a zero-copy FlatBuffers serialization framework provides significantly less computational overhead at the cost of a larger message size.
+As a serialization framework, Protobuf is designed to encode structured data — which is common for object-oriented programming languages — into a compact binary format. The resulting binary messages are efficient not only for transmission over the network, but also for persistent storage. Protobuf is highly optimized to reduce message size on the wire. (However, for resource-constrained IoT or mobile devices, using a zero-copy FlatBuffers serialization framework provides significantly less computational overhead at the cost of a larger message size.)
 
 As an interface definition language (IDL), the Protobuf compiler generates client and service stubs from declared RPC methods, which developers should use to implement their application-specific logic. The compiler also generates immutable message classes with convenient builders. The Protobuf compiler provides language-specific runtime libraries that transparently handle binary serialization and deserialization and transmission of binary messages over the network.
 
@@ -96,7 +94,7 @@ To implement this application, complete the following steps:
 
 ##### The contract between the service and the client
 
-A *.proto* file defines the contract between a service and a client. This example shows the *.proto* file used by both clients and servers in the application. Beyond the message and service definitions discussed earlier, the file also includes additional metadata. Specifically, it declares the use of Protobuf language version 3, and defines options specific to Java applications:
+A *.proto* file defines the contract between a service and a client. This example shows the *.proto* file used by both clients and servers in the application. Beyond the message and service definitions, the file also includes additional metadata. Specifically, it declares the use of Protobuf language version 3, and defines options specific to Java applications:
 
 
 ```
@@ -104,10 +102,10 @@ A *.proto* file defines the contract between a service and a client. This exampl
 syntax = "proto3";
 
 // package
-package example.grpc.echo;
+package example.grpc;
 
 // options
-option java_package = "com.example.grpc.echo";
+option java_package = "com.example.grpc";
 option java_multiple_files = true;
 
 // messages
@@ -129,18 +127,16 @@ service EchoService {
 ```
 
 
->The *java_package* option defines the package where the generated Java classes are placed. In contrast, the *package* directive defines the Protobuf namespace and is part of the cross-language contract between clients and services.
+The *java_package* option defines the package where the generated Java classes are placed. In contrast, the *package* directive defines the Protobuf cross-language service namespace.
 
 
 ##### Generating service and client stubs
 
-To use gRPC in your Gradle project, place your *.proto* file in the *src/main/proto* directory, add the required implementation and runtime gRPC dependencies, and configure the Protobuf Gradle plugin.
-
-Next, execute a Gradle task (*generateProto*, *compileJava*, or *build*), and the generated Java classes will be placed in a designated directory (in our example, *build/generated/source/proto/main/java*). These generated classes fall into two categories: message definition classes and service definition classes.
+To use gRPC in your Gradle project, place your *.proto* file in the *src/main/proto* directory, add the required implementation and runtime gRPC dependencies, and configure the Protobuf Gradle plugin. Next, execute a Gradle task (*generateProto*, *compileJava*, or *build*), and the generated Java classes will be placed in a designated directory (in our example, *build/generated/source/proto/main/java*). These generated classes fall into two categories: message definition classes and service definition classes.
 
 For the EchoRequest message, an immutable EchoRequest class is generated to handle data storage and serialization, along with an inner EchoRequest.Builder class to create the EchoRequest class using the builder pattern. Similar classes are generated for the EchoResponse message.
 
-For the EchoService, an EchoServiceGrpc class is generated, containing inner classes for both *providing* and *consuming* the remote service. For the server-side, an abstract inner class EchoServiceImplBase is generated as the server stub, which you should extend and implement to provide the service logic. For the client-side, four types of client stubs are generated:
+For the EchoService, an EchoServiceGrpc class is generated, containing inner classes for both providing and consuming the remote service. For the server-side, an abstract inner class EchoServiceImplBase is generated as the server stub, which you should extend and implement to provide the service logic. For the client-side, four types of client stubs are generated:
 
 
 
@@ -159,7 +155,7 @@ The next step in the application implementation is to create an echo server. To 
 1. Override the service methods in the generated service stub.
 2. Start a server to listen for client requests.
 
-We create the EchoServiceImpl class that extends and implements the generated EchoServiceGrpc.ServiceImplBase abstract class. The class overrides the serverStreamingEcho method, which receives the request as an EchoRequest instance to read from, and a *provided* EchoResponse stream observer to write responses to.
+We create the EchoServiceImpl class that extends and implements the generated EchoServiceGrpc.ServiceImplBase abstract class. The class overrides the serverStreamingEcho method, which receives the request as an EchoRequest instance to read from, and a provided EchoResponse stream observer to write responses to.
 
 To process a client request, the server performs the following steps: for each message, it constructs an EchoResponse using the builder and sends it to the client by calling the response stream observer’s onNext method. After all messages have been sent, the server calls the response stream observer’s onCompleted method to indicate that server-side streaming has finished.
 
@@ -197,7 +193,7 @@ logger.log(Level.INFO, "server started, listening on {0,number,#}", server.getPo
 Runtime.getRuntime().addShutdownHook(new Thread(() -> {
    System.err.println("server is shutting down");
    try {
-       server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+       server.shutdown().awaitTermination(10, TimeUnit.SECONDS);
    } catch (InterruptedException e) {
        server.shutdownNow();
    }
@@ -219,7 +215,7 @@ The next step in the application implementation is to create an echo client. To 
 * Obtain a client stub for the required communication pattern.
 * Invoke the service method using the obtained client stub.
 
-We create a channel using the ManagedChannelBuilder class, specifying the server host and port we want to connect to. In the first client example, a blocking stub is used. This stub is obtained from the auto-generated EchoServiceGrpc class by calling the newBlockingStub factory method and passing the channel as an argument. With this approach, the client *blocks* while invoking the serverStreamingEcho method and waits for the server’s response. The call either returns a response from the server or throws a StatusRuntimeException, in which a gRPC error is encoded as a Status.
+We create a channel using the ManagedChannelBuilder class, specifying the server host and port we want to connect to. In the first client example, a blocking stub is used. This stub is obtained from the auto-generated EchoServiceGrpc class by calling the newBlockingStub factory method and passing the channel as an argument. With this approach, the client blocks while invoking the serverStreamingEcho method and waits for the server’s response. The call either returns a response from the server or throws a StatusRuntimeException, in which a gRPC error is encoded as a Status.
 
 Because this example demonstrates server-side streaming with a blocking stub, the request is provided as a method parameter, and the response is returned as an iterator. After the call is completed, the channel is shut down to ensure that the underlying resources (threads and TCP connections) are released.
 
@@ -241,12 +237,12 @@ try {
 } catch (StatusRuntimeException e) {
     logger.log(Level.WARNING, "error: {0}", e.getStatus());
 } finally {
-   channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+   channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
 }
 ```
 
 
-In the second client example, we demonstrate the use of the same server-streaming service method with a synchronous, non-blocking stub. This stub is obtained from the auto-generated EchoServiceGrpc class by invoking the newStub factory method. As in the previous example, the request is provided as the first method parameter. The response is handled through a stream observer, which the client implements and passes as the second method parameter.
+In the second client example, we demonstrate the use of the same server-streaming service method with an asynchronous, non-blocking stub. This stub is obtained from the auto-generated EchoServiceGrpc class by invoking the newStub factory method. As in the previous example, the request is provided as the first method parameter. The response is handled through a stream observer, which the client implements and passes as the second method parameter.
 
 The onNext method is called each time the client receives a single response from the server. The onError method can be called once if the call has completed exceptionally. The onCompleted method is invoked once after the server has successfully sent all responses and the call has completed successfully.
 
@@ -278,18 +274,18 @@ asyncStub.serverStreamingEcho(request, new StreamObserver<EchoResponse>() {
 });
 
 done.await();
-channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
 ```
 
 
-In this implementation, the client *does not block* on the serverStreamingEcho method. To wait for the asynchronous interaction to complete — either successfully or with an exception — we use a CountDownLatch as a thread barrier. The main thread will be blocked until the countDown method is called, which occurs in either the onCompleted or onError handler of the response stream observer.
+In this implementation, the client does not block on the serverStreamingEcho method. To wait for the asynchronous interaction to complete — either successfully or with an exception — we use a CountDownLatch as a thread barrier. The main thread will be blocked until the countDown method is called, which occurs in either the onCompleted or onError handler of the response stream observer.
 
 
 ##### Running the server and client
 
 To build the application, run the Gradle *shadowJar* task to produce a self-contained (über) JAR that does not declare a main Java class. Then, start the client and server in any order. Because the client stub is configured to wait for server readiness, it will wait until the server becomes available or the specified deadline is reached.
 
-After the client has sent a request to the server and received a response from it, it closes the channel and stops itself. To stop the server, press Ctrl+C to send a SIGINT signal to it. The server then shuts down gracefully as the JVM executes its registered shutdown hooks. We use logging to *stderr* here since the logger may have been reset by its JVM shutdown hook:
+After the client has sent a request to the server and received a response from it, it closes the channel and stops itself. To stop the server, press Ctrl+C to send a SIGINT signal to it. The server then shuts down gracefully as the JVM executes its registered shutdown hooks. We use logging to *stderr* here since the logger may have been reset by its JVM shutdown hook.
 
 
 #### Conclusion

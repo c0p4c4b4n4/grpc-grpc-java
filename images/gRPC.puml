@@ -7,20 +7,20 @@ skinparam TitleFontSize 14
 skinparam defaultTextAlignment center
 skinparam linetype ortho
 
-card "client" as C0
-card "channel" as C1
-card "client stub" as C2
-card "gRPC runtime" as C3
-card "transport" as C4
+rectangle "client" as C0
+rectangle "channel" as C1
+rectangle "client stub" as C2
+rectangle "gRPC runtime" as C3
+rectangle "transport" as C4
 
-card "server" as S0
-card "service" as S1
-card "service stub" as S2
-card "gRPC runtime" as S3
-card "transport" as S4
+rectangle "server" as S0
+rectangle "service" as S1
+rectangle "service stub" as S2
+rectangle "gRPC runtime" as S3
+rectangle "transport" as S4
 
-card "ProtoBuf" as P
-card "HTTP/2" as H
+rectangle "ProtoBuf" as P
+rectangle "HTTP/2" as H
 
 C0 -d- C1
 C1 -d- C2

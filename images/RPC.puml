@@ -1,6 +1,6 @@
 @startuml
 !theme mono
-scale 1.2
+scale 1.1
 hide footbox
 title Remote Procedure Call (RPC)
 skinparam TitleFontStyle plain

@@ -1,5 +1,5 @@
 @startuml
-!theme mono
+!theme plain
 scale 1.1
 skinparam defaultTextAlignment center
 skinparam linetype ortho
@@ -29,10 +29,10 @@ S1 -down- S2
 S2 -down- S3
 S3 -down- S4
 
-C2 --[dotted]right-- P
-P --[dotted]right-- S2
+C2 -[dotted]right- P
+P -[dotted]right- S2
 
-C4 --right-- H
-H --right-- S4
+C4 -right- H
+H -right- S4
 
 @enduml

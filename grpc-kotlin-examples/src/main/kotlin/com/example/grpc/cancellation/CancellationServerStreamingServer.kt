@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.util.logging.Logger
 
-object ServerStreamingServer {
-  private val logger = Logger.getLogger(ServerStreamingServer::class.java.name)
+object CancellationServerStreamingServer {
+  private val logger = Logger.getLogger(CancellationServerStreamingServer::class.java.name)
 
   @JvmStatic
   fun main(args: Array<String>) {

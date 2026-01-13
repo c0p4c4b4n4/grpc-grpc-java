@@ -9,8 +9,8 @@ import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 
-object ServerStreamingCoroutineClient {
-  private val logger = Logger.getLogger(ServerStreamingCoroutineClient::class.java.name)
+object CancellationServerStreamingCoroutineClient {
+  private val logger = Logger.getLogger(CancellationServerStreamingCoroutineClient::class.java.name)
 
   @JvmStatic
   fun main(args: Array<String>) = runBlocking {

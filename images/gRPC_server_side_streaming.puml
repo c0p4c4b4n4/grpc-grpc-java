@@ -10,14 +10,14 @@ skinparam sequenceMessageAlign center
 participant client
 participant server
 
-client ->>(5) server: serverStreamingEcho(request)
+client ->>(5) server: stub.serverStreamingEcho(request)
 
 alt success
-    server ->>(5) client: onNext(response)
-    server ->>(5) client: onNext(response)
-    server ->>(5) client: onNext(response)
-    server ->>(5) client: onCompleted()
+    server ->>(5) client: responseObserver.onNext(response)
+    server ->>(5) client: responseObserver.onNext(response)
+    server ->>(5) client: responseObserver.onNext(response)
+    server ->>(5) client: responseObserver.onCompleted()
 else failure
-    server ->>(5) client: onError(error)
+    server ->>(5) client: responseObserver.onError(throwable)
 end
 @enduml

@@ -38,7 +38,7 @@ Since 2001, Google has been developing an internal RPC framework named Stubby. I
 
 Only in 2015, with the emergence of the innovative HTTP/2 protocol, Google decided to leverage its features in a redesigned version of Stubby. References to Google's internal infrastructure (mainly name resolution and load balancing) were removed from the framework, and the project was redesigned to comply with open source standards. The framework has also been adapted for use in mobile devices, IoT, and cloud-native applications. This updated version was released as gRPC (which recursively stands for **g**RPC **R**emote **P**rocedure **C**alls).
 
-Today, gRPC remains the primary mechanism for inter-service communication at Google. Also, Google offers gRPC interfaces alongside REST interfaces for many of its public services. This is because gRPC provides notable performance benefits and supports bidirectional streaming — a feature that is not achievable with traditional RESTful services. At the time of writing, gRPC applications running in Google data centers support as many as O(10<sup>10</sup>) *queries per second*.
+Today, gRPC remains the primary mechanism for inter-service communication at Google. Also, Google offers gRPC interfaces alongside REST interfaces for many of its public services. This is because gRPC provides notable performance benefits and supports bidirectional streaming — a feature that is not achievable with traditional RESTful services.
 
 
 #### gRPC foundations
@@ -49,6 +49,8 @@ The gRPC framework includes two main components:
 
 * HTTP/2 — an application-layer protocol used as a transport protocol
 * Protocol Buffers — a serialization framework and RPC interface definition language
+
+![gRPC life cycle](/images/gRPC_life_cycle.png)
 
 
 ##### HTTP/2
@@ -66,7 +68,7 @@ The third improvement is header compression using the HPACK algorithm, which lev
 
 Protocol Buffers (Protobuf) is a multi-language serialization framework and RPC interface definition language for effective data exchange over the network. Protobuf definitions describe the service contract, including the RPC methods exposed by the server as well as the structure of request and response messages. This contract is strongly typed and explicitly designed to support forward and backward compatibility.
 
-As a serialization framework, Protobuf is designed to encode structured data — which is common for object-oriented programming languages — into a compact binary format. The resulting binary messages are efficient not only for transmission over the network, but also for persistent storage. Protobuf is highly optimized to reduce message size on the wire. (However, for resource-constrained IoT or mobile devices, using a zero-copy FlatBuffers serialization framework provides significantly less computational overhead at the cost of a larger message size.)
+As a serialization framework, Protobuf is designed to encode structured data — which is common for object-oriented programming languages — into a compact binary format. The resulting binary messages are efficient not only for transmission over the network, but also for persistent storage. Protobuf is highly optimized to reduce message size on the wire.
 
 As an interface definition language (IDL), the Protobuf compiler generates client and service stubs from declared RPC methods, which developers should use to implement their application-specific logic. The Protobuf compiler provides language-specific runtime libraries that transparently handle binary serialization and deserialization and transmission of binary messages over the network.
 
@@ -84,7 +86,7 @@ Streaming is one of the most important features of gRPC, enabled by the underlyi
 
 The following example demonstrates how to build a simple server-streaming gRPC application using plain Java. The application consists of an echo client that sends one or many requests, and an echo server that receives those requests, modifies them, and returns responses. The client receives the responses and displays them. (Client and server examples using the other types of methods are available in the GitHub [repository](https://github.com/alexander-linden/grpc-java-examples).)
 
-![gRPC life cycle](/images/gRPC_life_cycle.png)
+![gRPC server-side streaming](/images/gRPC_server_side_streaming.png)
 
 To implement this application, complete the following steps:
 
@@ -98,7 +100,7 @@ To implement this application, complete the following steps:
 
 ##### The contract between the service and the client
 
-A *.proto* file defines the contract between a client and a service. This example shows the *.proto* file used by both clients and servers in the application. Beyond the message and service definitions, the file also contains additional metadata. The *syntax* option defines the use of Protobuf version 3. The *package* option defines the global cross-language Protobuf namespace. Also, each programming language may have its own specific Protobuff options. For Java the *java_package* option defines the package where the generated Java classes are placed, and *the java_multiple_files = true* option defines generating separate Java files for each message and service defined in the *.proto* file.
+A *.proto* file defines the contract between a client and a service. This example shows the *.proto* file used by both clients and servers in the application. Beyond the message and service definitions, the file also contains additional metadata. The *syntax* option defines the use of Protobuf version 3. The *package* option defines the global cross-language Protobuf namespace. Also, each programming language may have its own specific Protobuf options. For Java the *java_package* option defines the package where the generated Java classes are placed, and *the java_multiple_files = true* option defines generating separate Java files for each message and service defined in the *.proto* file.
 
 
 ```
@@ -282,7 +284,7 @@ In this implementation, the client does not block on the `serverStreamingEcho` m
 
 ##### Running the server and client
 
-To build the application, run the Gradle *shadowJar* task to produce a self-contained (über) JAR that does not have a main Java class. Then, start the client and server in any order. Because the client stub is configured to wait for server readiness, it will wait until the server becomes available or the specified deadline is reached.
+To build the application, run the Gradle *shadowJar* task to produce a self-contained (über) JAR. Then, start the client and server in any order. Because the client stub is configured to wait for server readiness, it will wait until the server becomes available or the specified deadline is reached.
 
 After the client has sent a request to the server and received a response from it, the client closes the channel and stops itself. To stop the server, press Ctrl+C to send a SIGINT signal to it. The server then shuts down gracefully as the JVM executes its registered shutdown hooks. We use logging to *stderr* here since the logger may have been reset by its JVM shutdown hook.
 

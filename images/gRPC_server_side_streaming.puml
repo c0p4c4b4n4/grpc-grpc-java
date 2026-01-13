@@ -7,17 +7,17 @@ skinparam TitleFontStyle plain
 skinparam TitleFontSize 14
 skinparam sequenceMessageAlign center
 
-participant Client
-participant "Server" as SVC
+participant client
+participant server
 
-Client ->>(5) SVC: request
+client ->>(5) server: serverStreamingEcho(request)
 
 alt success
-    SVC ->>(5) Client: onNext
-    SVC ->>(5) Client: onNext
-    SVC ->>(5) Client: onNext
-    SVC ->>(5) Client: onCompleted
-else error
-    SVC ->>(5) Client: onError
+    server ->>(5) client: onNext(response)
+    server ->>(5) client: onNext(response)
+    server ->>(5) client: onNext(response)
+    server ->>(5) client: onCompleted()
+else failure
+    server ->>(5) client: onError(error)
 end
 @enduml

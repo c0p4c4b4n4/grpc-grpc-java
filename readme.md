@@ -22,15 +22,14 @@ However, with REST architecture, problems arise when implementing client-server 
 
 RPC is based on the technique of calling methods in another process — either on the same machine or on a different machine over the network — as if they were local methods. RPC frameworks provide code generation tools that create client and server stubs based on a given RPC interface. These stubs handle data serialization and network communication. As a result, when a client invokes a remote method with parameters and receives a return value, it appears to be a local method call. RPC frameworks aim to hide the complexity of serialization and network communication from developers.
 
-![Remote Procedure Call](/images/RPC.png)
-![gRPC](/images/gRPC.png)
+![Remote Procedure Call](/images/Remote_Procedure_Call.png)
 
 
 #### The problem
 
-When developing an effective RPC framework, developers had to address two primary challenges. First, it is necessary to ensure efficient cross-language serialization. Solutions, based on textual formats (such as JSON, YAML, or XML), are typically an order of magnitude less efficient than binary formats. They require additional computational resources for serialization and additional network bandwidth for transmitting larger messages.
+When developing an effective RPC framework, developers had to address two primary challenges. First, it is necessary to ensure efficient cross-language and cross-platform serialization. Solutions, based on textual formats (such as JSON, YAML, or XML), are typically an order of magnitude less efficient than binary formats. They require additional computational overhead for serialization and additional network bandwidth for transmitting larger messages.
 
-Second, there was an absence of an efficient application-layer protocol specifically designed for modern inter-service communication. Initially, the HTTP protocol was designed to allow clients (typically browsers) to request resources such as HTML documents, images, and scripts from servers in the hypermedia systems. It was not designed to support high-speed, bidirectional, simultaneous communication. Various workarounds based on HTTP/1.0 — short and long polling, webhooks — were inherently inefficient in their utilization of computational and network resources. Even new features introduced in HTTP/1.1, such as persistent connections, pipelining, and chunked transfer encoding, proved insufficient for these demands.
+Second, there was an absence of an efficient application-layer protocol specifically designed for modern inter-service communication. Initially, the HTTP protocol was designed to allow clients (typically browsers) to request resources such as HTML documents, images, and scripts from servers in the hypermedia systems. It was not designed to support high-speed, bidirectional, simultaneous communication. Various workarounds based on HTTP/1.0 — short and long polling, webhooks — were inherently inefficient in their utilization of computational and network resources. Even new features introduced in HTTP/1.1 — persistent connections, pipelining, and chunked transfer encoding — proved insufficient for these purposes.
 
 
 #### The solution
@@ -56,7 +55,7 @@ The gRPC framework includes two main components:
 
 HTTP/2 is the next version of the HTTP application-layer protocol. HTTP/2 started as an internal Google project named SPDY, whose main design goal was to reduce latency on the Web. HTTP/2 retains the semantics of the previous version of the protocol (methods, response codes, headers), but introduces significant changes in implementation. While HTTP/2 brings several improvements that benefit various platforms (browsers, mobile devices, and IoT), only a subset of these changes is relevant to gRPC.
 
-The first improvement is multiplexing, which allows multiple concurrent requests and responses to be sent over a single TCP connection. This solves the HTTP *head-of-line blocking* problem, where a slow response to one request delays subsequent requests on the same connection. In HTTP/2, requests and responses are divided into frames that can be transmitted interleaved and independently of each other within a stream. This approach allowed efficient streaming from client to server, from server to client, and simultaneous bidirectional streaming.
+The first improvement is multiplexing, which allows multiple concurrent requests and responses to be sent over a single TCP connection. This solves the HTTP *head-of-line blocking* problem, where a slow response to one request delays subsequent requests on the same connection. In HTTP/2, requests and responses are divided into frames that can be transmitted independently of each other within a stream. This approach allowed efficient streaming from client to server, from server to client, and simultaneous bidirectional streaming.
 
 The second improvement is the transition from text-based headers and bodies to a binary format. The binary framing layer encodes all communication between the client and server — headers, data, control, and other frame types — into a structured binary representation. This approach reduces the number of transmitted bytes that use network bandwidth more efficiently, and lowers computational overhead for data encoding and decoding.
 
@@ -85,6 +84,8 @@ Streaming is one of the most important features of gRPC, enabled by the underlyi
 
 The following example demonstrates how to build a simple server-streaming gRPC application using plain Java. The application consists of an echo client that sends one or many requests, and an echo server that receives those requests, modifies them, and returns responses. The client receives the responses and displays them. (Client and server examples using the other types of methods are available in the GitHub [repository](https://github.com/alexander-linden/grpc-java-examples).)
 
+![gRPC life cycle](/images/gRPC_life_cycle.png)
+
 To implement this application, complete the following steps:
 
 
@@ -97,7 +98,7 @@ To implement this application, complete the following steps:
 
 ##### The contract between the service and the client
 
-A *.proto* file defines the contract between a service and a client. This example shows the *.proto* file used by both clients and servers in the application. Beyond the message and service definitions, the file also contains additional metadata. The *syntax* option defines the use of Protobuf version 3. The *package* option defines the global cross-language Protobuf namespace. Also, each programming language may have its own specific Protobuff options. For Java the *java_package* option defines the package where the generated Java classes are placed, and *the java_multiple_files = true* option defines generating separate Java files for each message and service defined in the *.proto* file.
+A *.proto* file defines the contract between a client and a service. This example shows the *.proto* file used by both clients and servers in the application. Beyond the message and service definitions, the file also contains additional metadata. The *syntax* option defines the use of Protobuf version 3. The *package* option defines the global cross-language Protobuf namespace. Also, each programming language may have its own specific Protobuff options. For Java the *java_package* option defines the package where the generated Java classes are placed, and *the java_multiple_files = true* option defines generating separate Java files for each message and service defined in the *.proto* file.
 
 
 ```
@@ -283,7 +284,7 @@ In this implementation, the client does not block on the `serverStreamingEcho` m
 
 To build the application, run the Gradle *shadowJar* task to produce a self-contained (über) JAR that does not have a main Java class. Then, start the client and server in any order. Because the client stub is configured to wait for server readiness, it will wait until the server becomes available or the specified deadline is reached.
 
-After the client has sent a request to the server and received a response from it, it closes the channel and stops itself. To stop the server, press Ctrl+C to send a SIGINT signal to it. The server then shuts down gracefully as the JVM executes its registered shutdown hooks. We use logging to *stderr* here since the logger may have been reset by its JVM shutdown hook.
+After the client has sent a request to the server and received a response from it, the client closes the channel and stops itself. To stop the server, press Ctrl+C to send a SIGINT signal to it. The server then shuts down gracefully as the JVM executes its registered shutdown hooks. We use logging to *stderr* here since the logger may have been reset by its JVM shutdown hook.
 
 
 #### Conclusion
@@ -296,8 +297,8 @@ gRPC is an effective framework for implementing inter-service communication. How
 * The application requires client streaming or bidirectional streaming, which cannot be efficiently implemented using HTTP/1.1.
 * Automatic generation of gRPC service and client stubs is available for all required programming languages and platforms.
 * Both the client and server are developed within the same organization, and the application operates in a controlled environment.
-* Your organization has strong development standards that require strongly defined client-server contracts.
-* Development will benefit from built-in gRPC features, such as retry/deadline/cancellation, manual flow control, error handling, interceptors, authentication, name resolution, client-side load balancing, health checking, proxyless service mesh, etc.
+* Your organization has strict development standards that require strongly defined client-server contracts.
+* Development will benefit from built-in gRPC features, such as retry/deadline/cancellation, manual flow control, error propagation, interceptors, authentication, name resolution, client-side load balancing, health checking, proxyless service mesh, etc.
 
 However, REST is a more appropriate architecture if the application meets most of the following conditions:
 

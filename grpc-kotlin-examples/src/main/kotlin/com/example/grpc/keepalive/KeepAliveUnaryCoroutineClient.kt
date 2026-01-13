@@ -15,6 +15,7 @@ object KeepAliveUnaryCoroutineClient {
   @JvmStatic
   fun main(args: Array<String>) = runBlocking {
     Loggers.init()
+    Loggers.initIoGrpc()
 
     val channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext()
       .keepAliveTime(10, TimeUnit.SECONDS)

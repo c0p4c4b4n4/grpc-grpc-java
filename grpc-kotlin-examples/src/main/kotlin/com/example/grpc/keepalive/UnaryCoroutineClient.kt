@@ -1,4 +1,4 @@
-package com.example.grpc.cancellation
+package com.example.grpc.keepalive
 
 import com.example.grpc.EchoServiceGrpcKt
 import com.example.grpc.Loggers
@@ -8,10 +8,9 @@ import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
-import kotlinx.coroutines.*
 
-object CancellationServerStreamingCoroutineClient {
-  private val logger = Logger.getLogger(CancellationServerStreamingCoroutineClient::class.java.name)
+object UnaryCoroutineClient {
+  private val logger = Logger.getLogger(UnaryCoroutineClient::class.java.name)
 
   @JvmStatic
   fun main(args: Array<String>) = runBlocking {
@@ -22,9 +21,8 @@ object CancellationServerStreamingCoroutineClient {
       val stub = EchoServiceGrpcKt.EchoServiceCoroutineStub(channel)
 
       val request = echoRequest { this.message = "world" }
-      stub.serverStreamingEcho(request).collect { response ->
-        logger.info("response: ${response.message}")
-      }
+      val response = stub.unaryEcho(request)
+      logger.info("response: ${response.message}")
     } catch (e: StatusRuntimeException) {
       logger.warning("RPC error: ${e.status}")
     } finally {

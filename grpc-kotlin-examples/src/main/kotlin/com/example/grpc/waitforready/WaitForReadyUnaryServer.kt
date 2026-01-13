@@ -1,4 +1,4 @@
-package com.example.grpc.methodtypes.unary
+package com.example.grpc.waitforready
 
 import com.example.grpc.EchoRequest
 import com.example.grpc.EchoServiceGrpcKt

@@ -1,8 +1,9 @@
-package com.example.grpc.methodtypes.unary
+package com.example.grpc.waitforready
 
 import com.example.grpc.EchoServiceGrpcKt
 import com.example.grpc.Loggers
 import com.example.grpc.echoRequest
+import io.grpc.Deadline
 import io.grpc.ManagedChannelBuilder
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.runBlocking

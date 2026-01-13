@@ -1,4 +1,4 @@
-package com.example.grpc.methodtypes.streaming.server
+package com.example.grpc.cancellation
 
 import com.example.grpc.EchoRequest
 import com.example.grpc.EchoResponse

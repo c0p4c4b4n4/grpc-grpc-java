@@ -1,4 +1,4 @@
-package com.example.grpc.methodtypes.streaming.server
+package com.example.grpc.cancellation
 
 import com.example.grpc.EchoServiceGrpcKt
 import com.example.grpc.Loggers
@@ -8,6 +8,7 @@ import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
+import kotlinx.coroutines.*
 
 object CancellationServerStreamingCoroutineClient {
   private val logger = Logger.getLogger(CancellationServerStreamingCoroutineClient::class.java.name)

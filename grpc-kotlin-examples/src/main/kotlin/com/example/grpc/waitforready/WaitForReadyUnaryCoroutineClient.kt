@@ -21,7 +21,7 @@ object WaitForReadyUnaryCoroutineClient {
     try {
       val stub = EchoServiceGrpcKt.EchoServiceCoroutineStub(channel)
         .withWaitForReady()
-        .withDeadline(Deadline.after(30, TimeUnit.SECONDS));
+        .withDeadline(Deadline.after(30, TimeUnit.SECONDS))
 
       val request = echoRequest { this.message = "world" }
       val response = stub.unaryEcho(request)

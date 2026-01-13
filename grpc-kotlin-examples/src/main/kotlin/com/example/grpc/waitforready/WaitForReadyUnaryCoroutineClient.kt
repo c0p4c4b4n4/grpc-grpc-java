@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 
 object WaitForReadyUnaryCoroutineClient {
-  private val logger = Logger.getLogger(UnaryCoroutineClient::class.java.name)
+  private val logger = Logger.getLogger(WaitForReadyUnaryCoroutineClient::class.java.name)
 
   @JvmStatic
   fun main(args: Array<String>) = runBlocking {
@@ -19,6 +19,9 @@ object WaitForReadyUnaryCoroutineClient {
     val channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build()
     try {
       val stub = EchoServiceGrpcKt.EchoServiceCoroutineStub(channel)
+        .withWaitForReady()
+        .withDeadline(Deadline.after(30, TimeUnit.SECONDS));
+
       val request = echoRequest { this.message = "world" }
       val response = stub.unaryEcho(request)
       logger.info("response: ${response.message}")

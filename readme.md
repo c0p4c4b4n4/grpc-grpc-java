@@ -100,7 +100,7 @@ To implement this application, complete the following steps:
 
 ##### The contract between the service and the client
 
-A *.proto* file defines the contract between a client and a service. This example shows the *.proto* file used by both clients and servers in the application. Beyond the message and service definitions, the file also contains additional metadata. The *syntax* option defines the use of Protobuf version 3. The *package* option defines the global cross-language Protobuf namespace. Also, each programming language may have its own specific Protobuf options. For Java the *java_package* option defines the package where the generated Java classes are placed, and *the java_multiple_files = true* option defines generating separate Java files for each message and service defined in the *.proto* file.
+A *.proto* file defines the contract between a client and a service. This example shows the *.proto* file used by both clients and servers in the application. Beyond the message and service definitions, the file also contains additional metadata. The *syntax* option defines the use of Protobuf version 3. The *package* option defines the global cross-language Protobuf namespace. Also, each programming language may have its own specific Protobuf options. For Java, the *java_package* option defines the package where the generated Java classes are placed, and *the java_multiple_files = true* option defines generating separate Java files for each message and service defined in the *.proto* file.
 
 
 ```

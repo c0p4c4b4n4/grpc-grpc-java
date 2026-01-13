@@ -20,8 +20,8 @@ rectangle "service stub" as server2
 rectangle "gRPC runtime" as server1
 rectangle "transport" as server0
 
-rectangle "ProtoBuf" as P
-rectangle "HTTP/2" as H
+rectangle "ProtoBuf" as protobuf
+rectangle "HTTP/2" as http
 
 client4 -d- client3
 client3 -d- client2
@@ -44,10 +44,10 @@ server1 -[hidden]d- server0
 server1 -[hidden]d- server0
 server1 -[hidden]d- server0
 
-client2 -[dotted]r- P
-P -[dotted]r- server2
+client2 -[dotted]r- protobuf
+protobuf -[dotted]r- server2
 
-client0 -r- H
-H -r- server0
+client0 -r- http
+http -r- server0
 
 @enduml

@@ -8,20 +8,20 @@ skinparam defaultTextAlignment center
 skinparam linetype ortho
 skinparam ranksep 30
 
-card "client" as client4
-card "channel" as client3
-card "client stub" as client2
-card "gRPC runtime" as client1
-card "transport" as client0
+rectangle "client" as client4
+rectangle "channel" as client3
+rectangle "client stub" as client2
+rectangle "gRPC runtime" as client1
+rectangle "transport" as client0
 
-card "server" as server4
-card "service" as server3
-card "service stub" as server2
-card "gRPC runtime" as server1
-card "transport" as server0
+rectangle "server" as server4
+rectangle "service" as server3
+rectangle "service stub" as server2
+rectangle "gRPC runtime" as server1
+rectangle "transport" as server0
 
-card "ProtoBuf" as protobuf
-card "HTTP/2" as http
+rectangle "ProtoBuf" as protobuf
+rectangle "HTTP/2" as http
 
 client4 -d- client3
 client3 -d- client2

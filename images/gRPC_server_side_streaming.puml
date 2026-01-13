@@ -20,4 +20,5 @@ alt success
 else failure
     server ->>(5) client: responseObserver.onError(throwable)
 end
+
 @enduml

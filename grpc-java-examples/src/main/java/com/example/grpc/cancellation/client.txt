@@ -1,0 +1,54 @@
+kotlin
+import kotlinx.coroutines.*
+
+val job = Job()
+val scope = CoroutineScope(Dispatchers.Default + job)
+
+scope.launch {
+    try {
+        val stub = EchoServiceGrpcKt.EchoServiceCoroutineStub(channel)
+        val request = echoRequest { message = "world" }
+
+        var count = 0
+        stub.serverStreamingEcho(request).collect { response ->
+            logger.info("response: ${response.message}")
+            count++
+            if (count > 3) {
+                // This cancels the coroutine and the gRPC stream
+                job.cancel(CancellationException("Client cancelled"))
+            }
+        }
+    } catch (e: CancellationException) {
+        logger.warning("RPC Cancelled: ${e.message}")
+    }
+}
+Use code with caution.
+
+Key Differences from Java:
+No CancellableContext: Kotlin gRPC uses the CoroutineContext. If the coroutine collecting the flow is cancelled, the RPC is cancelled automatically via the gRPC Kotlin library.
+Flows: Since serverStreamingEcho returns a Flow, you can use flow operators like .take(n), .withTimeout(), or .first() which handle cancellation safely and idiomatically.
+Exception Handling: Cancellation in Kotlin throws a kotlinx.coroutines.CancellationException, which is generally ignored by crash handlers but stops the RPC.
+
+import kotlinx.coroutines.*
+
+val job = Job()
+val scope = CoroutineScope(Dispatchers.Default + job)
+
+scope.launch {
+    try {
+        val stub = EchoServiceGrpcKt.EchoServiceCoroutineStub(channel)
+        val request = echoRequest { message = "world" }
+
+        var count = 0
+        stub.serverStreamingEcho(request).collect { response ->
+            logger.info("response: ${response.message}")
+            count++
+            if (count > 3) {
+                // This cancels the coroutine and the gRPC stream
+                job.cancel(CancellationException("Client cancelled"))
+            }
+        }
+    } catch (e: CancellationException) {
+        logger.warning("RPC Cancelled: ${e.message}")
+    }
+}

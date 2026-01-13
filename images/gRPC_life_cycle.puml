@@ -25,7 +25,10 @@ rectangle "HTTP/2" as H
 C0 -d- C1
 C1 -d- C2
 C2 -d- C3
+C3 -[hidden]d- C4
 C3 -d- C4
+C3 -[hidden]d- C4
+C3 -[hidden]d- C4
 C3 -[hidden]d- C4
 C3 -[hidden]d- C4
 C3 -[hidden]d- C4
@@ -33,7 +36,9 @@ C3 -[hidden]d- C4
 S0 -d- S1
 S1 -d- S2
 S2 -d- S3
+S3 -[hidden]d- S4
 S3 -d- S4
+S3 -[hidden]d- S4
 S3 -[hidden]d- S4
 S3 -[hidden]d- S4
 S3 -[hidden]d- S4

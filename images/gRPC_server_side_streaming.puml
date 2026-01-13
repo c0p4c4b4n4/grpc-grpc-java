@@ -1,0 +1,23 @@
+@startuml
+!theme mono
+scale 1.1
+hide footbox
+title gRPC server-side streaming
+skinparam TitleFontStyle plain
+skinparam TitleFontSize 14
+skinparam sequenceMessageAlign center
+
+participant Client
+participant "Server" as SVC
+
+Client ->>(5) SVC: request
+
+alt success
+    SVC ->>(5) Client: onNext
+    SVC ->>(5) Client: onNext
+    SVC ->>(5) Client: onNext
+    SVC ->>(5) Client: onCompleted
+else error
+    SVC ->>(5) Client: onError
+end
+@enduml

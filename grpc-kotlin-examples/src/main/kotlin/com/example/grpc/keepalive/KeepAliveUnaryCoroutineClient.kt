@@ -9,14 +9,18 @@ import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 
-object UnaryCoroutineClient {
-  private val logger = Logger.getLogger(UnaryCoroutineClient::class.java.name)
+object KeepAliveUnaryCoroutineClient {
+  private val logger = Logger.getLogger(KeepAliveUnaryCoroutineClient::class.java.name)
 
   @JvmStatic
   fun main(args: Array<String>) = runBlocking {
     Loggers.init()
 
-    val channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build()
+    val channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext()
+      .keepAliveTime(10, TimeUnit.SECONDS)
+      .keepAliveTimeout(1, TimeUnit.SECONDS)
+      .keepAliveWithoutCalls(true)
+      .build()
     try {
       val stub = EchoServiceGrpcKt.EchoServiceCoroutineStub(channel)
 

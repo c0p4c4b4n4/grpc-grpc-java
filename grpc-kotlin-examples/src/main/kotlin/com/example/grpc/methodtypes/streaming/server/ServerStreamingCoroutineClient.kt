@@ -19,6 +19,7 @@ object ServerStreamingCoroutineClient {
     val channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build()
     try {
       val stub = EchoServiceGrpcKt.EchoServiceCoroutineStub(channel)
+
       val request = echoRequest { this.message = "world" }
       stub.serverStreamingEcho(request).collect { response ->
         logger.info("response: ${response.message}")

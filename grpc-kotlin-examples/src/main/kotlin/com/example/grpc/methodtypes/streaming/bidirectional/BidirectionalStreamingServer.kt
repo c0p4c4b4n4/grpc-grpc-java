@@ -22,6 +22,7 @@ object BidirectionalStreamingServer {
       requests.collect { request ->
         val name = request.message
         logger.info("next request: $name")
+
         emit(echoResponse { message = "hello $name" })
         emit(echoResponse { message = "guten tag $name" })
         emit(echoResponse { message = "bonjour $name" })      }

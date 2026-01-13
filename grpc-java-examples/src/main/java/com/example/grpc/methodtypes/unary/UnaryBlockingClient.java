@@ -20,6 +20,7 @@ public class UnaryBlockingClient {
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         try {
             var blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+
             var request = EchoRequest.newBuilder().setMessage("world").build();
             var response = blockingStub.unaryEcho(request);
             logger.log(Level.INFO, "response: {0}", response.getMessage());

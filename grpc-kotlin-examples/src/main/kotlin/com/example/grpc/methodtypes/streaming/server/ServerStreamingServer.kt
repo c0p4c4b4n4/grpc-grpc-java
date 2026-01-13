@@ -21,6 +21,7 @@ object ServerStreamingServer {
     override fun serverStreamingEcho(request: EchoRequest): Flow<EchoResponse> {
       val name = request.message
       logger.info("request: $name")
+
       return flow {
         emit(echoResponse { message = "hello $name" })
         emit(echoResponse { message = "guten tag $name" })

@@ -27,6 +27,7 @@ public class BidirectionalStreamingBlockingV2Client {
             blockingClientCall.write(EchoRequest.newBuilder().setMessage("world").build());
             blockingClientCall.write(EchoRequest.newBuilder().setMessage("welt").build());
             blockingClientCall.write(EchoRequest.newBuilder().setMessage("monde").build());
+
             blockingClientCall.halfClose();
 
             for (EchoResponse response; (response = blockingClientCall.read()) != null; ) {

@@ -22,6 +22,7 @@ public class ServerStreamingServer {
         public void serverStreamingEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
             var name = request.getMessage();
             logger.log(Level.INFO, "request: {0}", name);
+
             responseObserver.onNext(EchoResponse.newBuilder().setMessage("hello " + name).build());
             responseObserver.onNext(EchoResponse.newBuilder().setMessage("guten tag " + name).build());
             responseObserver.onNext(EchoResponse.newBuilder().setMessage("bonjour " + name).build());

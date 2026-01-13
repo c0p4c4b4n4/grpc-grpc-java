@@ -20,6 +20,7 @@ public class ServerStreamingBlockingClient {
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         try {
             var blockingStub = EchoServiceGrpc.newBlockingStub(channel);
+
             var request = EchoRequest.newBuilder().setMessage("world").build();
             var responses = blockingStub.serverStreamingEcho(request);
             while (responses.hasNext()) {

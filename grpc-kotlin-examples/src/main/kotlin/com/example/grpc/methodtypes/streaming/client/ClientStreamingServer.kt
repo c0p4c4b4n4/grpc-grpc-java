@@ -20,8 +20,9 @@ object ClientStreamingServer {
     override suspend fun clientStreamingEcho(requests: Flow<EchoRequest>): EchoResponse {
       val responses = mutableListOf<String>()
       requests.collect { request ->
-        logger.info("next request: ${request.message}")
-        responses.add("hello ${request.message}")
+        var name = request.message
+        logger.info("next request: ${name}")
+        responses.add("hello ${name}")
       }
       return echoResponse { message = responses.joinToString(", ") }
     }

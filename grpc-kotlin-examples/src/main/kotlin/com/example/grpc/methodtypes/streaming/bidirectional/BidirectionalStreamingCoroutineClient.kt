@@ -20,6 +20,7 @@ object BidirectionalStreamingCoroutineClient {
     val channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build()
     try {
       val stub = EchoServiceGrpcKt.EchoServiceCoroutineStub(channel)
+
       val requests = flow {
         emit(echoRequest { this.message = "world" })
         emit(echoRequest { this.message = "welt" })

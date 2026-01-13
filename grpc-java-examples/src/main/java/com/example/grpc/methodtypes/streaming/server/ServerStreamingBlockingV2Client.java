@@ -23,6 +23,7 @@ public class ServerStreamingBlockingV2Client {
         var channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
         try {
             var blockingStub = EchoServiceGrpc.newBlockingV2Stub(channel);
+
             var request = EchoRequest.newBuilder().setMessage("world").build();
             var blockingClientCall = blockingStub.serverStreamingEcho(request);
             for (EchoResponse response; (response = blockingClientCall.read()) != null; ) {

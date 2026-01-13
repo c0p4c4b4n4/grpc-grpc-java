@@ -9,7 +9,7 @@ import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 
-object UnaryCoroutineClient {
+object WaitForReadyUnaryCoroutineClient {
   private val logger = Logger.getLogger(UnaryCoroutineClient::class.java.name)
 
   @JvmStatic
@@ -19,7 +19,6 @@ object UnaryCoroutineClient {
     val channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build()
     try {
       val stub = EchoServiceGrpcKt.EchoServiceCoroutineStub(channel)
-
       val request = echoRequest { this.message = "world" }
       val response = stub.unaryEcho(request)
       logger.info("response: ${response.message}")

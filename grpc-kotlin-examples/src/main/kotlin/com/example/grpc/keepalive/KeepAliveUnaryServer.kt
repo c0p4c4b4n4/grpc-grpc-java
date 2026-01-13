@@ -14,9 +14,9 @@ object KeepAliveUnaryServer {
   fun main(args: Array<String>) {
     Loggers.initIoGrpc()
 
-    var serverBuilder = ServerBuilder
+    val serverBuilder = ServerBuilder
       .forPort(50051)
-      .addService( EchoServiceImpl())
+      .addService(EchoServiceImpl())
       .keepAliveTime(5, TimeUnit.SECONDS)
       .keepAliveTimeout(1, TimeUnit.SECONDS)
       .permitKeepAliveTime(5, TimeUnit.SECONDS)

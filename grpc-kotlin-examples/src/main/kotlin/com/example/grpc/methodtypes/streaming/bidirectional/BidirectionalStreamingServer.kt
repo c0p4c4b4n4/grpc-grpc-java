@@ -25,7 +25,8 @@ object BidirectionalStreamingServer {
 
         emit(echoResponse { message = "hello $name" })
         emit(echoResponse { message = "guten tag $name" })
-        emit(echoResponse { message = "bonjour $name" })      }
+        emit(echoResponse { message = "bonjour $name" })
+      }
     }
   }
 }

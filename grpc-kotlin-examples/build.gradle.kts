@@ -20,8 +20,8 @@ dependencies {
     api(libs.grpc.kotlin.stub)
     //implementation("io.grpc:grpc-kotlin-stub:${project.findProperty("grpcVersion")}")
 
-    runtimeOnly(libs.grpc.netty)
-    //runtimeOnly("io.grpc:grpc-netty:${project.findProperty("grpcVersion")}")
+//    runtimeOnly(libs.grpc.netty)
+    runtimeOnly("io.grpc:grpc-netty-shaded:${project.findProperty("grpcVersion")}")
 }
 
 kotlin { jvmToolchain(17) }

@@ -9,10 +9,12 @@ import java.util.logging.Logger
 object Servers {
   private val logger = Logger.getLogger(Servers::class.java.name)
 
-  fun start(serverBuilder: ServerBuilder<*>) {
+  fun start(bindableService: BindableService) {
     Loggers.init()
 
-    val server: Server = serverBuilder
+    val server = ServerBuilder
+      .forPort(50051)
+      .addService(bindableService)
       .build()
       .start()
 

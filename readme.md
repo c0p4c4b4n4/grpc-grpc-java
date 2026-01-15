@@ -17,7 +17,7 @@ However, with REST architecture, problems arise when implementing client-server 
 
 
 * Reading and writing complex data structures comprising multiple resources.
-* Low latency and high throughput communication.
+* Low-latency and high-throughput communication.
 * Client streaming or bidirectional streaming.
 
 RPC is based on the technique of calling procedures in another process — either on the same machine or on a different machine over the network — as if they were local procedures. RPC frameworks provide code generation tools that create client and server stubs based on a given RPC interface. These stubs handle data serialization and network communication. As a result, when a client invokes a remote procedure with parameters and receives a return value, it appears to be a local method call. RPC frameworks aim to hide the complexity of serialization and network communication from developers. (However, developers using RPC communication should be aware that the network is inherently [unreliable](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing) and should implement retry/deadline/cancellation and exception handling to manage partial or total network failures.)
@@ -59,7 +59,7 @@ HTTP/2 is the next version of the HTTP application-layer protocol. HTTP/2 starte
 
 The first improvement is multiplexing, which allows multiple concurrent requests and responses to be sent over a single TCP connection. This solves the HTTP *head-of-line blocking* problem, where a slow response to one request delays subsequent requests on the same connection. In HTTP/2, requests and responses are divided into frames that can be transmitted independently of each other within a stream. This approach allowed efficient streaming from client to server, from server to client, and simultaneous bidirectional streaming.
 
-The second improvement is the transition from text-based headers and bodies to a binary format. The binary framing layer encodes all communication between the client and server — headers, data, control, and other frame types — into a structured binary representation. This approach reduces the number of bytes transmitted over the wire, and lowers computational overhead for encoding and decoding.
+The second improvement is the transition from text-based headers and bodies to a binary format. The binary framing layer encodes all communication between the client and server — headers, data, control, and other frame types — into a structured binary representation. This approach reduces the number of bytes transmitted over the wire and lowers computational overhead for encoding and decoding.
 
 The third improvement is header compression using the HPACK algorithm, which uses static and dynamic header tables together with Huffman encoding to reduce redundancy. This is particularly beneficial when multiple consecutive requests and responses share the same headers — a common scenario in inter-service communication — because it significantly reduces the number of transmitted bytes.
 
@@ -68,7 +68,7 @@ The third improvement is header compression using the HPACK algorithm, which use
 
 Protocol Buffers (Protobuf) is a multi-language serialization framework and RPC interface definition language for effective data exchange over the network. Protobuf definitions describe the RPC service contract, including methods exposed by the server, and the structure of request and response messages. This contract is strongly typed and explicitly designed to support forward and backward compatibility.
 
-As a serialization framework, Protobuf is designed to encode structured data — which is common for object-oriented programming languages — into a compact binary format. The resulting binary messages are efficient not only for transmission over the network, but also for persistent storage. Protobuf is highly optimized to minimize network overhead by reducing the serialized message size. (However, if developers have to minimize computational and memory overhead at the expense of increased message size, they can use gRPC with zero-copy serialization frameworks FlatBuffers or Cap’n Proto.)
+As a serialization framework, Protobuf is designed to encode structured data — which is common for object-oriented programming languages — into a compact binary format. The resulting binary messages are efficient not only for transmission over the network, but also for persistent storage. Protobuf is highly optimized to minimize network overhead by reducing the serialized message size. (However, if developers have to minimize computational and memory overhead at the expense of increased message size, they can use gRPC with zero-copy serialization frameworks — FlatBuffers or Cap’n Proto.)
 
 As an interface definition language (IDL), the Protobuf compiler generates client and service stubs from declared RPC services, which developers should use to implement their application-specific logic. The Protobuf compiler provides language-specific runtime libraries that transparently handle binary serialization and transmission of messages over the network.
 
@@ -146,7 +146,7 @@ For the `EchoService` service, an `EchoServiceGrpc` class is generated, containi
 
 * `EchoServiceStub`: to make asynchronous calls using the `StreamObserver` interface (it supports all four communication patterns)
 * `EchoServiceBlockingStub`: to make synchronous calls (it supports unary and server-streaming calls only)
-* `EchoServiceBlockingV2Stub`: to make synchronous calls (it supports unary calls as a stable feature and all 3 streaming calls as experimental features), and can throw checked `StatusException` instead of runtime `StatusRuntimeException`.
+* `EchoServiceBlockingV2Stub`: to make synchronous calls (it supports unary calls as a stable feature and all 3 streaming calls as experimental features), but can throw checked `StatusException` instead of runtime `StatusRuntimeException`.
 * `EchoServiceFutureStub`: to asynchronous calls with the `ListenableFuture` interface (it supports unary calls only)
 
 
@@ -161,7 +161,7 @@ The next step in the application implementation is to create an echo server. To 
 
 We create the `EchoServiceImpl` class that extends and implements the auto-generated abstract `EchoServiceGrpc.ServiceImplBase` class. The class overrides the `serverStreamingEcho` method, which receives the request as an `EchoRequest` instance to read from, and a provided `EchoResponse` stream observer to write responses to.
 
-To process a client request, the server performs the following steps: for each message, it constructs an `EchoResponse` using the builder and sends it to the client by calling the `onNext` method. After all messages have been sent, the server calls the `onCompleted` method to indicate that the call has finished sucessfully. (Had an error occurred while processing the response, the server would have called the `onError` method to indicate that the call had failed.)
+To process a client request, the server performs the following steps: for each message, it constructs an `EchoResponse` using the builder and sends it to the client by calling the `onNext` method. After all messages have been sent, the server calls the `onCompleted` method to indicate that the call has finished successfully. (Had an error occurred while processing the response, the server would have called the `onError` method to indicate that the call had failed.)
 
 
 ```
@@ -220,7 +220,7 @@ The next step in the application implementation is to create an echo client. To 
 
 We create a channel using the `ManagedChannelBuilder` class, specifying the server host and port we want to connect to. In the first client example, a blocking stub is used. This stub is obtained from the generated `EchoServiceGrpc` class by calling the `newBlockingStub` factory method and passing the channel as an argument. With this approach, the client blocks while invoking the `serverStreamingEcho` method and waits for the server’s response. The call either returns a response from the server or throws a `StatusRuntimeException`, in which a gRPC error is encoded as a `Status`.
 
-The example below demonstrates a client for server-side streaming service with a blocking stub, the request is provided as a method parameter, and the response is returned as an iterator. After the call is completed, the channel is shut down to ensure that the underlying resources (threads and TCP connections) are released.
+The example below demonstrates a client for a server-side streaming service with a blocking stub, where the request is provided as a method parameter, and the response is returned as an iterator. After the call is completed, the channel is shut down to ensure that the underlying resources (threads and TCP connections) are released.
 
 
 ```

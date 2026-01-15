@@ -1,7 +1,7 @@
 @startuml
 !theme mono
-scale 1.0
-title gRPC life cycle
+scale 1.1
+title gRPC structure
 skinparam TitleFontStyle plain
 skinparam TitleFontSize 14
 skinparam defaultTextAlignment center

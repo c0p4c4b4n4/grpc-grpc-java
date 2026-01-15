@@ -50,7 +50,7 @@ The gRPC framework includes two main components:
 * HTTP/2 — an application-layer protocol used as a transport protocol
 * Protocol Buffers — a serialization framework and RPC interface definition language
 
-![gRPC life cycle](/images/gRPC_life_cycle.png)
+![gRPC structure](/images/gRPC_structure.png)
 
 
 ##### HTTP/2

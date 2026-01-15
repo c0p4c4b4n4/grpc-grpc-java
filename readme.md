@@ -5,7 +5,7 @@
 
 gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed for high-performance inter-service communication: on-premises, in the cloud, in containers, or on mobile and IoT devices.
 
-gRPC uses HTTP/2 as a transport protocol along with Protocol Buffers (Protobuf) as a binary serialization framework and RPC interface description language. Thanks to these features, gRPC can provide qualitative and quantitative characteristics of communication between services that are not available for RESTful services, which typically means transferring textual JSONs over the HTTP/1.1 protocol.
+gRPC uses HTTP/2 as a transport protocol along with Protocol Buffers (Protobuf) as a binary serialization framework and RPC interface description language. Thanks to these features, gRPC can provide qualitative and quantitative characteristics of communication that are not available for RESTful services, which typically means transferring textual JSONs over the HTTP/1.1 protocol.
 
 
 #### Why not REST?
@@ -66,13 +66,13 @@ The third improvement is header compression using the HPACK algorithm, which use
 
 ##### Protocol Buffers
 
-Protocol Buffers (Protobuf) is a multi-language serialization framework and RPC interface definition language for effective data exchange over the network. Protobuf definitions describe the service contract, including the RPC methods exposed by the server, as well as the structure of request and response messages. This contract is strongly typed and explicitly designed to support forward and backward compatibility.
+Protocol Buffers (Protobuf) is a multi-language serialization framework and RPC interface definition language for effective data exchange over the network. Protobuf definitions describe the RPC service contract, including methods exposed by the server, and the structure of request and response messages. This contract is strongly typed and explicitly designed to support forward and backward compatibility.
 
-As a serialization framework, Protobuf is designed to encode structured data — which is common for object-oriented programming languages — into a compact binary format. The resulting binary messages are efficient not only for transmission over the network, but also for persistent storage. Protobuf is highly optimized to minimize network overhead by reducing the serialized message size. (However, if developers have to minimize computational and memory overhead at the expense of increased message size, they can use gRPC with zero-copy frameworks FlatBuffers or Cap’n Proto.)
+As a serialization framework, Protobuf is designed to encode structured data — which is common for object-oriented programming languages — into a compact binary format. The resulting binary messages are efficient not only for transmission over the network, but also for persistent storage. Protobuf is highly optimized to minimize network overhead by reducing the serialized message size. (However, if developers have to minimize computational and memory overhead at the expense of increased message size, they can use gRPC with zero-copy serialization frameworks FlatBuffers or Cap’n Proto.)
 
 As an interface definition language (IDL), the Protobuf compiler generates client and service stubs from declared RPC services, which developers should use to implement their application-specific logic. The Protobuf compiler provides language-specific runtime libraries that transparently handle binary serialization and transmission of messages over the network.
 
-Streaming is one of the most important features of gRPC, enabled by the underlying HTTP/2 protocol. Depending on whether the client sends a single parameter or a stream of parameters, and whether the service returns a single response or a stream of responses, there are four supported RPC method types:
+Streaming is one of the most important features of gRPC, enabled by the underlying HTTP/2 protocol. Depending on whether the client sends a single parameter or a stream of parameters, and whether the service returns a single response or a stream of responses, there are four supported method types:
 
 
 
@@ -136,7 +136,7 @@ service EchoService {
 
 ##### Generating service and client stubs
 
-To use gRPC in your Gradle project, place your *.proto* file in the *src/main/proto* directory, add the required implementation and runtime gRPC dependencies, and configure the Protobuf Gradle plugin. Next, execute the Gradle task *generateProto*, and the generated Java classes will be placed in a designated directory (in our example, *build/generated/source/proto/main/java*). These generated classes fall into two categories: message definition classes and service definition classes.
+To use gRPC in your Gradle project, place your *.proto* file in the *src/main/proto* directory, add the required implementation and runtime dependencies, and configure the Protobuf Gradle plugin. Next, execute the Gradle task *generateProto*, and the generated Java classes will be placed in a designated directory (in our example, *build/generated/source/proto/main/java*). These generated classes fall into two categories: message classes and service classes.
 
 For the `EchoRequest` message, an immutable `EchoRequest` class is generated to handle data storage and serialization, along with an inner `EchoRequest.Builder` class to create the `EchoRequest` class using the builder pattern. Similar classes are generated for the `EchoResponse` message.
 
@@ -146,7 +146,7 @@ For the `EchoService` service, an `EchoServiceGrpc` class is generated, containi
 
 * `EchoServiceStub`: to make asynchronous calls using the `StreamObserver` interface (it supports all four communication patterns)
 * `EchoServiceBlockingStub`: to make synchronous calls (it supports unary and server-streaming calls only)
-* `EchoServiceBlockingV2Stub`: to make synchronous calls (it supports unary calls as a stable feature and all 3 streaming calls as experimental features), but can throw checked `StatusException` instead of runtime `StatusRuntimeException`.
+* `EchoServiceBlockingV2Stub`: to make synchronous calls (it supports unary calls as a stable feature and all 3 streaming calls as experimental features), and can throw checked `StatusException` instead of runtime `StatusRuntimeException`.
 * `EchoServiceFutureStub`: to asynchronous calls with the `ListenableFuture` interface (it supports unary calls only)
 
 
@@ -159,9 +159,9 @@ The next step in the application implementation is to create an echo server. To 
 1. Override the service methods in the generated service stub.
 2. Start a server to listen for client requests.
 
-We create the `EchoServiceImpl` class that extends and implements the auto-generated `EchoServiceGrpc.ServiceImplBase` abstract class. The class overrides the `serverStreamingEcho` method, which receives the request as an `EchoRequest` instance to read from, and a provided `EchoResponse` stream observer to write responses to.
+We create the `EchoServiceImpl` class that extends and implements the auto-generated abstract `EchoServiceGrpc.ServiceImplBase` class. The class overrides the `serverStreamingEcho` method, which receives the request as an `EchoRequest` instance to read from, and a provided `EchoResponse` stream observer to write responses to.
 
-To process a client request, the server performs the following steps: for each message, it constructs an `EchoResponse` using the builder and sends it to the client by calling the response stream observer’s `onNext` method. After all messages have been sent, the server calls the response stream observer’s `onCompleted` method to indicate that server-side streaming has finished.
+To process a client request, the server performs the following steps: for each message, it constructs an `EchoResponse` using the builder and sends it to the client by calling the `onNext` method. After all messages have been sent, the server calls the `onCompleted` method to indicate that the call has finished sucessfully. (Had an error occurred while processing the response, the server would have called the `onError` method to indicate that the call had failed.)
 
 
 ```
@@ -181,7 +181,7 @@ private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase
 
 
 
-To implement a gRPC server that provides this service, use the `ServerBuilder` class. First, specify the port to listen for client requests by calling the `forPort` method. Next, create an instance of the `EchoServiceImpl` service and register it with the server using the `addService` method. Finally, build and start the server using a modified version of the Netty server.
+To implement a gRPC server that provides this service, use the `ServerBuilder` class. First, specify the port to listen for client requests by calling the `forPort` method. Next, create an instance of the `EchoServiceImpl` service and register it with the server using the `addService` method (a server can provide multiple services). Finally, build and start the server using a modified version of the Netty server.
 
 
 ```
@@ -220,7 +220,7 @@ The next step in the application implementation is to create an echo client. To 
 
 We create a channel using the `ManagedChannelBuilder` class, specifying the server host and port we want to connect to. In the first client example, a blocking stub is used. This stub is obtained from the generated `EchoServiceGrpc` class by calling the `newBlockingStub` factory method and passing the channel as an argument. With this approach, the client blocks while invoking the `serverStreamingEcho` method and waits for the server’s response. The call either returns a response from the server or throws a `StatusRuntimeException`, in which a gRPC error is encoded as a `Status`.
 
-Because this example demonstrates server-side streaming with a blocking stub, the request is provided as a method parameter, and the response is returned as an iterator. After the call is completed, the channel is shut down to ensure that the underlying resources (threads and TCP connections) are released.
+The example below demonstrates a client for server-side streaming service with a blocking stub, the request is provided as a method parameter, and the response is returned as an iterator. After the call is completed, the channel is shut down to ensure that the underlying resources (threads and TCP connections) are released.
 
 
 ```
@@ -244,7 +244,7 @@ try {
 ```
 
 
-In the second client example, we demonstrate the use of the same server-streaming service method with an asynchronous, non-blocking stub. This stub is obtained from the auto-generated `EchoServiceGrpc` class by invoking the `newStub` factory method. As in the previous example, the request is provided as the first method parameter. The response is handled through a stream observer, which the client implements and passes as the second method parameter.
+In the second client example, we demonstrate the use of the same server-streaming service with an asynchronous, non-blocking stub. This stub is obtained from the same auto-generated `EchoServiceGrpc` class by invoking the `newStub` factory method. As in the previous example, the request is provided as the first method parameter. The response is handled through a stream observer, which the client implements and passes as the second method parameter.
 
 The `onNext` method is called each time the client receives a single response from the server. The `onError` method can be called once if the call has completed exceptionally. The `onCompleted` method is invoked once after the server has successfully sent all responses and the call has completed successfully.
 
@@ -292,11 +292,11 @@ After the client has sent a request to the server and received a response from i
 
 #### Conclusion
 
-gRPC is an effective framework for implementing inter-service communication. However, like any technology, it is not a universal solution and is designed to address specific problem domains. You should consider migrating your application from REST to gRPC if it meets most of the following criteria:
+gRPC is an effective framework for implementing inter-service communication. However, like any technology, it is not a universal solution and is designed to address specific problems. You should consider migrating your application from REST to gRPC if it meets most of the following criteria:
 
 
 
-* The application has high performance requirements, including high throughput and low latency.
+* The application has performance requirements, including high throughput and low latency.
 * The application requires client streaming or bidirectional streaming, which cannot be efficiently implemented using HTTP/1.1.
 * Automatic generation of gRPC service and client stubs is available for all required programming languages and platforms.
 * Both the client and server are developed within the same organization, and the application operates in a controlled environment.

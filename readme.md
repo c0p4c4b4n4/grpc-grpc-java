@@ -3,7 +3,7 @@
 
 #### What is gRPC?
 
-gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed for high-performance inter-service communication on-premises, in the cloud, in containers, on mobile and IoT devices, or in browsers.
+gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed for high-performance inter-service communication on-premises, in the cloud, in containers, in mobile and IoT devices, or in browsers.
 
 gRPC uses HTTP/2 as a transport protocol along with Protocol Buffers (Protobuf) as a binary serialization framework and RPC interface description language. Thanks to these features, gRPC can provide qualitative and quantitative characteristics of communication that are not available for RESTful services, which typically means transferring textual JSONs over the HTTP/1.1 protocol.
 
@@ -20,16 +20,16 @@ However, with REST architecture, problems arise when implementing client-server 
 * Low-latency and high-throughput communication.
 * Client streaming or bidirectional streaming.
 
-RPC is based on the technique of calling methods in another process — either on the same machine or on a different machine over the network — as if they were local procedures. RPC frameworks provide code generation tools that create client and server stubs based on a given RPC interface. These stubs handle data serialization and network communication. As a result, when a client invokes a remote method with parameters and receives a return value, it appears to be a local method call. RPC frameworks aim to hide the complexity of serialization and network communication from developers. (However, developers using RPC communication should be aware that the network is inherently [unreliable](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing) and should implement retry/deadline/cancellation and exception handling to manage partial and total network failures.)
+RPC is based on the technique of calling methods in another process (either on the same machine or on a different machine over the network) as if they were local methods. RPC frameworks provide code generation tools that create client and server stubs based on a given RPC interface. These stubs handle data serialization and network communication. As a result, when a client invokes a remote method with parameters and receives a return value, it appears to be a local method call. RPC frameworks aim to hide the complexity of serialization and network communication from developers. (However, developers using RPC communication should be aware that the network is inherently [unreliable](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing) and should implement retry/deadline/cancellation and exception handling to manage partial and total network failures.)
 
 ![Remote Procedure Call](/images/Remote_Procedure_Call.png)
 
 
 #### The problem
 
-When developing an effective RPC framework, developers had to address two primary challenges. First, it is necessary to ensure efficient cross-language and cross-platform serialization. Solutions, based on textual formats (such as JSON, YAML, or XML), are typically an order of magnitude less efficient than binary formats. They require additional computational overhead for serialization and additional network bandwidth for transmitting larger messages. To reduce the size of transmitted messages, there is no alternative to using binary formats. (However, these are often not portable between different programming languages, and ensuring backward and especially forward compatibility presents significant challenges.)
+When developing an effective RPC framework, developers had to address two primary challenges. First, it is necessary to ensure efficient cross-language and cross-platform serialization. Solutions, based on textual formats (such as JSON, YAML, or XML), are typically an order of magnitude less efficient than binary formats. They require additional computational overhead for serialization and additional network bandwidth for transmitting larger messages. To reduce the size of transmitted messages, there is no alternative to using binary formats. (However, these are often not portable between different languages and platforms, and ensuring backward and especially forward compatibility presents significant challenges.)
 
-Second, there was an absence of an efficient application-layer protocol specifically designed for modern inter-service communication. Initially, the HTTP protocol was designed to allow clients (typically browsers) to request resources such as HTML documents, images, and scripts from servers in the hypermedia systems. It was not designed to support high-speed, bidirectional, simultaneous communication. Various workarounds based on HTTP/1.0 — short and long polling, webhooks — were inherently inefficient in their utilization of computational and network resources. Even new features introduced in HTTP/1.1 — persistent connections, pipelining, and chunked transfer encoding — proved insufficient for these purposes. (Perhaps only the TCP transport-layer protocol would have provided efficient full-duplex communication, but it is too low-level to implement an effective RPC framework based on it.)
+Second, there was an absence of an efficient application-layer protocol specifically designed for modern inter-service communication. Initially, the HTTP protocol was designed to allow clients (typically browsers) to request resources such as HTML documents, images, and scripts from servers in the hypermedia systems. It was not designed to support high-speed, bidirectional, simultaneous communication. Various workarounds based on HTTP/1.0 (such as short polling, long polling, and webhooks) were inherently inefficient in their utilization of computational and network resources. Even new features introduced in HTTP/1.1 (persistent connections, pipelining, and chunked transfer encoding) proved insufficient for these purposes. (Perhaps only the TCP transport-layer protocol would have provided performant full-duplex communication, but it is too low-level to implement an efficient RPC framework based on it.)
 
 
 #### The solution
@@ -50,7 +50,7 @@ The gRPC framework includes two main components:
 * HTTP/2 — an application-layer protocol used as a transport protocol
 * Protocol Buffers — a serialization framework and RPC interface definition language
 
-![gRPC structure](/images/gRPC_structure.png)
+![gRPC life cycle](/images/gRPC_life_cycle.png)
 
 
 ##### HTTP/2
@@ -66,11 +66,11 @@ The third improvement is header compression using the HPACK algorithm, which use
 
 ##### Protocol Buffers
 
-Protocol Buffers (Protobuf) is a multi-language serialization framework and RPC interface definition language for effective data exchange over the network. Protobuf definitions describe the RPC service contract, including methods exposed by the server, and the structure of request and response messages. This contract is strongly typed and explicitly designed to support forward and backward compatibility.
+Protocol Buffers (Protobuf) is a multi-language serialization framework and RPC interface definition language for effective data exchange over the network. By default, gRPC uses Protobuf to describe the RPC service contract, including methods exposed by the server, and the structure of request and response messages. This contract is strongly typed and explicitly designed to support forward and backward compatibility.
 
 As a serialization framework, Protobuf is designed to encode structured data (which is common for object-oriented programming languages) into a compact binary format. The resulting binary messages are efficient not only for transmission over the network, but also for persistent storage. Protobuf is highly optimized to minimize network overhead by reducing the serialized message size. (However, if developers have to minimize computational and memory overhead at the expense of increased message size, they can use gRPC with zero-copy serialization frameworks — FlatBuffers or Cap’n Proto.)
 
-As an interface definition language (IDL), the Protobuf compiler generates client and service stubs from declared RPC services, which developers should use to implement their application-specific logic. The Protobuf compiler provides language-specific runtime libraries that transparently handle binary serialization and transmission of messages over the network.
+As an interface definition language (IDL), the Protobuf compiler with the language-specific plugin generates client and service stubs from declared RPC services, which developers should use to implement their application-specific logic. The Protobuf compiler provides language-specific runtime libraries that transparently handle binary serialization and transmission of messages over the network.
 
 Streaming is one of the most important features of gRPC, enabled by the underlying HTTP/2 protocol. Depending on whether the client sends a single parameter or a stream of parameters, and whether the service returns a single response or a stream of responses, there are four supported method types:
 
@@ -100,7 +100,7 @@ To implement this application, complete the following steps:
 
 ##### The contract between the service and the client
 
-A *.proto* file defines the contract between a client and a service. This example shows the *.proto* file used by both clients and servers in the application. Beyond the message and service definitions, the file also contains additional metadata. The *syntax* option defines the use of Protobuf version 3. The *package* option defines the global cross-language Protobuf namespace. Also, each programming language may have its own specific Protobuf options. For Java, the *java_package* option defines the package where the generated Java classes are placed, and *the java_multiple_files = true* option defines generating separate Java files for each message and service defined in the *.proto* file.
+A *.proto* file defines the contract between a client and a service. This example shows the *.proto* file used by both clients and servers in the application. Beyond the message and service definitions, the file also contains additional metadata. The *syntax* option defines the use of Protobuf version 3 (by default, version 2 is used with limited capabilities for backward compatibility). The *package* option defines the global cross-language Protobuf namespace. Also, each programming language may have its own specific Protobuf options. For Java, the *java_package* option defines the package where the generated Java classes are placed, and *the java_multiple_files = true* option defines generating separate Java files for each message and service defined in the *.proto* file.
 
 
 ```

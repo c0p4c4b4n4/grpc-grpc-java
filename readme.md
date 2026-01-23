@@ -3,7 +3,7 @@
 
 #### What is gRPC?
 
-gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed for high-performance inter-service communication on-premises, in the cloud, in containers, in mobile and IoT devices, or in browsers.
+gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed for high-performance inter-service communication - whether on-premises, in the cloud, in containers, in mobile and IoT devices, or in browsers.
 
 gRPC uses HTTP/2 as a transport protocol along with Protocol Buffers (Protobuf) as a binary serialization framework and RPC interface description language. Thanks to these features, gRPC can provide qualitative and quantitative characteristics of communication that are not available for RESTful services, which typically means transferring textual JSONs over the HTTP/1.1 protocol.
 
@@ -38,7 +38,7 @@ Since 2001, Google has been developing an internal RPC framework named Stubby. I
 
 Only in 2015, with the emergence of the innovative HTTP/2 protocol, Google decided to enhance its features in a redesigned version of Stubby. References to Google's internal infrastructure (mainly name resolution and load balancing) were removed from the framework, and the project was redesigned to comply with open source standards. The framework has also been adapted for use in cloud-native applications and in resource-constrained mobile and IoT devices. This updated version was released as gRPC (which recursively stands for **g**RPC **R**emote **P**rocedure **C**alls).
 
-Today, gRPC remains the primary mechanism for inter-service communication at Google. Also, Google offers gRPC interfaces alongside REST interfaces for many of its public services. This is because gRPC provides significant performance benefits and supports bidirectional streaming — a feature that is not achievable with traditional RESTful services.
+Today, gRPC remains the primary mechanism for inter-service communication at Google. Also, Google offers gRPC interfaces alongside REST interfaces for many of its public services. This is because gRPC provides significant performance benefits and supports bidirectional streaming - a feature that is not achievable with traditional RESTful services.
 
 
 #### gRPC foundations
@@ -47,8 +47,8 @@ The gRPC framework includes two main components:
 
 
 
-* HTTP/2 — an application-layer protocol used as a transport protocol
-* Protocol Buffers — a serialization framework and RPC interface definition language
+* HTTP/2 - an application-layer protocol used as a transport protocol
+* Protocol Buffers - a serialization framework and RPC interface definition language
 
 ![gRPC life cycle](/images/gRPC_life_cycle.png)
 
@@ -68,7 +68,7 @@ The third improvement is header compression using the HPACK algorithm, which use
 
 Protocol Buffers (Protobuf) is a multi-language serialization framework and RPC interface definition language for effective data exchange over the network. By default, gRPC uses Protobuf to describe the RPC service contract, including methods exposed by the server, and the structure of request and response messages. This contract is strongly typed and explicitly designed to support backward and forward compatibility.
 
-As a serialization framework, Protobuf is designed to encode structured data (which is common for object-oriented languages) into a compact binary format. The resulting binary messages are efficient not only for transmission over the network, but also for persistent storage. Protobuf is highly optimized to minimize network overhead by reducing the serialized message size. However, if developers have to minimize computational and memory overhead at the expense of increased message size, they can use gRPC with zero-copy serialization frameworks — FlatBuffers or Cap’n Proto.
+As a serialization framework, Protobuf is designed to encode structured data (which is common for object-oriented languages) into a compact binary format. The resulting binary messages are efficient not only for transmission over the network, but also for persistent storage. Protobuf is highly optimized to minimize network overhead by reducing the serialized message size. However, if developers have to minimize computational and memory overhead at the expense of increased message size, they can use gRPC with zero-copy serialization frameworks - FlatBuffers or Cap’n Proto.
 
 As an interface definition language (IDL), the Protobuf compiler with the language-specific plugin generates client and service stubs from declared RPC services, which developers should use to implement their applications. The Protobuf compiler provides language-specific runtime libraries that transparently handle binary serialization and transmission of messages over the network.
 
@@ -280,7 +280,7 @@ channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
 ```
 
 
-In this implementation, the client does not block on the `serverStreamingEcho` method. To wait for the asynchronous interaction to complete — either successfully or with an exception — we use a `CountDownLatch` as a thread barrier. The main thread will be blocked until the `countDown` method is called, which occurs in either the `onError` or `onCompleted` handler of the response stream observer.
+In this implementation, the client does not block on the `serverStreamingEcho` method. To wait for the asynchronous interaction to complete (either successfully or with an exception) we use a `CountDownLatch` as a thread barrier. The main thread will be blocked until the `countDown` method is called, which occurs in either the `onError` or `onCompleted` handler of the response stream observer.
 
 
 ##### Running the server and client

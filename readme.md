@@ -3,9 +3,9 @@
 
 #### What is gRPC?
 
-gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed for high-performance inter-service communication - whether on-premises, in the cloud, in containers, in mobile and IoT devices, or in browsers.
+gRPC is a multi-language and cross-platform remote procedure call (RPC) framework initially developed by Google. gRPC is designed for high-performance inter-service communication, whether on-premises, in the cloud, in containers, on mobile and IoT devices, or in browsers.
 
-gRPC uses HTTP/2 as a transport protocol along with Protocol Buffers (Protobuf) as a binary serialization framework and RPC interface description language. Thanks to these features, gRPC can provide qualitative and quantitative characteristics of communication that are not available for RESTful services, which typically means transferring textual JSONs over the HTTP/1.1 protocol.
+gRPC uses HTTP/2 as a transport protocol along with Protocol Buffers (Protobuf) as the default binary serialization framework and RPC interface description language. Thanks to these features, gRPC can provide qualitative and quantitative characteristics of communication that are not available for RESTful services, which typically use transferring textual JSONs over the HTTP/1.1 protocol.
 
 
 #### Why not REST?
@@ -20,25 +20,25 @@ However, with REST architecture, problems arise when implementing client-server 
 * Low-latency and high-throughput communication.
 * Client streaming or bidirectional streaming.
 
-RPC is based on the technique of calling methods in another process (either on the same machine or on a different machine over the network) as if they were local methods. RPC frameworks provide code generation tools that create client and server stubs based on a given RPC interface. These stubs handle message serialization and network communication. As a result, when a client calls a remote method with parameters and receives a return value, it appears to be a local method call. RPC frameworks aim to hide the complexity of serialization and communication from developers. (However, developers using RPC should be aware that the network is inherently [unreliable](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing) and should implement retry/deadline/cancellation and exception handling to manage partial and total network failures.)
+RPC is based on the technique of calling methods in another process (either on the same machine or on a different machine over the network) as if they were local methods. RPC frameworks provide code generation tools that create client and server stubs based on a given RPC service interface. These stubs handle message serialization and network communication. As a result, when a client calls a remote method with parameters and receives a return value, it appears to be a local method call. RPC frameworks aim to hide the complexity of serialization and communication from developers. (However, developers using RPC should be aware that the network is inherently [unreliable](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing) and should implement retry/deadline/cancellation and exception handling to manage partial and total network failures.)
 
 ![Remote Procedure Call](/images/Remote_Procedure_Call.png)
 
 
 #### The problem
 
-When developing an effective RPC framework, developers had to address two primary challenges. First, it is necessary to ensure efficient cross-language and cross-platform serialization. Solutions, based on textual formats (such as JSON, YAML, or XML), are typically an order of magnitude less efficient than binary formats. They require additional computational overhead for serialization and additional network bandwidth for transmitting larger messages. To reduce the size of transmitted messages, there is no alternative to using binary formats. (However, these are often not portable between different languages and platforms, and ensuring backward and especially forward compatibility presents significant challenges.)
+When developing an effective RPC framework, developers had to address two primary challenges. First, it is necessary to ensure efficient cross-language and cross-platform serialization. Solutions based on textual formats (such as JSON, YAML, or XML) are typically an order of magnitude less productive than binary formats. They require additional computational overhead for serialization and additional network bandwidth for transmitting larger messages. To reduce the size of transmitted messages, there is no alternative to using binary formats. (However, such solutions are often not portable between different languages and platforms, and ensuring backward and especially forward compatibility presents significant challenges.)
 
-Second, there was an absence of an efficient application-layer protocol, specifically designed for modern inter-service communication. Initially, the HTTP protocol was designed to allow clients (typically browsers) to request resources such as HTML documents, images, and scripts from servers in the hypermedia systems. It was not designed to support high-speed, bidirectional, simultaneous communication. Various workarounds based on HTTP/1.0 (such as short polling, long polling, and webhooks) were inherently inefficient in their utilization of computational and network resources. Even new features introduced in HTTP/1.1 (persistent connections, pipelining, and chunked transfer encoding) proved insufficient for these purposes. (Perhaps only the TCP transport-layer protocol would have provided performant full-duplex communication, but it is too low-level to implement an efficient RPC framework based on it.)
+Second, there was an absence of an effective application-layer protocol, specifically designed for modern inter-service communication. Initially, the HTTP protocol was designed to allow clients (typically browsers) to request resources, such as HTML documents, images, and scripts, from servers in hypermedia systems. It was not designed to support high-speed, bidirectional, simultaneous communication. Various workarounds based on HTTP/1.0 (such as short polling, long polling, and webhooks) were inherently inefficient in their utilization of computational and network resources. Even new features introduced in HTTP/1.1 (persistent connections, pipelining, and chunked transfer encoding) proved insufficient for these purposes. (Perhaps the TCP transport-layer protocol would have provided high-performance full-duplex communication, but it is too low-level to implement an efficient RPC framework based on it.)
 
 
 #### The solution
 
-Since 2001, Google has been developing an internal RPC framework named Stubby. It was designed to connect almost all internal services, both within and across Google data centers. Stubby was a high-performance multi-language and cross-platform framework built on Protobuf for serialization.
+Since 2001, Google has been developing an internal RPC framework named Stubby. It was designed to connect almost all internal microservices, both within and across Google data centers. Stubby was a high-performance multi-language and cross-platform framework built on Protobuf for serialization.
 
-Only in 2015, with the emergence of the innovative HTTP/2 protocol, Google decided to enhance its features in a redesigned version of Stubby. References to Google's internal infrastructure (mainly name resolution and load balancing) were removed from the framework, and the project was redesigned to comply with open source standards. The framework has also been adapted for use in cloud-native applications and in resource-constrained mobile and IoT devices. This updated version was released as gRPC (which recursively stands for **g**RPC **R**emote **P**rocedure **C**alls).
+Only in 2015, with the emergence of the innovative HTTP/2 protocol, Google decided to enhance its features in a redesigned version of Stubby. References to Google's internal infrastructure (mainly name resolution and load balancing) were removed from the framework, and the project was redesigned to comply with open source standards. The framework has also been adapted for use in cloud-native applications and on resource-constrained mobile and IoT devices. This updated version was released as gRPC (which recursively stands for **g**RPC **R**emote **P**rocedure **C**alls).
 
-Today, gRPC remains the primary mechanism for inter-service communication at Google. Also, Google offers gRPC interfaces alongside REST interfaces for many of its public services. This is because gRPC provides significant performance benefits and supports bidirectional streaming - a feature that is not achievable with traditional RESTful services.
+At the time of writing, gRPC remains the primary mechanism for inter-service communication at Google and many other major technology companies. Also, Google offers gRPC interfaces alongside REST interfaces for many of its public services. This is because gRPC provides significant performance benefits and supports bidirectional streaming - a feature that is not achievable with RESTful services.
 
 
 #### gRPC foundations
@@ -47,8 +47,8 @@ The gRPC framework includes two main components:
 
 
 
-* HTTP/2 - an application-layer protocol used as a transport protocol
-* Protocol Buffers - a serialization framework and RPC interface definition language
+* HTTP/2 - an application-layer protocol used as a transport protocol.
+* Protocol Buffers - a binary serialization framework and RPC interface definition language.
 
 ![gRPC life cycle](/images/gRPC_life_cycle.png)
 
@@ -72,7 +72,7 @@ As a serialization framework, Protobuf is designed to encode structured data (wh
 
 As an interface definition language (IDL), the Protobuf compiler with the language-specific plugin generates client and service stubs from declared RPC services, which developers should use to implement their applications. The Protobuf compiler provides language-specific runtime libraries that transparently handle binary serialization and transmission of messages over the network.
 
-Streaming is one of the most important features of gRPC, enabled by the underlying HTTP/2 protocol. Depending on whether the client sends a single parameter or a stream of parameters, and whether the service returns a single response or a stream of responses, there are four supported method types:
+Streaming with flow control is one of the most important features of gRPC, enabled by the underlying HTTP/2 protocol. Depending on whether the client sends a single parameter or a stream of parameters, and whether the service returns a single response or a stream of responses, there are four supported communication patterns:
 
 
 
@@ -149,6 +149,8 @@ For the `EchoService` service, an `EchoServiceGrpc` class is generated, containi
 * `EchoServiceBlockingV2Stub`: to make synchronous calls (it supports unary calls as a stable feature and all 3 streaming calls as experimental features), but can throw checked `StatusException` instead of runtime `StatusRuntimeException`.
 * `EchoServiceFutureStub`: to asynchronous calls with the `ListenableFuture` interface (it supports unary calls only).
 
+You should always use an asynchronous stub first, because the network is inherently asynchronous. Blocking a thread using a blocking stub wasted limited computing resources (unless you're using virtual Java threads). However, using a blocking stub is entirely justified in specific cases, such as integration tests.
+
 
 ##### Creating the server
 
@@ -181,7 +183,7 @@ private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase
 
 
 
-To implement a server that provides this service, use the `ServerBuilder` class. First, specify the port to listen for client requests by calling the `forPort` method. Next, create an instance of the `EchoServiceImpl` service and register it in the server using the `addService` method (a server can provide multiple services). Finally, build and start the server using a modified version of the Netty server.
+To implement a server that provides this service, use the `ServerBuilder` class. First, specify the port to listen for client requests by calling the `forPort` method. Next, create an instance of the `EchoServiceImpl` service and register it in the server using the `addService` method (a server can provide multiple services). Finally, build and start the server using a Netty server.
 
 
 ```
@@ -215,10 +217,10 @@ The next step in the application implementation is to create an echo client. To 
 
 
 * Create a channel to connect to the service.
-* Obtain a client stub of the required type.
+* Obtain a client stub for the required communication pattern.
 * Call the service method using the obtained client stub.
 
-We create a channel using the `ManagedChannelBuilder` class, specifying the server host and port we want to connect to. In the first client example, a blocking stub is used. This stub is obtained from the generated `EchoServiceGrpc` class by calling the `newBlockingStub` factory method and passing the channel as an argument. With this approach, the client blocks while invoking the `serverStreamingEcho` method and waits for the server’s response. The call either returns a response from the server or throws a `StatusRuntimeException`, in which a gRPC error is encoded as a `Status`.
+We create a channel using the `ManagedChannelBuilder` class, specifying the server host and port we want to connect to. In the first client example, a synchronous blocking stub is used. This stub is obtained from the generated `EchoServiceGrpc` class by calling the `newBlockingStub` factory method and passing the channel as an argument. With this approach, the client blocks while invoking the `serverStreamingEcho` method and waits for the server’s response. The call either returns a response from the server or throws a `StatusRuntimeException`, in which a gRPC error is encoded as a standardized `Status` error object.
 
 The example below demonstrates a client for the server-side streaming service with a blocking stub, where the request is provided as a method parameter, and the response is returned as an iterator. After the call is completed, the channel is shut down to ensure that the underlying resources (threads and TCP connections) are released.
 
@@ -244,7 +246,7 @@ try {
 ```
 
 
-In the second client example, we demonstrate the use of the same server-streaming service with an asynchronous, non-blocking stub. This stub is obtained from the same auto-generated `EchoServiceGrpc` class by calling the `newStub` factory method. As in the previous example, the request is provided as the first method parameter. The response is handled through a stream observer, which the client implements and passes as the second method parameter.
+In the second client example, we demonstrate the use of the same server-streaming service with an asynchronous non-blocking stub. This stub is obtained from the same auto-generated `EchoServiceGrpc` class by calling the `newStub` factory method. As in the previous example, the request is provided as the first method parameter. The response is handled through a stream observer, which the client implements and passes as the second method parameter.
 
 The `onNext` method is called each time the client receives a response from the server. The `onError` method can be called once if the call has finished exceptionally. The `onCompleted` method is called once after the server has successfully sent all responses.
 
@@ -301,7 +303,7 @@ gRPC is an effective framework for implementing inter-service communication. How
 * Automatic generation of gRPC service and client stubs is available for all required languages and platforms.
 * Both the client and server are developed within the same organization, and the application operates in a controlled environment.
 * Your organization has strict engineering standards that require strongly defined client-server contracts.
-* Development will benefit from built-in gRPC features, such as retry/deadline/cancellation, manual flow control, error propagation, interceptors, authentication, name resolution, client-side load balancing, health checking, proxyless service mesh, etc.
+* Development will benefit from built-in gRPC features, such as retry/deadline/cancellation, manual flow control, error propagation, interceptors, authentication, name resolution, client-side load balancing, health checking, proxyless service mesh, and much more.
 
 However, REST is a more appropriate architecture if the application meets most of the following conditions:
 

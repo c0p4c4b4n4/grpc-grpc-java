@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 public class ServerStreamingServer {
 
-    private static final Logger logger = Logger.getLogger(CancellationServerStreamingServer.class.getName());
+    private static final Logger logger = Logger.getLogger(ServerStreamingServer.class.getName());
 
     public static void main(String[] args) throws Exception {
         Servers.start(new EchoServiceImpl());

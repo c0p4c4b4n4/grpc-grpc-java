@@ -32,11 +32,11 @@ public class DeadlineServerStreamingServer {
                     return;
                 }
 
-                Delays.sleep(i);
-
                 var response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage() + " " + i).build();
                 logger.log(Level.INFO, "response: {0}", response.getMessage());
                 responseObserver.onNext(response);
+
+                Delays.sleep(i);
             }
             responseObserver.onCompleted();
         }

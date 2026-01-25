@@ -33,10 +33,11 @@ public class CancellationServerStreamingServer {
                     return;
                 }
 
-                Delays.sleep(1);
-
                 var response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage() + " " + i).build();
+                logger.log(Level.INFO, "response: {0}", response.getMessage());
                 responseObserver.onNext(response);
+
+                Delays.sleep(1);
             }
             responseObserver.onCompleted();
         }

@@ -29,8 +29,9 @@ public class HeadersUnaryServer {
     private static class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
         @Override
         public void unaryEcho(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
-            logger.log(Level.INFO, "request: {0}", request.getMessage());
-            var response = EchoResponse.newBuilder().setMessage("hello " + request.getMessage()).build();
+            var name = request.getMessage();
+            logger.log(Level.INFO, "request: {0}", name);
+            var response = EchoResponse.newBuilder().setMessage("hello " + name).build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         }

@@ -22,6 +22,7 @@ public class HeadersUnaryBlockingClient {
         try {
             var interceptor = new HeadersClientInterceptor();
             var blockingStub = EchoServiceGrpc.newBlockingStub(ClientInterceptors.intercept(channel, interceptor));
+
             var request = EchoRequest.newBuilder().setMessage("world").build();
             var response = blockingStub.unaryEcho(request);
             logger.log(Level.INFO, "response: {0}", response.getMessage());

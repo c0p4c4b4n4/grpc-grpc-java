@@ -34,9 +34,9 @@ object CancellationServerStreamingServer {
         }
       }.onCompletion { cause ->
         if (cause != null) {
-          logger.warning("stream cancelled or deadline exceeded: ${cause.message}")
+          logger.warning("stream failed: ${cause.message}")
         } else {
-          logger.info("stream completed successfully")
+          logger.info("stream succeed")
         }
       }
     }

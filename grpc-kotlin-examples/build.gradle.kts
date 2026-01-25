@@ -1,3 +1,4 @@
+import com.google.protobuf.gradle.*
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
@@ -16,7 +17,7 @@ dependencies {
     implementation("io.grpc:grpc-stub:${project.findProperty("grpcVersion")}")
 
     implementation("io.grpc:grpc-kotlin-stub:${project.findProperty("grpcKotlinVersion")}")
-    implementation("com.google.protobuf:protobuf-kotlin:${project.findProperty("protobufKotlinVersion")}")
+    implementation("com.google.protobuf:protobuf-kotlin:${project.findProperty("protobufVersion")}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${project.findProperty("kotlinCoroutinesVersion")}")
 
     runtimeOnly("io.grpc:grpc-netty-shaded:${project.findProperty("grpcVersion")}")
@@ -34,11 +35,14 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 
 protobuf {
     protoc {
-        artifact = libs.protoc.asProvider().get().toString()
+        artifact = "com.google.protobuf:protoc:${protobufVersion}"
+        artifact = "com.google.protobuf:protoc:${protobufVersion}"
     }
     plugins {
         create("grpc") {
-            artifact = libs.protoc.gen.grpc.java.get().toString()
+//            artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}"
+            artifact = "io.grpc:protoc-gen-grpc-java:1.78.0"
+//            artifact = libs.protoc.gen.grpc.java.get().toString()
         }
         create("grpckt") {
             artifact = libs.protoc.gen.grpc.kotlin.get().toString() + ":jdk8@jar"

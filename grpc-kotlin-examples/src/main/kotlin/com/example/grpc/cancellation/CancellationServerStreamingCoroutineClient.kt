@@ -8,6 +8,7 @@ import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
+import io.grpc.Status
 import java.util.logging.Logger
 
 object CancellationServerStreamingCoroutineClient {
@@ -28,7 +29,11 @@ object CancellationServerStreamingCoroutineClient {
           logger.info("response: ${response.message}")
         }
     } catch (e: StatusRuntimeException) {
-      logger.warning("RPC error: ${e.status}")
+      if (e.status.code == Status.Code.DEADLINE_EXCEEDED) {
+        logger.warning("RPC error: deadline exceeded")
+      } else {
+        logger.warning("RPC error: ${e.status}")
+      }
     } finally {
       channel.shutdown().awaitTermination(10, TimeUnit.SECONDS)
     }

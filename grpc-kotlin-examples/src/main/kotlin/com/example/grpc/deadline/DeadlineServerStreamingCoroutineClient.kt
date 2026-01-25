@@ -19,6 +19,7 @@ object DeadlineServerStreamingCoroutineClient {
     val channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build()
     try {
       val stub = EchoServiceGrpcKt.EchoServiceCoroutineStub(channel)
+        .withDeadlineAfter(3, TimeUnit.SECONDS)
 
       val request = echoRequest { this.message = "world" }
       stub.serverStreamingEcho(request).collect { response ->

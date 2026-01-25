@@ -22,6 +22,7 @@ public class DeadlineServerStreamingBlockingClient {
         try {
             var blockingStub = EchoServiceGrpc.newBlockingStub(channel)
                 .withDeadline(Deadline.after(3, TimeUnit.SECONDS));
+
             var request = EchoRequest.newBuilder().setMessage("world").build();
             var responses = blockingStub.serverStreamingEcho(request);
             while (responses.hasNext()) {

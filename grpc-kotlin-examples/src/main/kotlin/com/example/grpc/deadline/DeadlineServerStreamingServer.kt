@@ -5,8 +5,10 @@ import com.example.grpc.EchoResponse
 import com.example.grpc.EchoServiceGrpcKt
 import com.example.grpc.Servers
 import com.example.grpc.echoResponse
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onCompletion
 import java.util.logging.Logger
 
 object DeadlineServerStreamingServer {
@@ -23,9 +25,19 @@ object DeadlineServerStreamingServer {
       logger.info("request: $name")
 
       return flow {
-        emit(echoResponse { message = "hello $name" })
-        emit(echoResponse { message = "guten tag $name" })
-        emit(echoResponse { message = "bonjour $name" })
+        for (i in 0..9) {
+          delay(i * 1000L)
+
+          val response = echoResponse { message = "hello $name $i" }
+          logger.info("response: ${response.message}")
+          emit(response)
+        }
+      }.onCompletion { cause ->
+        if (cause != null) {
+          logger.warning("stream cancelled or deadline exceeded: ${cause.message}")
+        } else {
+          logger.info("stream completed successfully")
+        }
       }
     }
   }

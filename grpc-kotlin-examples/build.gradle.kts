@@ -1,30 +1,28 @@
 plugins {
-  application
+//  application
 
   alias(libs.plugins.kotlin.jvm)
+
   alias(libs.plugins.protobuf)
+
+  id("com.google.protobuf") version "0.9.6"
+  id("com.gradleup.shadow") version "9.3.0"
 }
 
+//plugins {
+//  java
+//  id("com.google.protobuf") version "0.9.4" // Replace with your actual version
+//  id("com.gradleup.shadow") version "8.3.5" // Replace with your actual version
+//}
+
 dependencies {
-  //api(libs.kotlinx.coroutines.core)
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${project.findProperty("kotlinCoroutinesVersion")}")
-
-//  api(libs.grpc.stub)
   implementation("io.grpc:grpc-stub:${project.findProperty("grpcVersion")}")
-
-  //api(libs.grpc.protobuf)
   implementation("io.grpc:grpc-protobuf:${project.findProperty("grpcVersion")}")
 
-//  api(libs.protobuf.java.util)
-  //implementation("com.google.protobuf:protobuf-java-util:${project.findProperty("grpcVersion")}")
-
-//  api(libs.protobuf.kotlin)
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${project.findProperty("kotlinCoroutinesVersion")}")
   implementation("com.google.protobuf:protobuf-kotlin:${project.findProperty("protobufKotlinVersion")}")
-
-//  api(libs.grpc.kotlin.stub)
   implementation("io.grpc:grpc-kotlin-stub:${project.findProperty("grpcKotlinVersion")}")
 
-//    runtimeOnly(libs.grpc.netty)
   runtimeOnly("io.grpc:grpc-netty-shaded:${project.findProperty("grpcVersion")}")
 }
 

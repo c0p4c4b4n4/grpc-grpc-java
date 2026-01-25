@@ -1,16 +1,17 @@
-package com.example.grpc.methodtypes.streaming.server
+package com.example.grpc.methodtype.streaming.bidirectional
 
 import com.example.grpc.EchoServiceGrpcKt
 import com.example.grpc.Loggers
 import com.example.grpc.echoRequest
 import io.grpc.ManagedChannelBuilder
 import io.grpc.StatusRuntimeException
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 
-object ServerStreamingCoroutineClient {
-  private val logger = Logger.getLogger(ServerStreamingCoroutineClient::class.java.name)
+object BidirectionalStreamingCoroutineClient {
+  private val logger = Logger.getLogger(BidirectionalStreamingCoroutineClient::class.java.name)
 
   @JvmStatic
   fun main(args: Array<String>) = runBlocking {
@@ -20,9 +21,14 @@ object ServerStreamingCoroutineClient {
     try {
       val stub = EchoServiceGrpcKt.EchoServiceCoroutineStub(channel)
 
-      val request = echoRequest { this.message = "world" }
-      stub.serverStreamingEcho(request).collect { response ->
-        logger.info("response: ${response.message}")
+      val requests = flow {
+        emit(echoRequest { this.message = "world" })
+        emit(echoRequest { this.message = "welt" })
+        emit(echoRequest { this.message = "monde" })
+      }
+      val responses = stub.bidirectionalStreamingEcho(requests)
+      responses.collect { response ->
+        logger.info("next response: ${response.message}")
       }
     } catch (e: StatusRuntimeException) {
       logger.warning("RPC error: ${e.status}")

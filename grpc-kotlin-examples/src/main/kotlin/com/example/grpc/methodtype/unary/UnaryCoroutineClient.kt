@@ -1,4 +1,4 @@
-package com.example.grpc.methodtypes.unary
+package com.example.grpc.methodtype.unary
 
 import com.example.grpc.EchoServiceGrpcKt
 import com.example.grpc.Loggers

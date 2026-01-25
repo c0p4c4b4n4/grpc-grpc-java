@@ -1,4 +1,4 @@
-package com.example.grpc.methodtypes.streaming.client
+package com.example.grpc.methodtype.streaming.client
 
 import com.example.grpc.EchoServiceGrpcKt
 import com.example.grpc.Loggers

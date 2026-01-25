@@ -17,8 +17,6 @@ public class HeadersUnaryServer {
     private static final Logger logger = Logger.getLogger(HeadersUnaryServer.class.getName());
 
     public static void main(String[] args) throws Exception {
-        Loggers.init();
-
         var serverBuilder = ServerBuilder
             .forPort(50051)
             .addService(ServerInterceptors.intercept(new EchoServiceImpl(), new HeadersServerInterceptor()));

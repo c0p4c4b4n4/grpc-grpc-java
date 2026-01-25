@@ -21,8 +21,6 @@ public class HealthServiceUnaryServer {
     private static final Logger logger = Logger.getLogger(HealthServiceUnaryServer.class.getName());
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        Loggers.init();
-
         var health = new HealthStatusManager();
 
         var serverBuilder = ServerBuilder

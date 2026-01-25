@@ -2,11 +2,11 @@ package com.example.grpc.deadline
 
 import com.example.grpc.EchoServiceGrpcKt
 import com.example.grpc.Loggers
-import com.example.grpc.cancellation.CancellationServerStreamingCoroutineClient
 import com.example.grpc.echoRequest
 import io.grpc.ManagedChannelBuilder
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
@@ -25,6 +25,13 @@ object DeadlineServerStreamingCoroutineClient {
 
       val request = echoRequest { this.message = "world" }
       stub.serverStreamingEcho(request)
+        .onCompletion { cause ->
+          if (cause != null) {
+            logger.warning("stream cancelled or deadline exceeded: ${cause.message}")
+          } else {
+            logger.info("stream completed successfully")
+          }
+        }
         .collect { response ->
           logger.info("response: ${response.message}")
         }

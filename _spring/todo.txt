@@ -1,0 +1,135 @@
+Spring Boot 3.5 (released May 2025) provides native gRPC support via the spring-grpc-spring-boot-starter. Below is a complete project structure for a unary "echo" service.
+1. Project Structure
+It is recommended to use a multi-module Gradle project for shared Protobuf files.
+text
+project-root/
++-- settings.gradle
++-- grpc-common/       # Shared proto & generated stubs
++-- grpc-server/       # Spring Boot gRPC Server
++-- grpc-client/       # Spring Boot gRPC Client
+Use code with caution.
+
+2. Common Configuration (grpc-common)
+grpc-common/build.gradle
+Use the com.google.protobuf plugin to generate Java code from .proto files.
+gradle
+plugins {
+    id 'java-library'
+    id 'com.google.protobuf' version '0.9.4'
+}
+
+dependencies {
+    implementation 'io.grpc:grpc-netty-shaded:1.69.0'
+    implementation 'io.grpc:grpc-protobuf:1.69.0'
+    implementation 'io.grpc:grpc-stub:1.69.0'
+    compileOnly 'jakarta.annotation:jakarta.annotation-api:2.1.1'
+}
+
+protobuf {
+    protoc { artifact = "com.google.protobuf:protoc:3.25.1" }
+    plugins { grpc { artifact = "io.grpc:protoc-gen-grpc-java:1.69.0" } }
+    generateProtoTasks {
+        all()*.plugins { grpc {} }
+    }
+}
+Use code with caution.
+
+grpc-common/src/main/proto/echo.proto
+Define the unary Echo service.
+proto
+syntax = "proto3";
+option java_multiple_files = true;
+package com.example.grpc;
+
+service EchoService {
+  rpc echo (EchoRequest) returns (EchoResponse);
+}
+
+message EchoRequest { string message = 1; }
+message EchoResponse { string message = 1; }
+Use code with caution.
+
+3. Server Implementation (grpc-server)
+grpc-server/build.gradle
+Include the Spring gRPC starter.
+gradle
+dependencies {
+    implementation project(':grpc-common')
+    implementation 'org.springframework.grpc:spring-grpc-spring-boot-starter'
+}
+Use code with caution.
+
+EchoServiceImpl.java
+Implement the service by extending the generated base class and annotating with @Service.
+java
+package com.example.server;
+
+import com.example.grpc.*;
+import io.grpc.stub.StreamObserver;
+import org.springframework.stereotype.Service;
+
+@Service
+public class EchoServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
+    @Override
+    public void echo(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
+        String message = "Echo: " + request.getMessage();
+        EchoResponse response = EchoResponse.newBuilder().setMessage(message).build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+}
+Use code with caution.
+
+4. Client Implementation (grpc-client)
+grpc-client/build.gradle
+gradle
+dependencies {
+    implementation project(':grpc-common')
+    implementation 'org.springframework.grpc:spring-grpc-spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+}
+Use code with caution.
+
+EchoClientController.java
+Use @GrpcClient to inject a blocking stub.
+java
+package com.example.client;
+
+import com.example.grpc.*;
+import org.springframework.grpc.client.GrpcClient;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+public class EchoClientController {
+
+    @GrpcClient("echo-server")
+    private EchoServiceGrpc.EchoServiceBlockingStub echoStub;
+
+    @GetMapping("/echo")
+    public String sendEcho(@RequestParam String msg) {
+        EchoRequest request = EchoRequest.newBuilder().setMessage(msg).build();
+        EchoResponse response = echoStub.echo(request);
+        return response.getMessage();
+    }
+}
+Use code with caution.
+
+application.yml
+Configure the target server address for the client.
+yaml
+spring:
+  grpc:
+    client:
+      echo-server:
+        address: "static://localhost:9090"
+        negotiation-type: plaintext
+Use code with caution.
+
+5. Running the Application
+Run ./gradlew build to generate the Protobuf stubs.
+Start the Server application (defaults to port 9090).
+Start the Client application.
+Test the unary request: curl http://localhost:8080/echo?msg=HelloSpring3.5
+
+
+

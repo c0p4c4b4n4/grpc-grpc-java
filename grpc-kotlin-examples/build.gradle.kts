@@ -6,19 +6,23 @@ plugins {
 }
 
 dependencies {
-  api(libs.kotlinx.coroutines.core)
-  //implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${project.findProperty("grpcVersion")}")
+  //api(libs.kotlinx.coroutines.core)
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${project.findProperty("kotlinCoroutinesVersion")}")
 
-  api(libs.grpc.stub)
-  //implementation("io.grpc:grpc-stub:${project.findProperty("grpcVersion")}")
-  api(libs.grpc.protobuf)
-  //implementation("io.grpc:grpc-protobuf:${project.findProperty("grpcVersion")}")
-  api(libs.protobuf.java.util)
+//  api(libs.grpc.stub)
+  implementation("io.grpc:grpc-stub:${project.findProperty("grpcVersion")}")
+
+  //api(libs.grpc.protobuf)
+  implementation("io.grpc:grpc-protobuf:${project.findProperty("grpcVersion")}")
+
+//  api(libs.protobuf.java.util)
   //implementation("com.google.protobuf:protobuf-java-util:${project.findProperty("grpcVersion")}")
-  api(libs.protobuf.kotlin)
-  //implementation("com.google.protobuf:protobuf-kotlin:${project.findProperty("grpcVersion")}")
-  api(libs.grpc.kotlin.stub)
-  //implementation("io.grpc:grpc-kotlin-stub:${project.findProperty("grpcVersion")}")
+
+//  api(libs.protobuf.kotlin)
+  implementation("com.google.protobuf:protobuf-kotlin:${project.findProperty("protobufKotlinVersion")}")
+
+//  api(libs.grpc.kotlin.stub)
+  implementation("io.grpc:grpc-kotlin-stub:${project.findProperty("grpcKotlinVersion")}")
 
 //    runtimeOnly(libs.grpc.netty)
   runtimeOnly("io.grpc:grpc-netty-shaded:${project.findProperty("grpcVersion")}")
@@ -29,7 +33,9 @@ kotlin {
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-  compilerOptions { freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn") }
+  compilerOptions {
+    freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
+  }
 }
 
 protobuf {

@@ -5,10 +5,10 @@ import com.example.grpc.EchoResponse
 import com.example.grpc.EchoServiceGrpcKt
 import com.example.grpc.Servers
 import com.example.grpc.echoResponse
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onCompletion
 import java.util.logging.Logger
 
 object CancellationServerStreamingServer {
@@ -20,20 +20,42 @@ object CancellationServerStreamingServer {
   }
 
   private class EchoServiceImpl : EchoServiceGrpcKt.EchoServiceCoroutineImplBase() {
-    override fun serverStreamingEcho(request: EchoRequest): Flow<EchoResponse> = flow {
+    override fun serverStreamingEcho(request: EchoRequest): Flow<EchoResponse> {
       val name = request.message
       logger.info("request: $name")
 
-      try {
+      return flow {
         for (i in 0..9) {
-          emit(echoResponse { message = "hello $name $i" })
+          val response = echoResponse { message = "hello $name $i" }
+          logger.info("response: ${response.message}")
+          emit(response)
 
           delay(1000L)
         }
-      } catch (e: CancellationException) {
-        logger.info("server received cancellation")
-        throw e
+      }.onCompletion { cause ->
+        if (cause != null) {
+          logger.warning("stream cancelled or deadline exceeded: ${cause.message}")
+        } else {
+          logger.info("stream completed successfully")
+        }
       }
     }
   }
+  /*
+      override fun serverStreamingEcho(request: EchoRequest): Flow<EchoResponse> = flow {
+        val name = request.message
+        logger.info("request: $name")
+
+        try {
+          for (i in 0..9) {
+            emit(echoResponse { message = "hello $name $i" })
+            delay(1000L)
+          }
+        } catch (e: CancellationException) {
+          logger.info("server received cancellation")
+          throw e
+        }
+      }
+    }
+   */
 }

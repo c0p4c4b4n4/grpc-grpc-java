@@ -26,11 +26,11 @@ object DeadlineServerStreamingServer {
 
       return flow {
         for (i in 0..9) {
-          delay(i * 1000L)
-
           val response = echoResponse { message = "hello $name $i" }
           logger.info("response: ${response.message}")
           emit(response)
+
+          delay(i * 1000L)
         }
       }.onCompletion { cause ->
         if (cause != null) {

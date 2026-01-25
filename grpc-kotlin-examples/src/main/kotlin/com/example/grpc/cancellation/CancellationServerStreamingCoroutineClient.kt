@@ -5,7 +5,6 @@ import com.example.grpc.Loggers
 import com.example.grpc.echoRequest
 import io.grpc.ManagedChannelBuilder
 import io.grpc.StatusRuntimeException
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
@@ -30,8 +29,6 @@ object CancellationServerStreamingCoroutineClient {
         }
     } catch (e: StatusRuntimeException) {
       logger.warning("RPC error: ${e.status}")
-    } catch (e: CancellationException) {
-      logger.info("client cancelled flow")
     } finally {
       channel.shutdown().awaitTermination(10, TimeUnit.SECONDS)
     }

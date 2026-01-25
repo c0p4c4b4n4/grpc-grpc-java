@@ -5,7 +5,7 @@ import com.example.grpc.EchoServiceGrpcKt
 import com.example.grpc.Servers
 import com.example.grpc.echoResponse
 
-object UnaryServer {
+object HeadersUnaryServer {
 
   @JvmStatic
   fun main(args: Array<String>) {

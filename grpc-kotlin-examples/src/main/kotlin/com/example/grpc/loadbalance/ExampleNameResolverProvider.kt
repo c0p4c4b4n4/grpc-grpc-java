@@ -1,29 +1,23 @@
-package com.example.grpc.loadbalance;
+package com.example.grpc.loadbalance
 
-import io.grpc.NameResolver;
-import io.grpc.NameResolverProvider;
+import io.grpc.NameResolver
+import io.grpc.NameResolverProvider
+import java.net.URI
 
-import java.net.URI;
+internal class ExampleNameResolverProvider : NameResolverProvider() {
+  override fun newNameResolver(targetUri: URI?, args: NameResolver.Args?): NameResolver {
+    return ExampleNameResolver(targetUri)
+  }
 
-class ExampleNameResolverProvider extends NameResolverProvider {
+  override fun isAvailable(): Boolean {
+    return true
+  }
 
-    @Override
-    public NameResolver newNameResolver(URI targetUri, NameResolver.Args args) {
-        return new ExampleNameResolver(targetUri);
-    }
+  override fun priority(): Int {
+    return 5
+  }
 
-    @Override
-    protected boolean isAvailable() {
-        return true;
-    }
-
-    @Override
-    protected int priority() {
-        return 5;
-    }
-
-    @Override
-    public String getDefaultScheme() {
-        return Settings.SCHEME;
-    }
+  override fun getDefaultScheme(): String {
+    return Settings.SCHEME
+  }
 }

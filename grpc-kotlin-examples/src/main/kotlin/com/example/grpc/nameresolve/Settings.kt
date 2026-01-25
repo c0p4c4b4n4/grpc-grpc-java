@@ -1,8 +1,10 @@
-package com.example.grpc.nameresolve;
+package com.example.grpc.nameresolve
 
-interface Settings {
-
-    String SCHEME = "example";
-    String SERVICE_NAME = "example.grpc.loadbalance";
-    int[] SERVER_PORTS = {50051, 50052, 50053};
+internal interface Settings {
+  companion object {
+    const val SCHEME: String = "example"
+    const val SERVICE_NAME: String = "example.grpc.loadbalance"
+    @JvmField
+    val SERVER_PORTS: IntArray = intArrayOf(50051, 50052, 50053)
+  }
 }

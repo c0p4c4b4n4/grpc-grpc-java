@@ -5,11 +5,15 @@ plugins {
 
 //  alias(libs.plugins.protobuf)
 
-  id("com.google.protobuf") version "0.9.6"
-  id("org.jetbrains.kotlin.jvm") version "2.2.20"
-  id("com.gradleup.shadow") version "9.3.0"
+  id("com.google.protobuf") version System.getProperty("protobufPluginVersion")
+  id("org.jetbrains.kotlin.jvm") version System.getProperty("kotlinPluginVersion")
+  id("com.gradleup.shadow") version System.getProperty("shadowPluginVersion")
 }
 
+repositories {
+  mavenCentral()
+  mavenLocal()
+}
 //plugins {
 //  java
 //  id("com.google.protobuf") version "0.9.4" // Replace with your actual version

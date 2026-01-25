@@ -1,11 +1,12 @@
 plugins {
 //  application
 
-  alias(libs.plugins.kotlin.jvm)
+//  alias(libs.plugins.kotlin.jvm)
 
-  alias(libs.plugins.protobuf)
+//  alias(libs.plugins.protobuf)
 
   id("com.google.protobuf") version "0.9.6"
+  id("org.jetbrains.kotlin.jvm") version "2.2.20"
   id("com.gradleup.shadow") version "9.3.0"
 }
 

@@ -5,10 +5,10 @@ import com.example.grpc.Loggers
 import com.example.grpc.echoRequest
 import io.grpc.ManagedChannelBuilder
 import io.grpc.StatusRuntimeException
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
-import io.grpc.Status
 import java.util.logging.Logger
 
 object CancellationServerStreamingCoroutineClient {
@@ -24,16 +24,19 @@ object CancellationServerStreamingCoroutineClient {
 
       val request = echoRequest { message = "world" }
       stub.serverStreamingEcho(request)
+        .onCompletion { cause ->
+          if (cause != null) {
+            logger.warning("stream cancelled or deadline exceeded: ${cause.message}")
+          } else {
+            logger.info("stream completed successfully")
+          }
+        }
         .take(3)
         .collect { response ->
           logger.info("response: ${response.message}")
         }
     } catch (e: StatusRuntimeException) {
-      if (e.status.code == Status.Code.DEADLINE_EXCEEDED) {
-        logger.warning("RPC error: deadline exceeded")
-      } else {
-        logger.warning("RPC error: ${e.status}")
-      }
+      logger.warning("RPC error: ${e.status}")
     } finally {
       channel.shutdown().awaitTermination(10, TimeUnit.SECONDS)
     }

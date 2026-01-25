@@ -4,7 +4,6 @@ import com.example.grpc.EchoServiceGrpcKt
 import com.example.grpc.Loggers
 import com.example.grpc.echoRequest
 import io.grpc.ManagedChannelBuilder
-import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.runBlocking
@@ -36,11 +35,7 @@ object DeadlineServerStreamingCoroutineClient {
           logger.info("response: ${response.message}")
         }
     } catch (e: StatusRuntimeException) {
-      if (e.status.code == Status.Code.DEADLINE_EXCEEDED) {
-        logger.warning("RPC error: deadline exceeded")
-      } else {
-        logger.warning("RPC error: ${e.status}")
-      }
+      logger.warning("RPC error: ${e.status}")
     } finally {
       channel.shutdown().awaitTermination(10, TimeUnit.SECONDS)
     }

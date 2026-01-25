@@ -41,21 +41,4 @@ object CancellationServerStreamingServer {
       }
     }
   }
-  /*
-      override fun serverStreamingEcho(request: EchoRequest): Flow<EchoResponse> = flow {
-        val name = request.message
-        logger.info("request: $name")
-
-        try {
-          for (i in 0..9) {
-            emit(echoResponse { message = "hello $name $i" })
-            delay(1000L)
-          }
-        } catch (e: CancellationException) {
-          logger.info("server received cancellation")
-          throw e
-        }
-      }
-    }
-   */
 }

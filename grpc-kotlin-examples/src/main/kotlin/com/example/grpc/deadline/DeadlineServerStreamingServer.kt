@@ -30,7 +30,7 @@ object DeadlineServerStreamingServer {
           logger.info("response: ${response.message}")
           emit(response)
 
-          delay(i * 1000L)
+          delay(1000L)
         }
       }.onCompletion { cause ->
         if (cause != null) {

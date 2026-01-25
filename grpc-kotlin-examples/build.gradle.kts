@@ -1,4 +1,3 @@
-import com.google.protobuf.gradle.*
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
@@ -35,8 +34,8 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:${protobufVersion}"
-        artifact = "com.google.protobuf:protoc:${protobufVersion}"
+        //artifact = "com.google.protobuf:protoc:${protobufVersion}"
+        artifact = "com.google.protobuf:protoc:4.33.4"
     }
     plugins {
         create("grpc") {
@@ -45,7 +44,8 @@ protobuf {
 //            artifact = libs.protoc.gen.grpc.java.get().toString()
         }
         create("grpckt") {
-            artifact = libs.protoc.gen.grpc.kotlin.get().toString() + ":jdk8@jar"
+            artifact = "io.grpc:protoc-gen-grpc-kotlin:1.4.3:jdk8@jar"
+//            artifact = libs.protoc.gen.grpc.kotlin.get().toString() + ":jdk8@jar"
         }
     }
     generateProtoTasks {

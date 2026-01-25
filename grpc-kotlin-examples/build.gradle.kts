@@ -35,17 +35,13 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 protobuf {
     protoc {
         artifact = "com.google.protobuf:protoc:${project.findProperty("protobufVersion")}"
-//        artifact = "com.google.protobuf:protoc:4.33.4"
     }
     plugins {
         create("grpc") {
             artifact = "io.grpc:protoc-gen-grpc-java:${project.findProperty("grpcVersion")}"
-//            artifact = "io.grpc:protoc-gen-grpc-java:1.78.0"
-//            artifact = libs.protoc.gen.grpc.java.get().toString()
         }
         create("grpckt") {
             artifact = "io.grpc:protoc-gen-grpc-kotlin:${project.findProperty("grpcKotlinVersion")}:jdk8@jar"
-//            artifact = libs.protoc.gen.grpc.kotlin.get().toString() + ":jdk8@jar"
         }
     }
     generateProtoTasks {

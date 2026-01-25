@@ -8,7 +8,6 @@ import java.util.logging.Logger
 interface Loggers {
 
   companion object {
-
     fun init() {
       System.setProperty(
         "java.util.logging.SimpleFormatter.format",

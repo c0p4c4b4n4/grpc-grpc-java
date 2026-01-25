@@ -1,15 +1,17 @@
-package com.example.grpc;
+package com.example.grpc
 
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit
 
-public interface Delays {
+interface Delays {
 
-    static void sleep(int seconds) {
-        try {
-            TimeUnit.SECONDS.sleep(seconds);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-        }
+  companion object {
+    fun sleep(seconds: Int) {
+      try {
+        TimeUnit.SECONDS.sleep(seconds.toLong())
+      } catch (e: InterruptedException) {
+        Thread.currentThread().interrupt()
+        throw RuntimeException(e)
+      }
     }
+  }
 }

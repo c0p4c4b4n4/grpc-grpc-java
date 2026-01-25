@@ -5,7 +5,6 @@ import io.grpc.Metadata
 import io.grpc.ServerCall
 import io.grpc.ServerCallHandler
 import io.grpc.ServerInterceptor
-import java.util.logging.Level
 import java.util.logging.Logger
 
 internal class HeadersServerInterceptor : ServerInterceptor {
@@ -14,7 +13,7 @@ internal class HeadersServerInterceptor : ServerInterceptor {
     requestHeaders: Metadata?,
     next: ServerCallHandler<ReqT?, RespT?>
   ): ServerCall.Listener<ReqT?>? {
-    logger.log(Level.INFO, "header received from client: {0}", requestHeaders)
+    logger.info("header received from client: $requestHeaders")
     return next.startCall(object : SimpleForwardingServerCall<ReqT?, RespT?>(call) {
       override fun sendHeaders(responseHeaders: Metadata) {
         responseHeaders.put<String?>(CUSTOM_HEADER_KEY, "custom_response_value")

@@ -8,7 +8,6 @@ import io.grpc.ForwardingClientCall.SimpleForwardingClientCall
 import io.grpc.ForwardingClientCallListener.SimpleForwardingClientCallListener
 import io.grpc.Metadata
 import io.grpc.MethodDescriptor
-import java.util.logging.Level
 import java.util.logging.Logger
 
 internal class HeadersClientInterceptor : ClientInterceptor {
@@ -22,7 +21,7 @@ internal class HeadersClientInterceptor : ClientInterceptor {
         headers.put<String?>(CUSTOM_HEADER_KEY, "custom_request_value")
         super.start(object : SimpleForwardingClientCallListener<RespT?>(responseListener) {
           override fun onHeaders(responseHeaders: Metadata?) {
-            logger.log(Level.INFO, "header received from server: {0}", responseHeaders)
+            logger.info("header received from server: $responseHeaders")
             super.onHeaders(responseHeaders)
           }
         }, headers)

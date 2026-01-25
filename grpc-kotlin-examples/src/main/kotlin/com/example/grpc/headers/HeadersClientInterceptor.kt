@@ -11,6 +11,11 @@ import io.grpc.MethodDescriptor
 import java.util.logging.Logger
 
 internal class HeadersClientInterceptor : ClientInterceptor {
+  private val logger: Logger = Logger.getLogger(HeadersClientInterceptor::class.java.getName())
+
+  private val CUSTOM_HEADER_KEY: Metadata.Key<String?> =
+    Metadata.Key.of<String?>("custom_client_header", Metadata.ASCII_STRING_MARSHALLER)
+
   override fun <ReqT, RespT> interceptCall(
     method: MethodDescriptor<ReqT?, RespT?>?,
     callOptions: CallOptions?,
@@ -27,11 +32,5 @@ internal class HeadersClientInterceptor : ClientInterceptor {
         }, headers)
       }
     }
-  }
-
-  companion object {
-    private val logger: Logger = Logger.getLogger(HeadersClientInterceptor::class.java.getName())
-    private val CUSTOM_HEADER_KEY: Metadata.Key<String?> =
-      Metadata.Key.of<String?>("custom_client_header", Metadata.ASCII_STRING_MARSHALLER)
   }
 }

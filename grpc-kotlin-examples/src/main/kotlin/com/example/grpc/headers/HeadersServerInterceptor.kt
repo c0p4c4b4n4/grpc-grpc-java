@@ -8,6 +8,11 @@ import io.grpc.ServerInterceptor
 import java.util.logging.Logger
 
 internal class HeadersServerInterceptor : ServerInterceptor {
+  private val logger: Logger = Logger.getLogger(HeadersServerInterceptor::class.java.getName())
+
+  private val CUSTOM_HEADER_KEY: Metadata.Key<String?> =
+    Metadata.Key.of<String?>("custom_server_header", Metadata.ASCII_STRING_MARSHALLER)
+
   override fun <ReqT, RespT> interceptCall(
     call: ServerCall<ReqT?, RespT?>?,
     requestHeaders: Metadata?,
@@ -20,11 +25,5 @@ internal class HeadersServerInterceptor : ServerInterceptor {
         super.sendHeaders(responseHeaders)
       }
     }, requestHeaders)
-  }
-
-  companion object {
-    private val logger: Logger = Logger.getLogger(HeadersServerInterceptor::class.java.getName())
-    private val CUSTOM_HEADER_KEY: Metadata.Key<String?> =
-      Metadata.Key.of<String?>("custom_server_header", Metadata.ASCII_STRING_MARSHALLER)
   }
 }

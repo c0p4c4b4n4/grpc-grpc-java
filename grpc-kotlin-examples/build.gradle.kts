@@ -1,10 +1,6 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
-//  application
-
-//  alias(libs.plugins.kotlin.jvm)
-
-//  alias(libs.plugins.protobuf)
-
     id("com.google.protobuf") version System.getProperty("protobufPluginVersion")
     id("org.jetbrains.kotlin.jvm") version System.getProperty("kotlinPluginVersion")
     id("com.gradleup.shadow") version System.getProperty("shadowPluginVersion")
@@ -14,19 +10,14 @@ repositories {
     mavenCentral()
     mavenLocal()
 }
-//plugins {
-//  java
-//  id("com.google.protobuf") version "0.9.4" // Replace with your actual version
-//  id("com.gradleup.shadow") version "8.3.5" // Replace with your actual version
-//}
 
 dependencies {
-    implementation("io.grpc:grpc-stub:${project.findProperty("grpcVersion")}")
     implementation("io.grpc:grpc-protobuf:${project.findProperty("grpcVersion")}")
+    implementation("io.grpc:grpc-stub:${project.findProperty("grpcVersion")}")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${project.findProperty("kotlinCoroutinesVersion")}")
-    implementation("com.google.protobuf:protobuf-kotlin:${project.findProperty("protobufKotlinVersion")}")
     implementation("io.grpc:grpc-kotlin-stub:${project.findProperty("grpcKotlinVersion")}")
+    implementation("com.google.protobuf:protobuf-kotlin:${project.findProperty("protobufKotlinVersion")}")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${project.findProperty("kotlinCoroutinesVersion")}")
 
     runtimeOnly("io.grpc:grpc-netty-shaded:${project.findProperty("grpcVersion")}")
 }
@@ -64,4 +55,9 @@ protobuf {
             }
         }
     }
+}
+
+tasks.named<ShadowJar>("shadowJar") {
+    mergeServiceFiles()
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }

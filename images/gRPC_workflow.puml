@@ -9,46 +9,46 @@ skinparam defaultTextAlignment center
 skinparam linetype ortho
 skinparam ranksep 30
 
-rectangle "client" as client4
-rectangle "channel" as client3
-rectangle "client stub" as client2
-rectangle "gRPC runtime" as client1
-rectangle "transport" as client0
+rectangle "client" as client5
+rectangle "channel" as client4
+rectangle "client stub" as client3
+rectangle "gRPC runtime" as client2
+rectangle "transport" as client1
 
-rectangle "server" as server4
-rectangle "service" as server3
-rectangle "service stub" as server2
-rectangle "gRPC runtime" as server1
-rectangle "transport" as server0
+rectangle "server" as server5
+rectangle "service" as server4
+rectangle "service stub" as server3
+rectangle "gRPC runtime" as server2
+rectangle "transport" as server1
 
 rectangle "ProtoBuf" as protobuf
 rectangle "HTTP/2" as http
 
+client5 -d- client4
 client4 -d- client3
 client3 -d- client2
+client2 -[hidden]d- client1
 client2 -d- client1
-client1 -[hidden]d- client0
-client1 -d- client0
-client1 -[hidden]d- client0
-client1 -[hidden]d- client0
-client1 -[hidden]d- client0
-client1 -[hidden]d- client0
-client1 -[hidden]d- client0
+client2 -[hidden]d- client1
+client2 -[hidden]d- client1
+client2 -[hidden]d- client1
+client2 -[hidden]d- client1
+client2 -[hidden]d- client1
 
+server5 -d- server4
 server4 -d- server3
 server3 -d- server2
+server2 -[hidden]d- server1
 server2 -d- server1
-server1 -[hidden]d- server0
-server1 -d- server0
-server1 -[hidden]d- server0
-server1 -[hidden]d- server0
-server1 -[hidden]d- server0
-server1 -[hidden]d- server0
+server2 -[hidden]d- server1
+server2 -[hidden]d- server1
+server2 -[hidden]d- server1
+server2 -[hidden]d- server1
 
-client2 -[dotted]r- protobuf
-protobuf -[dotted]r- server2
+client3 -[dotted]r- protobuf
+protobuf -[dotted]r- server3
 
-client0 -r- http
-http -r- server0
+client1 -r- http
+http -r- server1
 
 @enduml

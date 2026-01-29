@@ -1,0 +1,21 @@
+FROM gradle:jdk17-alpine AS build
+WORKDIR /app
+
+COPY gradlew .
+COPY gradle gradle
+COPY discovery-service/build.gradle .
+COPY settings.gradle .
+RUN chmod +x gradlew
+
+RUN ./gradlew dependencies --no-daemon
+
+COPY discovery-service/src src
+
+RUN ./gradlew assemble --no-daemon -x test
+
+# Runtime stage
+FROM eclipse-temurin:17-jre-alpine-3.22
+WORKDIR /app
+COPY --from=build /app/build/libs/*.jar app.jar
+EXPOSE 8761
+CMD ["java", "-jar", "app.jar"]
